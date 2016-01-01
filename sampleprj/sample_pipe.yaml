@@ -1,0 +1,19 @@
+dry_run: False  # TODO
+vars:
+  workspace: 'test'
+tasks:
+ - executor: executors.dummy
+   cmd: "anything"
+ - executor: executors.bash
+   cmd: "sleep 1 && echo {{workspace}} > ~/hhh"
+ - executor: executors.python
+   virtualenv: /Users/juha/work/getpipeline/.venv
+   workdir: /Users/juha/work/getpipeline/test
+   script: test_script.py
+plugins:
+  - pipelineplugins.dummy_executor.DummyExecutor
+  - pipelineplugins.stdout_logger.StdoutLogger
+  - class: pipelineplugins.webhook_logger.WebhookLogger
+    webhook_url: 'https://hooks.slack.com/services/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'
+  - pipelineplugins.bash_executor.BashExecutor
+  - pipelineplugins.python_executor.PythonExecutor
