@@ -1,6 +1,6 @@
 # Pipelines Command Line Tool
 
-Pipelines is a CLI tool to manage running tasks.
+Pipelines is a simple tool to manage running tasks.
 
 Pipeline definition file uses YAML syntax. Example:
 
