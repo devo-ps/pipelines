@@ -18,9 +18,9 @@ class WebhookLogger(StdoutLogger):
 
     @classmethod
     def from_dict(cls, conf_dict):
-        print conf_dict
         if 'webhook_url' not in conf_dict:
-            raise PluginError('WebhookLogger is missing webhook_url parameter')
+            raise PluginError('WebhookLogger is missing webhook_url'
+                              'configuration parameter')
 
         if not isinstance(conf_dict['webhook_url'], basestring):
             raise PluginError('WebhookLogger has invalid webhook_url parameter')

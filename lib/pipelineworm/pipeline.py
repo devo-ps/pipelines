@@ -6,6 +6,8 @@ import os
 
 import yaml
 
+import pipelineplugins
+from pipelineplugins import builtin_plugins
 from pipelineworm.exceptions import PipelineError
 from pipelineworm.task import Task
 from pipelineworm.var_processing import substitute_variables
@@ -14,6 +16,19 @@ from pluginworm.manager import PluginManager
 
 REQUIRED_DEF_KEYS = ['tasks']
 log = logging.getLogger()
+
+DEFAULT_PLUGINS = [
+    'stdout_logger',
+    'bash',
+    'python'
+]
+
+DEFAULTS = {
+    'task': {
+        'type': 'bash',
+        'param': 'cmd',
+    }
+}
 
 class Pipeline(object):
 
@@ -25,9 +40,10 @@ class Pipeline(object):
         for key in REQUIRED_DEF_KEYS:
             if key not in definition_dict:
                 raise PipelineError('Pipeline definition is missing {}' % type(definition_dict))
+
         tasks = definition_dict['tasks']
         plugins = definition_dict.get('plugins', [])
-        return Pipeline(tasks, plugins)
+        return Pipeline(tasks, plugins, state=definition_dict)
 
 
     @staticmethod
@@ -43,20 +59,24 @@ class Pipeline(object):
                 pipeline_def = yaml.load(f)
             except yaml.YAMLError as e:
                 log.exception(e)
-                raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s' % e.message)
+                err_msg = e.problem
+                err_msg += ' (line: {})'.format(e.problem_mark.line)
+                raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s' % err_msg)
 
         vars = pipeline_def.get('vars', {})
         pipeline_def = substitute_variables(vars, pipeline_def)
 
         return Pipeline.form_dict(pipeline_def)
 
-    def __init__(self, tasks, plugins):
+    def __init__(self, tasks, plugins, state):
         self.tasks = []
+        self.state = state
+
         self.plugin_mgr = PluginManager()
-
+        plugins.extend(DEFAULT_PLUGINS)
         self.load_plugins(plugins)
-        self.load_tasks(tasks)
 
+        self.load_tasks(tasks)
 
     def load_plugins(self, plugins):
         for plugin in plugins:
@@ -64,7 +84,8 @@ class Pipeline(object):
 
     def load_tasks(self, tasks):
         for i, task in enumerate(tasks):
-            task_obj = Task.from_dict(task)
+            normalized_task = self._normalize_task_dict(task)
+            task_obj = Task.from_dict(normalized_task)
             if not task_obj.name:
                 task_obj.name = 'Task-{}'.format(i+1)
             self.tasks.append(task_obj)
@@ -72,10 +93,28 @@ class Pipeline(object):
     def run(self):
         self.plugin_mgr.trigger('on_pipeline_start')
 
+        prev_result = None
         for task in self.tasks:
-            self._run_task(task)
+            if self._should_run(task, prev_result):
+                prev_result = self._run_task(task)
+            else:
+                log.debug('Skipping task: {}'.format(task.name))
 
         self.plugin_mgr.trigger('on_pipeline_finish')
+
+    def _should_run(self, task, prev_result):
+
+        if prev_result is None:
+            return True
+
+        if task.always_run:
+            return True
+
+        if prev_result.is_successful():
+            return True
+
+        return False
+
 
     def _run_task(self, task):
         log.debug('Starting to execute task {}'.format(task.name))
@@ -96,20 +135,45 @@ class Pipeline(object):
         self.plugin_mgr.trigger('on_task_finish', task, result)
         log.debug('Task finished. Result: %s' % result)
 
-    def _load_plugin(self, plugin):
-        if isinstance(plugin, basestring):
-            plugin = {'class': plugin}
+        return result
 
-        plugin_dict = plugin
+    def _load_plugin(self, plugin_str):
+        if not isinstance(plugin_str, basestring):
+            raise PluginError('Plugins must be a string, got {}'.format(plugin_str))
 
-        plugin_class = plugin_dict.pop('class')
-        try:
-            module, class_name = plugin_class.rsplit('.', 1)
-            m = importlib.import_module(module)
-        except ImportError:
-            raise PluginError('Could not import plugin {}'.format(plugin_class))
+        if plugin_str in builtin_plugins:
+            plugin_class = builtin_plugins[plugin_str]
+        else:
+            plugin_class = _parse_class(plugin_str)
 
-        if not hasattr(m, class_name):
-            raise PluginError('Could not find class for plugin {}'.format(plugin_class))
+        self.plugin_mgr.register_plugin(plugin_class, self.state.get('configuration'))
 
-        self.plugin_mgr.register_plugin(getattr(m, class_name), plugin_dict)
+    def _normalize_task_dict(self, task):
+        # Ensure dict
+        if not isinstance(task, dict):
+            task = {
+                'type': DEFAULTS['task']['type'],
+                DEFAULTS['task']['param']: task
+            }
+
+        # Ensure type
+        if 'type' not in task:
+            task['type'] = DEFAULTS['task']['type']
+
+        return task
+
+def _parse_class(class_path):
+    plugin_dict = class_path
+
+    plugin_class = plugin_dict.pop('class')
+    try:
+        module, class_name = plugin_class.rsplit('.', 1)
+        m = importlib.import_module(module)
+
+    except ImportError:
+        raise PluginError('Could not import plugin {}'.format(plugin_class))
+
+    if not hasattr(m, class_name):
+        raise PluginError('Could not find class for plugin {}'.format(plugin_class))
+
+    return getattr(m, plugin_class)

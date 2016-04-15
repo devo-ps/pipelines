@@ -28,7 +28,6 @@ class PluginManager():
 
     def get_plugin_count(self, hook_name=None):
         if hook_name is None:
-            print self.plugins
             return reduce(lambda counter, p: counter+len(p), self.plugins.values(), 0)
 
         if hook_name in self.plugins:

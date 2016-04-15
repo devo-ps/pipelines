@@ -102,7 +102,7 @@ class StdoutLogger(BasePlugin):
         # import json
         # print json.dumps(self.stats['tasks'], default=datetime_serializer)
 
-        fail_count = len(filter(lambda task: not task['result'].isSuccessful(),
+        fail_count = len(filter(lambda task: not task['result'].is_successful(),
                                 self.stats['tasks']))
 
         return 'Pipeline finished. Duration: {duration}, {fail_count} failed tasks'.format(

@@ -1,14 +1,14 @@
 import logging
 
-from pipelineplugins.base_executor import ExecutionResult, EXECUTION_SUCCESSFUL, BaseExecutorPlugin, EXECUTION_FAILED
 from pipelineplugins.bash_executor import BashExecutor, BashExecuteError
+from pipelineworm.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
 from pluginworm.exceptions import PluginError
 from os import path
 
 log = logging.getLogger()
 
 class PythonExecutor(BashExecutor):
-    hook_prefix = 'executors.python'
+    hook_prefix = 'python'
     hooks = ('execute',)
 
     def _parse_args_dict(self, args_dict):
@@ -35,7 +35,7 @@ class PythonExecutor(BashExecutor):
         log.debug('Running python script: {}'.format(bash_input))
 
         if self.dry_run:
-            return ExecutionResult(EXECUTION_SUCCESSFUL)
+            return TaskResult(EXECUTION_SUCCESSFUL)
 
 
         try:
@@ -45,7 +45,7 @@ class PythonExecutor(BashExecutor):
             status = EXECUTION_FAILED
             stdout = e.stderr
 
-        return ExecutionResult(status, stdout)
+        return TaskResult(status, stdout)
 
 
 if __name__ == '__main__':

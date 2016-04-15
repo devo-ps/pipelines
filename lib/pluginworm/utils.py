@@ -3,8 +3,7 @@ import logging
 
 from datetime import datetime, timedelta
 
-from pipelineplugins.base_executor import ExecutionResult
-from pipelineworm.task import Task
+from pipelineworm.task import Task, TaskResult
 
 
 def class_name(obj):
@@ -39,7 +38,7 @@ def datetime_serializer(obj):
         })
         return serial
 
-    if isinstance(obj, ExecutionResult):
+    if isinstance(obj, TaskResult):
         serial = json.dumps({
             'status': obj.status,
             'message': obj.message

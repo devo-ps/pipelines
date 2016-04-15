@@ -26,6 +26,26 @@ plugins:
   - pipelineplugins.python_executor.PythonExecutor
  ```
 
+```yaml
+
+vars:
+  workdir: /opt/myprj
+
+configuration:
+  slack:
+    webhook: 'http://...'
+
+tasks:
+ - type: bash
+   cmd: 'echo blah'
+ - "echo blah2"
+ - type: python
+   script: 'test_script.py'
+   virtualenv: '{{ workdir }}/.venv'
+   workdir: '{{ workdir }}'
+ ```
+
+
 ## Installation
 
  To install simply run:

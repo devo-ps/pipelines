@@ -1,4 +1,5 @@
-from pipelineplugins.base_executor import ExecutionResult, EXECUTION_SUCCESSFUL, BaseExecutorPlugin
+from pipelineplugins.base_executor import BaseExecutorPlugin
+from pipelineworm.task import TaskResult, EXECUTION_SUCCESSFUL
 from pluginworm.exceptions import PluginError
 
 
@@ -19,7 +20,7 @@ class DummyExecutor(BaseExecutorPlugin):
         cmd = self._parse_args_dict(args_dict)
 
         if self.dry_run:
-            return ExecutionResult(EXECUTION_SUCCESSFUL, 'Dry run')
+            return TaskResult(EXECUTION_SUCCESSFUL, 'Dry run')
 
         print 'Running executor with command: %s' % cmd
-        return ExecutionResult(EXECUTION_SUCCESSFUL, 'Dummy execute completed')
+        return TaskResult(EXECUTION_SUCCESSFUL, 'Dummy execute completed')
