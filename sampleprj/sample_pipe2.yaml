@@ -1,14 +1,9 @@
 vars:
-  workdir: '/Users/juha/work/pipelines'
-
-configuration:
-  webhook_url: 'https://hooks.slack.com/services/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'
-
+  workspace: '/opt/superproject'
+  log_file: somelogfile.log
+  status_file: somestatusfile.json
 tasks:
- - type: bash
-   cmd: 'echo blah'
- - "echo blah2"
- - type: python
-   script: 'test/test_script.py'
-   virtualenv: '{{ workdir }}/.venv'
-   workdir: '{{ workdir }}'
+ - "find ../.."
+plugins: []
+# - file_logger
+# - status_logger

@@ -1,3 +1,4 @@
+import json
 import logging
 
 from pipelineplugins.base_executor import BaseExecutorPlugin
@@ -16,6 +17,9 @@ class BashExecuteError(PluginError):
 class BashExecutor(BaseExecutorPlugin):
     hook_prefix = 'bash'
     hooks = ('execute',)
+
+    def __init__(self, log_file=None):
+        self.log_file = log_file
 
     def _parse_args_dict(self, args_dict):
         if 'cmd' not in args_dict:
@@ -47,17 +51,25 @@ class BashExecutor(BaseExecutorPlugin):
 
         from sh import bash
         stdout = ''
+        f = None
+        if self.log_file:
+            f = open(self.log_file, 'w+')
+
         try:
-            for line in bash(_in=bash_input):
+            for line in bash(_in=bash_input, _iter=True):
                 log.debug('BashExec stdout: {}'.format(line))
                 stdout += line
+                if f:
+                    f.write(line)
         except ErrorReturnCode as e:
             log.debug('BashExec failed')
             raise BashExecuteError(e.stderr, e.exit_code)
 
         return stdout
 
-
+    @classmethod
+    def from_dict(cls, conf_dict):
+        return cls(conf_dict.get('log_file'))
 
 if __name__ == '__main__':
     from pluginworm.utils import setup_logging

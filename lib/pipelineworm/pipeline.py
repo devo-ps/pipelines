@@ -1,4 +1,5 @@
 import importlib
+import json
 import logging
 import re
 
@@ -20,7 +21,8 @@ log = logging.getLogger()
 DEFAULT_PLUGINS = [
     'stdout_logger',
     'bash',
-    'python'
+    'python',
+    'status_logger'
 ]
 
 DEFAULTS = {
@@ -47,7 +49,7 @@ class Pipeline(object):
 
 
     @staticmethod
-    def from_yaml(file_path):
+    def from_yaml(file_path, params):
         if not isinstance(file_path, basestring):
             raise PipelineError('Unexpected argument type %s expecting string' % type(file_path))
 
@@ -63,6 +65,13 @@ class Pipeline(object):
                 err_msg += ' (line: {})'.format(e.problem_mark.line)
                 raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s' % err_msg)
 
+        if not 'vars' in pipeline_def:
+            pipeline_def['vars'] = {}
+
+        # Merge parameters to variables dict
+        pipeline_def['vars'].update(params)
+
+        # Substitute {{ }} variables in tasks
         vars = pipeline_def.get('vars', {})
         pipeline_def = substitute_variables(vars, pipeline_def)
 
@@ -140,13 +149,12 @@ class Pipeline(object):
     def _load_plugin(self, plugin_str):
         if not isinstance(plugin_str, basestring):
             raise PluginError('Plugins must be a string, got {}'.format(plugin_str))
-
         if plugin_str in builtin_plugins:
             plugin_class = builtin_plugins[plugin_str]
         else:
             plugin_class = _parse_class(plugin_str)
 
-        self.plugin_mgr.register_plugin(plugin_class, self.state.get('configuration'))
+        self.plugin_mgr.register_plugin(plugin_class, self.state.get('vars'))
 
     def _normalize_task_dict(self, task):
         # Ensure dict

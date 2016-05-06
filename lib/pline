@@ -32,7 +32,10 @@ def main():
     log = logging.getLogger()
 
     try:
-        pipe = Pipeline.from_yaml(configfile)
+        pipe = Pipeline.from_yaml(configfile, params={
+            'status_file': 'status.json',
+            'log_file': 'log.log'
+        })
         pipe.run()
     except PipelineError as e:
         log.error(e.message)
