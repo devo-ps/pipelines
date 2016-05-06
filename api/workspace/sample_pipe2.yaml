@@ -3,7 +3,7 @@ vars:
   log_file: somelogfile.log
   status_file: somestatusfile.json
 tasks:
- - "find .."
+ - "find ."
 plugins: []
 # - file_logger
 # - status_logger

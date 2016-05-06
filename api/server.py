@@ -69,6 +69,26 @@ class GetPipelinesHandler(RequestHandler):
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
+class GetLogsHandler(RequestHandler):
+
+    def get(self, pipeline_slug, task_id):
+        workspace = self.settings['workspace_path']
+        log.debug('Getting all pipelines')
+
+        with open(os.path.join(workspace, pipeline_slug, task_id, 'output.log')) as f:
+            self.write(json.dumps({'output': f.read()}, indent=2))
+            self.finish()
+
+class GetStatusHandler(RequestHandler):
+
+    def get(self, pipeline_slug, task_id):
+        workspace = self.settings['workspace_path']
+        log.debug('Getting all pipelines')
+
+        with open(os.path.join(workspace, pipeline_slug, task_id, 'status.json')) as f:
+            self.write(f.read())
+            self.finish()
+
 class RunPipelineHandler(RequestHandler):
     @gen.coroutine
     def post(self, pipeline_slug):
@@ -97,6 +117,8 @@ def make_app():
     return Application([
         url(r"/api/pipelines/", GetPipelinesHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/run", RunPipelineHandler),
+        url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
+        url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
         #url(r"/", HelloHandler),
         ],
         workspace_path= 'workspace'
