@@ -1,8 +1,8 @@
 import logging
 
-from pluginworm.base_plugin import BasePlugin
-from pluginworm.exceptions import PluginError
-from pluginworm.utils import class_name
+from pipelines.plugin.base_plugin import BasePlugin
+from pipelines.plugin.exceptions import PluginError
+from pipelines.plugin.utils import class_name
 
 log = logging.getLogger()
 

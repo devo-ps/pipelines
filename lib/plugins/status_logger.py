@@ -1,7 +1,7 @@
 import json
 
-from pluginworm.base_plugin import BasePlugin
-from pluginworm.exceptions import PluginError
+from pipelines.plugin.base_plugin import BasePlugin
+from pipelines.plugin.exceptions import PluginError
 
 
 class StatusLogger(BasePlugin):

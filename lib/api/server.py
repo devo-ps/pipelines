@@ -8,7 +8,7 @@ from uuid import uuid4
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.web import RequestHandler, Application, url, HTTPError
-from pipelineworm.pipeline import Pipeline
+from pipelines.pipeline.pipeline import Pipeline
 from concurrent.futures import ThreadPoolExecutor
 from tornado import concurrent, ioloop
 

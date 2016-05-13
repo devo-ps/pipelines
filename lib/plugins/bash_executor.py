@@ -1,9 +1,9 @@
 import json
 import logging
 
-from pipelineplugins.base_executor import BaseExecutorPlugin
-from pipelineworm.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
-from pluginworm.exceptions import PluginError
+from pipelines.plugins.base_executor import BaseExecutorPlugin
+from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
+from pipelines.plugin.exceptions import PluginError
 from sh import ErrorReturnCode
 
 log = logging.getLogger()

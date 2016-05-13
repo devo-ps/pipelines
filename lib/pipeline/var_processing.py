@@ -1,6 +1,6 @@
 import re
 
-from pipelineworm.exceptions import PipelineError
+from pipelines.pipeline.exceptions import PipelineError
 
 
 def substitute_variables(vars, obj):

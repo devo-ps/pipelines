@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
 
-from pluginworm.base_plugin import BasePlugin
-from pluginworm.utils import datetime_serializer
+from pipelines.plugin.base_plugin import BasePlugin
+from pipelines.plugin.utils import datetime_serializer
 
 log = logging.getLogger()
 

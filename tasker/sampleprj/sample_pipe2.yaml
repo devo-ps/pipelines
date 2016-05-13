@@ -1,9 +1,0 @@
-vars:
-  workspace: '/opt/superproject'
-  log_file: somelogfile.log
-  status_file: somestatusfile.json
-tasks:
- - "find ../.."
-plugins: []
-# - file_logger
-# - status_logger
