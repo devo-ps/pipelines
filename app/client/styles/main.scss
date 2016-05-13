@@ -1,0 +1,96 @@
+body {
+  font-family: "Helvetica Neue", serif;
+  font-size: 16px;
+}
+
+.content {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  width: 100%;
+}
+section {
+  margin: auto;
+  width: 960px;
+}
+
+.icon {
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  fill: currentColor;
+
+  &-circle-right{
+    color: #777;
+  }
+
+  &-checkmark {
+    color: green;
+  }
+}
+
+.pipeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    margin-top: 15px;
+  }
+}
+
+.task {
+  border: 1px solid #ddd;
+  display: block;
+  width: 100%;
+  padding: 10px;
+
+  &-id,
+  &-name,
+  &-action {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  &-id {
+    width: 20%;
+  }
+  &-name {
+    width: 70%;
+  }
+  &-action {
+    width: 10%;
+    .icon-circle-right {    
+      cursor: pointer;
+    }
+  }
+}
+.details {
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #444;
+  color: #fff;
+  padding: 10px;
+  min-height: 60px;
+  max-height: 400px;
+}
+
+.spinning {
+  animation-name:spin;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.disabled {
+  pointer-events: none;
+  cursor: none;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
