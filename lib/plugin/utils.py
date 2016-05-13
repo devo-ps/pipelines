@@ -3,7 +3,7 @@ import logging
 
 from datetime import datetime, timedelta
 
-from pipelineworm.task import Task, TaskResult
+from pipelines.pipeline.task import Task, TaskResult
 
 
 def class_name(obj):

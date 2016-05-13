@@ -1,8 +1,8 @@
 import logging
 
-from pipelineplugins.bash_executor import BashExecutor, BashExecuteError
-from pipelineworm.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
-from pluginworm.exceptions import PluginError
+from pipelines.plugins.bash_executor import BashExecutor, BashExecuteError
+from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
+from pipelines.plugin.exceptions import PluginError
 from os import path
 
 log = logging.getLogger()

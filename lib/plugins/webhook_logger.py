@@ -1,7 +1,7 @@
 import logging
 import requests
-from pipelineplugins.stdout_logger import StdoutLogger
-from pluginworm.exceptions import PluginError
+from pipelines.plugins.stdout_logger import StdoutLogger
+from pipelines.plugin.exceptions import PluginError
 
 RETRY_COUNT = 2
 

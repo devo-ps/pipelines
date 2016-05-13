@@ -7,13 +7,13 @@ import os
 
 import yaml
 
-import pipelineplugins
-from pipelineplugins import builtin_plugins
-from pipelineworm.exceptions import PipelineError
-from pipelineworm.task import Task
-from pipelineworm.var_processing import substitute_variables
-from pluginworm.exceptions import PluginError
-from pluginworm.manager import PluginManager
+import pipelines.plugins
+from pipelines.plugins import builtin_plugins
+from pipelines.pipeline.exceptions import PipelineError
+from pipelines.pipeline.task import Task
+from pipelines.pipeline.var_processing import substitute_variables
+from pipelines.plugin.exceptions import PluginError
+from pipelines.plugin.manager import PluginManager
 
 REQUIRED_DEF_KEYS = ['tasks']
 log = logging.getLogger()

@@ -1,6 +1,6 @@
-from pipelineworm.exceptions import PipelineError
-from pipelineworm.task import TaskResult
-from pluginworm.base_plugin import BasePlugin
+from pipelines.pipeline.exceptions import PipelineError
+from pipelines.pipeline.task import TaskResult
+from pipelines.plugin.base_plugin import BasePlugin
 
 class BaseExecutorPlugin(BasePlugin):
     dry_run = False

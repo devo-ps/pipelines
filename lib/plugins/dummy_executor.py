@@ -1,6 +1,6 @@
-from pipelineplugins.base_executor import BaseExecutorPlugin
-from pipelineworm.task import TaskResult, EXECUTION_SUCCESSFUL
-from pluginworm.exceptions import PluginError
+from pipelines.plugins.base_executor import BaseExecutorPlugin
+from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL
+from pipelines.plugin.exceptions import PluginError
 
 
 class DummyExecutor(BaseExecutorPlugin):
