@@ -53,17 +53,21 @@ class StdoutLogger(BasePlugin):
         self._add_task_start_stats(task)
 
         if 'on_task_start' in self.write_on:
-            msg =  'Task started: {task_name}'.format(task_name=task.name)
+            msg = 'Task started: {task_name}'.format(task_name=task.name)
             self.write(msg)
 
     def on_task_finish(self, task, result):
         self._add_task_finish_stats(result)
 
         if 'on_task_finish' in self.write_on:
-            msg =  ('Task finished, name: {task_name}, status: {task_status}, '
-                    'msg: {message}').format(task_name = task.name,
-                                             task_status = result.status,
-                                             message=result.message)
+            msg = (
+                'Task finished, name: {task_name}, status: {task_status}, '
+                'msg: {message}'
+            ).format(
+                task_name = task.name,
+                task_status = result.status,
+                message=result.message
+            )
 
             self.write(msg)
 
@@ -85,7 +89,7 @@ class StdoutLogger(BasePlugin):
         task_stat = self.stats['tasks'][-1]
         task_stat.update({
             'end': now,
-            'duration': now-task_stat['start'],
+            'duration': now - task_stat['start'],
             'result': result
         })
 
@@ -95,7 +99,7 @@ class StdoutLogger(BasePlugin):
     def _add_pipeline_finish_stats(self):
         now = datetime.now()
         self.stats['finish'] = now
-        self.stats['duration'] = now-self.stats['start']
+        self.stats['duration'] = now - self.stats['start']
 
 
     def _generate_report(self, msg_format):
@@ -115,8 +119,8 @@ class StdoutLogger(BasePlugin):
 
     def _duration_str(self, duration):
         total_seconds = duration.total_seconds()
-        hours, rest = divmod(total_seconds,60*60)
-        minutes, seconds = divmod(rest,60)
+        hours, rest = divmod(total_seconds, 60 * 60)
+        minutes, seconds = divmod(rest, 60)
         ret = ''
         if hours:
             ret += '{}h '.format(hours)

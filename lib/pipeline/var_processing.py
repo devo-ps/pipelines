@@ -52,11 +52,11 @@ if __name__ == '__main__':
         'testvar2': '--{{ var-2 }}',
         'testvar3': '{{ var_3}}jj',
         'test:{{var1}}': '{{var1}}',
-        'testlist': [ 'norm', '{{var1}}', '{{var-2}}', 'norm2' ],
+        'testlist': ['norm', '{{var1}}', '{{var-2}}', 'norm2'],
         'testdict': {
-          '{{var1}}': 'vvv',
-          'd2': '{{var1}}',
-          'nested': ['nest1', 'nestvar{{var-2}}']
+            '{{var1}}': 'vvv',
+            'd2': '{{var1}}',
+            'nested': ['nest1', 'nestvar{{var-2}}']
         }
 
     }

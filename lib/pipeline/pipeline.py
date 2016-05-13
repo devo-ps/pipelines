@@ -65,7 +65,7 @@ class Pipeline(object):
                 err_msg += ' (line: {})'.format(e.problem_mark.line)
                 raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s' % err_msg)
 
-        if not 'vars' in pipeline_def:
+        if 'vars' not in pipeline_def:
             pipeline_def['vars'] = {}
 
         # Merge parameters to variables dict
@@ -96,7 +96,7 @@ class Pipeline(object):
             normalized_task = self._normalize_task_dict(task)
             task_obj = Task.from_dict(normalized_task)
             if not task_obj.name:
-                task_obj.name = 'Task-{}'.format(i+1)
+                task_obj.name = 'Task-{}'.format(i + 1)
             self.tasks.append(task_obj)
 
     def run(self):
