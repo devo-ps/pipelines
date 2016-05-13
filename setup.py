@@ -21,14 +21,14 @@ setup(
     author_email='pipelines@wirecraft.com',
     license='MIT',
     package_dir={ 
-        '': 'tasker',
-        'pipelinesapi': 'api' 
+        'pipelines': 'lib',
     },
     packages=[
-        'pipelinesapi',
-        'pipelineplugins',
-        'pipelineworm',
-        'pluginworm'
+        'pipelines',
+        'pipelines.pipeline',
+        'pipelines.api',
+        'pipelines.plugins',
+        'pipelines.plugin'
     ],
     scripts=[
         'bin/pipelines-api'
