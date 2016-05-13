@@ -10,3 +10,6 @@ tornado==4.3
 #
 mock
 nose
+pep8
+pyflakes
+coverage
