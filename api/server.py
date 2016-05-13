@@ -27,6 +27,13 @@ def conf_logging():
 conf_logging()
 log = logging.getLogger('applog')
 
+class BaseHandler(RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
+
 class AsyncRunner(object):
     __instance = None
 
@@ -57,7 +64,7 @@ def _slugify_file(filename):
     basename = filename.rsplit('/', 1)[-1]
     return basename.rsplit('.', 1)[0]
 
-class GetPipelinesHandler(RequestHandler):
+class GetPipelinesHandler(BaseHandler):
 
     def get(self):
         workspace = self.settings['workspace_path']
@@ -69,7 +76,7 @@ class GetPipelinesHandler(RequestHandler):
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
-class GetLogsHandler(RequestHandler):
+class GetLogsHandler(BaseHandler):
 
     def get(self, pipeline_slug, task_id):
         workspace = self.settings['workspace_path']
@@ -79,7 +86,7 @@ class GetLogsHandler(RequestHandler):
             self.write(json.dumps({'output': f.read()}, indent=2))
             self.finish()
 
-class GetStatusHandler(RequestHandler):
+class GetStatusHandler(BaseHandler):
 
     def get(self, pipeline_slug, task_id):
         workspace = self.settings['workspace_path']
@@ -89,7 +96,7 @@ class GetStatusHandler(RequestHandler):
             self.write(f.read())
             self.finish()
 
-class RunPipelineHandler(RequestHandler):
+class RunPipelineHandler(BaseHandler):
     @gen.coroutine
     def post(self, pipeline_slug):
         workspace = self.settings['workspace_path']
