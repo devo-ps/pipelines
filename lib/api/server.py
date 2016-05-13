@@ -126,8 +126,7 @@ def make_app():
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/run", RunPipelineHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
-        #url(r"/", HelloHandler),
-        ],
+    ],
         workspace_path= 'workspace'
     )
 

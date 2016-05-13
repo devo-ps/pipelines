@@ -33,7 +33,7 @@ class WebhookLogger(StdoutLogger):
             'text': msg
         }
 
-        for i in range(RETRY_COUNT+1):
+        for i in range(RETRY_COUNT + 1):
             resp = requests.post(self.webhook_url, json=payload)
             if resp.ok:
                 log.debug('Successfully sent webhook')

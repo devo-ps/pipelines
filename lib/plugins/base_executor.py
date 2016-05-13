@@ -6,7 +6,7 @@ class BaseExecutorPlugin(BasePlugin):
     dry_run = False
 
     def call(self, *args, **kwargs):
-        result =  self.execute(*args, **kwargs)
+        result = self.execute(*args, **kwargs)
         if not isinstance(result, TaskResult):
             raise PipelineError('Executor did not return type ExecutionResult, got {}'.format(type(result)))
 

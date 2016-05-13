@@ -22,13 +22,14 @@ class PluginManager():
                 results.append(ret)
             except Exception as e:
                 log.error('Unknown error running callback {} hook {}, aborting.'.format(
-                        cb.__name__, hook_name))
+                    cb.__name__, hook_name)
+                )
                 raise
         return results
 
     def get_plugin_count(self, hook_name=None):
         if hook_name is None:
-            return reduce(lambda counter, p: counter+len(p), self.plugins.values(), 0)
+            return reduce(lambda counter, p: counter + len(p), self.plugins.values(), 0)
 
         if hook_name in self.plugins:
             return len(self.plugins[hook_name])
@@ -37,7 +38,8 @@ class PluginManager():
     def register_plugin(self, plugin_class, conf_dict):
         if not issubclass(plugin_class, BasePlugin):
             raise PluginError('Trying to register plugin that is not extending BasePlugin: {}'.format(
-                    class_name(plugin_class)))
+                class_name(plugin_class))
+            )
 
         plugin = plugin_class.from_dict(conf_dict)
 

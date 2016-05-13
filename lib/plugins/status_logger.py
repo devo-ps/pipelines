@@ -28,10 +28,10 @@ class StatusLogger(BasePlugin):
         return StatusLogger(conf_dict['status_file'])
 
     def on_pipeline_start(self, *args):
-        self._write({ 'status': 'processing' })
+        self._write({'status': 'processing'})
 
     def on_pipeline_finish(self, *args):
-        self._write({ 'status': 'success' })
+        self._write({'status': 'success'})
 
     def _write(self, status):
         with open(self.file_path, 'w+') as f:
