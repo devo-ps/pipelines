@@ -3,6 +3,7 @@ import json
 import logging
 
 import os
+import re
 from uuid import uuid4
 
 from tornado import gen
@@ -64,15 +65,28 @@ def _slugify_file(filename):
     basename = filename.rsplit('/', 1)[-1]
     return basename.rsplit('.', 1)[0]
 
+def _run_id_iterator(slug):
+    for sub_folder in os.listdir(slug):
+        if _is_valid_uuid(sub_folder):
+            yield sub_folder
+
+def _is_valid_uuid(uuid):
+    regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+    match = regex.match(uuid)
+    return bool(match)
+
 class GetPipelinesHandler(BaseHandler):
 
     def get(self):
         workspace = self.settings['workspace_path']
         log.debug('Getting all pipelines')
-
         pipelines = []
         for path in _file_iterator(workspace, extension='yaml'):
-            pipelines.append({'slug': _slugify_file(path)})
+            slug = _slugify_file(path)
+            full_path = os.path.join(workspace, slug)
+            if os.path.isdir(full_path):
+                ids = list(_run_id_iterator(full_path))
+                pipelines.append({ 'slug': slug, 'run_ids': ids })
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
@@ -127,7 +141,7 @@ def make_app():
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
     ],
-        workspace_path= 'workspace'
+        workspace_path= 'fixtures/workspace'
     )
 
 def main():
