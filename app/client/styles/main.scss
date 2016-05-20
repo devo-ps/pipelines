@@ -1,3 +1,5 @@
+@import "normalize.scss";
+
 body {
   font-family: "Helvetica Neue", serif;
   font-size: 16px;
@@ -11,7 +13,7 @@ body {
 }
 section {
   margin: auto;
-  width: 960px;
+  width: 760px;
 }
 
 .icon {
@@ -19,11 +21,14 @@ section {
   width: 2em;
   height: 2em;
   fill: currentColor;
+  cursor: pointer;
 
-  &-circle-right{
+  &-run{
+    color: green;
+  }
+  &-running {
     color: #777;
   }
-
   &-checkmark {
     color: green;
   }
@@ -39,30 +44,46 @@ section {
   }
 }
 
-.task {
-  border: 1px solid #ddd;
+.panel {
   display: block;
-  width: 100%;
-  padding: 10px;
-
-  &-id,
-  &-name,
-  &-action {
+  padding: 10px 25px;
+  border: 1px solid #ddd;
+  &-content {
+    width: 80%;
+  }
+  &-control {
+    width: 20%;
+    text-align: right;
+  }
+  &-content,
+  &-control {
     display: inline-block;
     vertical-align: middle;
   }
 
-  &-id {
-    width: 20%;
-  }
-  &-name {
-    width: 70%;
-  }
+}
+.task {
   &-action {
-    width: 10%;
-    .icon-circle-right {    
-      cursor: pointer;
+    margin-right: 10px;
+  }
+  &-summary {
+    p {
+      margin: 0;
+      color: #777;
     }
+  }
+  &-summary,
+  &-action {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+.collapse {
+  display: none;
+
+  &.in {
+    display: block;
+    min-height: 60px;
   }
 }
 .details {
@@ -71,8 +92,12 @@ section {
   background-color: #444;
   color: #fff;
   padding: 10px;
-  min-height: 60px;
   max-height: 400px;
+  overflow-y: auto;
+  .loading {
+    display: block;
+    text-align: center;
+  }
 }
 
 .spinning {

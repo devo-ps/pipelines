@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react'
 import {Collapse} from 'react-bootstrap';
-import classnames from 'classnames'
 import LoadingIcon from '../LoadingIcon'
 import * as API from '../../api'
 
@@ -26,6 +25,10 @@ export default class Task extends Component {
         this.pollingLog()
         this.pollingStatus()
       })
+  }
+
+  toggleMenu () {
+    this.setState({ open: !this.state.open })
   }
 
   pollingStatus () {
@@ -69,22 +72,32 @@ export default class Task extends Component {
 
   render () {
     const {task} = this.props
-    let runBtn = classnames({'disabled': this.state.running})
+    let runBtn = <span onClick={::this.onRun}><svg className='icon icon-run'><use xlinkHref='#icon-play2'></use></svg></span>
+    let runSpinnerBtn = <svg className='icon icon-running spinning'><use xlinkHref='#icon-spinner9'></use></svg>
 
     return (
       <div className='wrapper'>
-        <div className='task'>
-            <div className='task-id'>{task.slug || '2344ddfs'}</div>
-            <div className='task-name'>{task.name || 'Testing getpipeline.com'}</div>
+        <div className='panel'>
+          <div className='task panel-content'>
             <div className='task-action'>
-              {!this.state.status && <span onClick={::this.onRun} className={runBtn}><svg className='icon icon-circle-right'><use xlinkHref='#icon-circle-right'></use></svg></span>}
-              {this.state.status === 'success' && <svg className='icon icon-checkmark'><use xlinkHref='#icon-checkmark'></use></svg>}
+              {!this.state.running && runBtn}
+              {this.state.running && runSpinnerBtn}
             </div>
+            <div className='task-summary'>
+              <div className='title'>{task.slug || '2344ddfs'}</div>
+              {this.state.running && <p><small>Task is running</small></p>}
+              {this.state.status === 'success' && <p><small>Task run successfully</small></p>}
+            </div>
+          </div>
+          <div className='panel-control'>
+            {!this.state.open && <span onClick={::this.toggleMenu}><svg className='icon icon-menu'><use xlinkHref='#icon-menu'></use></svg></span>}
+            {this.state.open && <span onClick={::this.toggleMenu}><svg className='icon icon-cross'><use xlinkHref='#icon-cross'></use></svg></span>}
+          </div>
         </div>
         <Collapse in={this.state.open}>
           <div className='details'>
           {this.state.taskLog}
-          {this.state.running && <LoadingIcon /> }
+          {this.state.running && <span className='loading'><LoadingIcon /></span> }
           </div>
         </Collapse>
       </div>
