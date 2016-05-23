@@ -37,6 +37,7 @@ setup(
         'PyYAML==3.11',
         'requests==2.9.1',
         'sh==1.11',
-        'tornado==4.3'
+        'tornado==4.3',
+        'docopt==0.6.2'
     ],
 )
