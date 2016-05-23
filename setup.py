@@ -3,9 +3,7 @@ import os
 import sys
 import shutil
 
-# from shazam import __version__, __author__
-__version__ = '0.0.1'
-__author__ = 'Wirecraft'
+from pipelines import __version__, __author__
 
 try:
     from setuptools import setup
@@ -21,7 +19,7 @@ setup(
     author_email='pipelines@wirecraft.com',
     license='MIT',
     package_dir={ 
-        'pipelines': 'lib',
+        'pipelines': 'pipelines',
     },
     packages=[
         'pipelines',
@@ -31,7 +29,7 @@ setup(
         'pipelines.plugin'
     ],
     scripts=[
-        'bin/pipelines-api'
+        'bin/pipelines'
     ],
     install_requires = [],
 )
