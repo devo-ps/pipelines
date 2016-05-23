@@ -31,5 +31,12 @@ setup(
     scripts=[
         'bin/pipelines'
     ],
-    install_requires = [],
+    install_requires = [
+        'futures==3.0.5',
+        'Jinja2==2.8',
+        'PyYAML==3.11',
+        'requests==2.9.1',
+        'sh==1.11',
+        'tornado==4.3'
+    ],
 )
