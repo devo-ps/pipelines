@@ -28,7 +28,7 @@ Configuration
 
 The configuration files can be found in `/etc/pipelines/`.
 
-``Currently not supported! too bad, come back at 0.0.3!``
+``Currently not supported! too bad, come back at 0.1.0!``
 
 pipelines.conf
 --------------
@@ -122,3 +122,18 @@ Pipeline definition file uses YAML syntax. Example:
         virtualenv: /Users/juha/work/getpipeline/.venv
         workdir: /Users/juha/work/getpipeline/test
         script: test_script.py
+
+Roadmap
+=======
+
+No definitive roadmap for the moment, mainly focusing on having a lean code base (heavy refactoring to come).
+
+Among the possible features:
+
+- better web UI
+- better webhook management
+- better management of the tasks (celery?)
+- better CLI 
+- toolbar 
+- auth
+- etc.
