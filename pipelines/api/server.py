@@ -134,19 +134,19 @@ class RunPipelineHandler(BaseHandler):
         yield runner.run(yaml_filepath, folder_path)
 
 
-def make_app():
+def make_app(workspace='fixtures/workspace'):
     return Application([
         url(r"/api/pipelines/", GetPipelinesHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/run", RunPipelineHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
     ],
-        workspace_path= 'fixtures/workspace'
+        workspace_path=workspace
     )
 
-def main():
-    app = make_app()
-    app.listen(8888)
+def main(config):
+    app = make_app(config.get('workspace'))
+    app.listen(int(config.get('port', 8888)), address=config.get('host', '127.0.0.1'))
     print('Starting ioloop')
     io_loop = IOLoop.current()
     io_loop.start()
