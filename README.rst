@@ -65,7 +65,8 @@ Start the API with the following:
 
     pipelines api
 
-## Run as a daemon
+Run as a daemon
+---------------
 
 Create a dedicated user to run pipelines
 
