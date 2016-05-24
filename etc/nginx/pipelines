@@ -1,0 +1,12 @@
+server {
+  listen 443 ssl;
+
+  server_name example.com;
+
+  ssl_certificate /etc/nginx/ssl/server.crt;
+  ssl_certificate_key /etc/nginx/ssl/server.key; 
+
+  location / {
+    proxy_pass http://127.0.0.1:8888;
+  }
+}
