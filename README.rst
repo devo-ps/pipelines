@@ -73,7 +73,7 @@ Create a dedicated user to run pipelines
 .. code-block:: bash
 
     # Create a pipelines user
-    useradd -m -d /var/lib/pipelines -s /sbin/nologin pipelines
+    useradd -m -d /var/lib/pipelines -s /bin/false pipelines
     
     # Create the workspace folder (optional)
     mkdir /var/lib/pipelines/workspace
