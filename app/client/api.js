@@ -1,6 +1,6 @@
 import superagent from 'superagent'
 
-const API_URL = 'http://localhost:8888/api/pipelines'
+const API_URL = 'https://pipelines.service.wiredcraft.com:4443/api/pipelines'
 
 function request(method, url) {
   return superagent(method, `${API_URL}${url}`)

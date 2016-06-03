@@ -87,13 +87,15 @@ section {
   }
 }
 .details {
-  margin: 5px;
-  border-radius: 5px;
-  background-color: #444;
-  color: #fff;
-  padding: 10px;
-  max-height: 400px;
-  overflow-y: auto;
+  .logs {    
+    margin: 15px 5px;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+    padding: 10px;
+    // max-height: 400px;
+    overflow-y: auto;
+  }
   .loading {
     display: block;
     text-align: center;
@@ -117,5 +119,37 @@ section {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+.job-id {
+  width: 60px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  background: #ddd;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+.task-details {
+  border: 1px solid #ddd;
+  border-top: none;
+  
+  li {
+    margin: 0;
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    &.active {
+      border-right: none; 
+    }
+    span {
+      margin-right: 5px;
+    }
+  }
+  nav .icon {
+    font-size: 10px;
   }
 }

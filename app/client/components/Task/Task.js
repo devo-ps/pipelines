@@ -11,17 +11,48 @@ export default class Task extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {open: false};
+    this.state = {open: false, runTasks: [], historyTasks: []};
+  }
+
+  componentDidMount () {
+    const {task} = this.props
+
+    if (task.run_ids && task.run_ids.length > 0) {
+      let temp = task.run_ids
+
+      Promise.all(temp.map((id, idx) => {
+        return API.getPipelineStatus(task.slug, id)
+          .then((result) => {
+            return {status: result.status, id: id}
+          })
+      }))
+      .then((result) => {
+        this.setState({
+          historyTasks: result
+        })
+      })
+
+      API.getPipelineLog(task.slug, task.run_ids[0])
+        .then((result) => {
+          this.setState({taskLog: result.output})
+        })
+    }
   }
 
   onRun () {
     const {task} = this.props
+    let tmp = this.state.runTasks
     this.setState({ open: !this.state.open })
 
     API.runPipeline(task.slug)
       .then((data) => {
         console.log(data)
-        this.setState({taskId: data.task_id, running: true})
+        tmp.unshift({status: 'running', id: data.task_id})
+        this.setState({
+          taskId: data.task_id,
+          running: true,
+          runTasks: tmp
+        })
         this.pollingLog()
         this.pollingStatus()
       })
@@ -72,8 +103,22 @@ export default class Task extends Component {
 
   render () {
     const {task} = this.props
+    const {runTasks, historyTasks} = this.state
     let runBtn = <span onClick={::this.onRun}><svg className='icon icon-run'><use xlinkHref='#icon-play2'></use></svg></span>
     let runSpinnerBtn = <svg className='icon icon-running spinning'><use xlinkHref='#icon-spinner9'></use></svg>
+
+    let pastJobs = runTasks.concat(historyTasks).map((item, index) => {
+      return (
+        <li key={'historyTasks'+index} className={index === 0 ? 'active' : ''}>
+          <span>
+          {item.status === 'success'
+            ? <svg className='icon icon-checkmark'><use xlinkHref='#icon-checkmark'></use></svg>
+            : <svg className='icon icon-cross'><use xlinkHref='#icon-cross'></use></svg>}
+          </span>
+          <span className='job-id'>{item.id}</span>
+        </li>
+      )
+    })
 
     return (
       <div className='wrapper'>
@@ -95,10 +140,21 @@ export default class Task extends Component {
           </div>
         </div>
         <Collapse in={this.state.open}>
-          <div className='details'>
-          {this.state.taskLog}
-          {this.state.running && <span className='loading'><LoadingIcon /></span> }
-          </div>
+          <section className='task-details'>
+            <div className='mui-row'>
+            <nav className='mui-col-md-3'>
+              <ul className='mui-list--unstyled'>
+                {pastJobs}
+              </ul>
+            </nav>
+            <div className='details mui-col-md-9'>
+              <p className='logs'>
+                {this.state.taskLog}
+              </p>
+            {this.state.running && <span className='loading'><LoadingIcon /></span> }
+            </div>
+            </div>
+            </section>
         </Collapse>
       </div>
     );
