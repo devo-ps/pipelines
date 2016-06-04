@@ -7,3 +7,8 @@ tasks:
 plugins: []
 # - file_logger
 # - status_logger
+triggers:
+ - name: gh-webhook
+   type: github
+ - name: slack-webhook
+   type: slack

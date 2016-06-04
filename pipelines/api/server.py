@@ -4,6 +4,7 @@ import logging
 
 import os
 import re
+import yaml
 from uuid import uuid4
 
 from tornado import gen
@@ -12,6 +13,8 @@ from tornado.web import RequestHandler, Application, url, HTTPError
 from pipelines.pipeline.pipeline import Pipeline
 from concurrent.futures import ThreadPoolExecutor
 from tornado import concurrent, ioloop
+
+WEB_HOOK_CONFIG = 'webhook.json'
 
 def conf_logging():
     logger = logging.getLogger('applog')
@@ -75,6 +78,27 @@ def _is_valid_uuid(uuid):
     match = regex.match(uuid)
     return bool(match)
 
+def _get_webhook_id(dict):
+    if not os.path.exists(WEB_HOOK_CONFIG):
+        return str(uuid4())
+    json_data = open(WEB_HOOK_CONFIG).read()
+    m = json.loads(json_data)
+    for k,v in m.items():
+        if cmp(dict, v) == 0:
+            return k
+    return str(uuid4())
+
+def _get_slug_trigger(webhook_id):
+    if not os.path.exists(WEB_HOOK_CONFIG):
+        raise HTTPError(404, 'Webhook config not found')
+    json_data = open(WEB_HOOK_CONFIG).read()
+    try:
+        m = json.loads(json_data)[webhook_id]
+    except KeyError as ke:
+        return ()
+    log.debug('wh content %s', m)
+    return (m['slug'], m['wh_name'])
+
 class GetPipelinesHandler(BaseHandler):
 
     def get(self):
@@ -110,29 +134,69 @@ class GetStatusHandler(BaseHandler):
             self.write(f.read())
             self.finish()
 
+def _run_pipeline(handler, workspace, slug):
+    yaml_filepath = os.path.join(workspace, '%s.yaml' % slug)
+    log.debug('_run_pipeline')
+    if not os.path.exists(yaml_filepath):
+        print('not found %s' % yaml_filepath)
+        raise HTTPError(404, 'Pipeline not found')
+
+    task_id = str(uuid4())
+    folder_path = os.path.join(workspace, slug, task_id)
+    os.makedirs(folder_path)
+
+    handler.write(json.dumps({'task_id': task_id}, indent=2))
+    handler.finish()
+
+    runner = AsyncRunner()
+    yield runner.run(yaml_filepath, folder_path)
+
+
 class RunPipelineHandler(BaseHandler):
     @gen.coroutine
     def post(self, pipeline_slug):
         workspace = self.settings['workspace_path']
         log.debug('Running pipeline')
+        return _run_pipeline(self, workspace, pipeline_slug)
 
-        # payload = json.loads(self.request.body.decode())
+class WebhookHandler(BaseHandler):
+    @gen.coroutine
+    def post(self, webhook_id):
+        workspace = self.settings['workspace_path']
+        t = _get_slug_trigger(webhook_id)
+        if len(t) == 2:
+            slug = t[0] #TODO may need the trigger name as well T.B.D
+            return _run_pipeline(self, workspace, slug)
+
+class GetTriggersHandler(BaseHandler):
+
+    def get(self, pipeline_slug):
+        workspace = self.settings['workspace_path']
+        log.debug('get triggers')
+
         yaml_filepath = os.path.join(workspace, '%s.yaml' % pipeline_slug)
 
         if not os.path.exists(yaml_filepath):
-            print 'not found %s' % yaml_filepath
+            print('not found %s' % yaml_filepath)
             raise HTTPError(404, 'Pipeline not found')
 
-        task_id = str(uuid4())
-        folder_path = os.path.join(workspace, pipeline_slug, task_id)
-        os.makedirs(folder_path)
-
-        self.write(json.dumps({'task_id': task_id}, indent=2))
-        self.finish()
-
-        runner = AsyncRunner()
-        yield runner.run(yaml_filepath, folder_path)
-
+        with open(yaml_filepath) as f:
+            try:
+                pipeline_def = yaml.load(f)
+                log.debug(pipeline_def)
+            except yaml.YAMLError as e:
+                log.exception(e)
+                raise HTTPError(500, 'Invali yaml config')
+            mapping = {}
+            for trigger in pipeline_def['triggers']:
+                id = _get_webhook_id({ 'slug': pipeline_slug, 'wh_name': trigger['name'] })
+                trigger['webhook_id'] =  id
+                mapping[id] = { 'slug': pipeline_slug, 'wh_name': trigger['name'] }
+            log.debug(mapping)
+            with open(WEB_HOOK_CONFIG, 'w') as wh_file:
+                json.dump(mapping, wh_file, indent=2)
+            self.write(json.dumps({'triggers': pipeline_def['triggers']}, indent=2))
+            self.finish()
 
 def make_app(workspace='fixtures/workspace'):
     return Application([
@@ -140,6 +204,8 @@ def make_app(workspace='fixtures/workspace'):
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/run", RunPipelineHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
+        url(r"/api/pipelines/([0-9a-zA-Z_]+)/triggers", GetTriggersHandler),
+        url(r"/api/webhook/([0-9a-zA-Z_\-]+)", WebhookHandler)
     ],
         workspace_path=workspace
     )
