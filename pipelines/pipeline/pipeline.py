@@ -124,21 +124,27 @@ class Pipeline(object):
 
         return False
 
+    def _validate_executor_plugin(self, executor_name):
+        plugin_name = '{}.execute'.format(executor_name)
+
+        if self.plugin_mgr.get_plugin_count(plugin_name) > 1:
+            raise PipelineError('More than one executor plugins with same name {}'.format(plugin_name))
+
+        if self.plugin_mgr.get_plugin_count(plugin_name) == 0:
+            raise PipelineError('Can not find executor plugin for {}'.format(plugin_name))
 
     def _run_task(self, task):
         log.debug('Starting to execute task {}'.format(task.name))
 
         self.plugin_mgr.trigger('on_task_start', task)
 
-        hook = '{}.execute'.format(task.executor)
+        plugin_name = '{}.execute'.format(task.executor)
 
-        if self.plugin_mgr.get_plugin_count(hook) > 1:
-            raise PipelineError('More than one executor plugins with same name {}'.format(hook))
+        self._validate_executor_plugin(plugin_name)
 
-        if self.plugin_mgr.get_plugin_count(hook) == 0:
-            raise PipelineError('Can not find executor plugin for {}'.format(hook))
+        # Run the executor
+        results = self.plugin_mgr.trigger(plugin_name, task.args)
 
-        results = self.plugin_mgr.trigger(hook, task.args)
         result = results[0]
 
         self.plugin_mgr.trigger('on_task_finish', task, result)
@@ -149,12 +155,16 @@ class Pipeline(object):
     def _load_plugin(self, plugin_str):
         if not isinstance(plugin_str, basestring):
             raise PluginError('Plugins must be a string, got {}'.format(plugin_str))
-        if plugin_str in builtin_plugins:
-            plugin_class = builtin_plugins[plugin_str]
-        else:
-            plugin_class = _parse_class(plugin_str)
 
+        plugin_class = self._resolve_plugin_class(plugin_str)
         self.plugin_mgr.register_plugin(plugin_class, self.state.get('vars'))
+
+
+    def _resolve_plugin_class(self, plugin_name):
+        if plugin_name in builtin_plugins:
+            return builtin_plugins[plugin_name]
+
+        return _parse_class(plugin_name)
 
     def _normalize_task_dict(self, task):
         # Ensure dict
