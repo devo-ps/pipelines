@@ -32,6 +32,8 @@ export default class Task extends Component {
         })
       })
 
+      this.setState({activeTask: task.run_ids[0]})
+
       API.getPipelineLog(task.slug, task.run_ids[0])
         .then((result) => {
           this.setState({taskLog: result.output})
@@ -101,6 +103,16 @@ export default class Task extends Component {
 
   }
 
+  getPastLog (taskId) {
+    // console.log(taskId)
+    this.setState({activeTask: taskId})
+
+    API.getPipelineLog(this.props.task.slug, taskId)
+      .then((result) => {
+        this.setState({taskLog: result.output})
+      })
+  }
+
   render () {
     const {task} = this.props
     const {runTasks, historyTasks} = this.state
@@ -109,11 +121,13 @@ export default class Task extends Component {
 
     let pastJobs = runTasks.concat(historyTasks).map((item, index) => {
       return (
-        <li key={'historyTasks'+index} className={index === 0 ? 'active' : ''}>
+        <li key={'historyTasks'+index}
+          onClick={this.getPastLog.bind(this, item.id)}
+          className={this.state.activeTask === item.id ? 'active' : ''}>
           <span>
           {item.status === 'success'
             ? <svg className='icon icon-checkmark'><use xlinkHref='#icon-checkmark'></use></svg>
-            : <svg className='icon icon-cross'><use xlinkHref='#icon-cross'></use></svg>}
+            : item.status === 'running' ? '' : <svg className='icon icon-cross'><use xlinkHref='#icon-cross'></use></svg>}
           </span>
           <span className='job-id'>{item.id}</span>
         </li>

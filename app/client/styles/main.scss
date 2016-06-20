@@ -144,6 +144,7 @@ section {
     border-bottom: 1px solid #ddd;
     &.active {
       border-right: none; 
+      cursor: pointer;
     }
     span {
       margin-right: 5px;
@@ -152,4 +153,21 @@ section {
   nav .icon {
     font-size: 10px;
   }
+}
+
+.collapse {
+  display: none;
+
+  &.in      { display: block; }
+  tr&.in    { display: table-row; }
+  tbody&.in { display: table-row-group; }
+}
+
+.collapsing {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  transition-property: "height, visibility";
+  transition-duration: .35s;
+  transition-timing-function: ease;
 }
