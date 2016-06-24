@@ -3,7 +3,9 @@ vars:
   log_file: somelogfile.log
   status_file: somestatusfile.json
 tasks:
- - "find ."
+ - "find '/tmp/Atom Crashes'"
+ - type: bash
+   cmd: "find '/etc/emond.d'"
 plugins: []
 # - file_logger
 # - status_logger

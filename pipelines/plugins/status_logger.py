@@ -11,19 +11,17 @@ class StatusLogger(BasePlugin):
         'on_pipeline_finish',
     )
 
-    def __init__(self, file_path):
+    def __init__(self, file_path=None):
         super(StatusLogger, self).__init__()
 
-        self.file_path = file_path
+        if file_path:
+            self.file_path = file_path
 
     @classmethod
     def from_dict(cls, conf_dict):
         if 'status_file' not in conf_dict:
-            raise PluginError('File logger is missing status_file'
-                              'configuration parameter')
-
-        if not isinstance(conf_dict['status_file'], basestring):
-            raise PluginError('File logger has invalid status_file parameter')
+            if not isinstance(conf_dict['status_file'], basestring):
+                raise PluginError('File logger has invalid status_file parameter')
 
         return StatusLogger(conf_dict['status_file'])
 
@@ -34,5 +32,9 @@ class StatusLogger(BasePlugin):
         self._write({'status': 'success'})
 
     def _write(self, status):
-        with open(self.file_path, 'w+') as f:
-            json.dump(status, f, indent=2)
+        if self.file_path:
+            with open(self.file_path, 'w+') as f:
+                json.dump(status, f, indent=2)
+        else:
+            # Write to stdout
+            print(json.dumps(status, indent=2))

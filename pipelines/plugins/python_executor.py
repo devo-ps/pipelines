@@ -49,10 +49,11 @@ class PythonExecutor(BashExecutor):
 
 
 if __name__ == '__main__':
-    from pluginworm.utils import setup_logging
-    setup_logging(logging.WARNING)
-    b = BashExecutor()
-    r = b.execute({'cmd': 'echo "test" && echo "test2"'})
-
-    print r.status
-    print r.message
+    pass
+    # from plugins.utils import setup_logging
+    # setup_logging(logging.WARNING)
+    # b = BashExecutor()
+    # r = b.execute({'cmd': 'echo "test" && echo "test2"'})
+    #
+    # print r.status
+    # print r.message

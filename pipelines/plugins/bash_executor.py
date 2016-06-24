@@ -72,7 +72,7 @@ class BashExecutor(BaseExecutorPlugin):
         return cls(conf_dict.get('log_file'))
 
 if __name__ == '__main__':
-    from pluginworm.utils import setup_logging
+    from plugin.utils import setup_logging
     setup_logging(logging.WARNING)
     b = BashExecutor()
     r = b.execute({'cmd': 'echo "test" && echo "test2"'})
