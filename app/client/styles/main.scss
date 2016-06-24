@@ -142,9 +142,9 @@ section {
     padding: 10px;
     border-right: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+    cursor: pointer;
     &.active {
       border-right: none; 
-      cursor: pointer;
     }
     span {
       margin-right: 5px;

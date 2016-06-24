@@ -44,14 +44,14 @@ export default class Task extends Component {
   onRun () {
     const {task} = this.props
     let tmp = this.state.runTasks
-    this.setState({ open: !this.state.open })
+    this.setState({ open: true, taskLog: '' })
 
     API.runPipeline(task.slug)
       .then((data) => {
         console.log(data)
         tmp.unshift({status: 'running', id: data.task_id})
         this.setState({
-          taskId: data.task_id,
+          activeTask: data.task_id,
           running: true,
           runTasks: tmp
         })
@@ -76,10 +76,16 @@ export default class Task extends Component {
   getStatus () {
     const {task} = this.props
 
-    return API.getPipelineStatus(task.slug, this.state.taskId)
+    return API.getPipelineStatus(task.slug, this.state.activeTask)
       .then((result) => {
         if (result.status === 'success') {
-          this.setState({running: false, status: 'success'})
+          let tmp = this.state.runTasks
+          tmp[0].status = 'success'
+          this.setState({
+            running: false,
+            status: 'success',
+            runTasks: tmp
+          })
         }
       })
 
@@ -96,7 +102,7 @@ export default class Task extends Component {
 
   getLog () {
     const {task} = this.props
-    return API.getPipelineLog(task.slug, this.state.taskId)
+    return API.getPipelineLog(task.slug, this.state.activeTask)
       .then((result) => {
         this.setState({taskLog: result.output})
       })
@@ -156,16 +162,16 @@ export default class Task extends Component {
         <Collapse in={this.state.open}>
           <section className='task-details'>
             <div className='mui-row'>
-            <nav className='mui-col-md-3'>
+            <nav className='mui-col-md-3 mui-col-xs-3'>
               <ul className='mui-list--unstyled'>
                 {pastJobs}
               </ul>
             </nav>
-            <div className='details mui-col-md-9'>
+            <div className='details mui-col-md-9 mui-col-xs-9'>
+              {this.state.running && <span className='loading'><LoadingIcon /></span> }
               <p className='logs'>
                 {this.state.taskLog}
               </p>
-            {this.state.running && <span className='loading'><LoadingIcon /></span> }
             </div>
             </div>
             </section>
