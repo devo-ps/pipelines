@@ -3,6 +3,6 @@
 
 *.pyc
 *.pyo
-
+fixtures/workspace
 *.egg-info
 dist
