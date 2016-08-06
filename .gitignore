@@ -5,11 +5,9 @@
 *.pyo
 fixtures/workspace
 *.egg-info
-dist
 
 node_modules
 npm-debug.log
-dist
 assets.json
 .DS_Store
 
