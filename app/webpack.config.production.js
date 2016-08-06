@@ -4,6 +4,8 @@ var webpack = require('webpack');
 var config = require('./webpack.config.base.js');
 
 var SaveAssetsJson = require('assets-webpack-plugin');
+var FileSystem = require('fs')
+var Path = require("path");
 
 config.bail = true;
 config.debug = false;
@@ -37,7 +39,26 @@ config.plugins = config.plugins.concat([
     'process.env': {
       NODE_ENV: JSON.stringify('production')
     }
-  })
+  }),
+        function() {
+            this.plugin("done", function(statsData) {
+                var stats = statsData.toJson();
+
+                if (!stats.errors.length) {
+                    var inFileName = "index.tpl.html";
+                    var outFileName = "index.html";
+                    var html = FileSystem.readFileSync(Path.join(__dirname, inFileName), "utf8");
+
+                    var htmlOutput = html.replace(
+                        /<script\s+src=(["'])(.+?)bundle\.js\1/i,
+                        "<script src=$1$2" + stats.assetsByChunkName.main[0] + "$1");
+
+                    FileSystem.writeFileSync(
+                        Path.join(__dirname, outFileName),
+                        htmlOutput);
+                }
+            });
+        }
 ]);
 
 config.module.loaders = config.module.loaders.concat([
