@@ -1,0 +1,22 @@
+# This is a sample of a pipeline that deploys code from GitHub to a Digital Ocean server
+# and send a notification on Slack upon success
+# The `id` of the pipeline is defined by the filename; `sample-deploy`
+
+vars:
+ slack_url: XXXX
+ code_branch: dev
+
+triggers:
+  # By default you can trigger the pipeline by hitting `http://example.com/wh/SECRET` (where `SECRET` is displayed in
+  # the Web UI). Maybe we can make overridable.
+  - type: webhook
+  - type: cron
+    schedule: XXX
+
+actions:
+ - type: bash
+   cmd: echo ansible-playbook deploy.yml -i hosts -u root -k -v --extra-vars "branch={{ code_branch }}"
+ - type: slack
+   message: 'Deployed !!'    # "Depoyed {{ code_branch }} with status {{ tasks.0.status }}!" # Big question: how do we format and assign stdout
+#   always_run: true
+ - 'echo "done"'

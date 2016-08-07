@@ -24,15 +24,23 @@ class StdoutLogger(BasePlugin):
     timestamp_format = '%Y:%m:%d %H:%M:%S'
     log_format = '{timestamp}: {message}'
 
+    log_file=None
 
-
-    def __init__(self, config={}):
-        self.log_duration = config.get('duration', False)
+    def __init__(self, log_file=None):
         self.stats = {
             'start': None,
             'finish': None,
             'tasks': []
         }
+        self.log_file = log_file
+
+    @classmethod
+    def from_dict(cls, conf_dict):
+        if 'log_file' in conf_dict:
+            print 'Found Log File for stdout logger: %s' % conf_dict['log_file']
+        else:
+            print 'No Log File for stdout logger'
+        return cls(conf_dict.get('log_file'))
 
     def on_pipeline_start(self, *args):
         self._add_pipeline_start_stats()
@@ -73,8 +81,14 @@ class StdoutLogger(BasePlugin):
 
     def write(self, msg):
         now_str = self._timestamp(datetime.now())
-        print(self.log_format.format(timestamp=now_str,
-                                     message=msg))
+
+        to_write = self.log_format.format(timestamp=now_str,
+                                          message=msg)
+        if self.log_file:
+            with open(self.log_file, 'a') as f:
+                f.write(to_write)
+        else:
+            print(to_write)
 
     def _add_task_start_stats(self, task):
         now = datetime.now()

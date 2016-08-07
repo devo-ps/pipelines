@@ -1,7 +1,5 @@
 import importlib
-import json
 import logging
-import re
 
 import os
 
@@ -9,8 +7,9 @@ import sys
 
 import yaml
 
-import pipelines.plugins
 from dotmap import DotMap
+
+from pipelines.pipeline.task import TaskResult, EXECUTION_FAILED
 from pipelines.plugins import builtin_plugins
 from pipelines.pipeline.exceptions import PipelineError
 from pipelines.pipeline.task import Task
@@ -19,14 +18,15 @@ from pipelines.plugin.exceptions import PluginError
 from pipelines.plugin.manager import PluginManager
 from schema import Or, Schema, Optional
 
-REQUIRED_DEF_KEYS = ['tasks']
 log = logging.getLogger()
 
 DEFAULT_PLUGINS = [
     'stdout_logger',
     'bash',
     'python',
-    'status_logger'
+    'status_logger',
+    'slack'
+    # 'webhook_logger'
 ]
 
 DEFAULTS = {
@@ -40,38 +40,43 @@ PIPELINES_SCHEMA = Schema({
     'vars': {
         basestring: basestring
     },
-    'tasks': [
-        Or(basestring, {
-            'type': basestring,
-            'cmd': basestring
-        })
+    'actions': [
+        Or(
+            basestring,
+            {
+                'type': basestring,
+                Optional('cmd'): basestring,
+                Optional('always_run'): bool,
+                Optional('message'): basestring,
+                Optional(basestring): basestring  # Allow custom keys for actions
+            }
+        )
     ],
-    'plugins': [
+    Optional('plugins'): [
         basestring
     ],
-    Optional('triggers'): {
-        'webhook': 'basestring'
-    }
+    Optional('triggers'): [{
+        'type': Or('webhook', 'cron'),
+        Optional('schedule'): basestring
+    }]
 })
 
 class Pipeline(object):
 
     @staticmethod
     def form_dict(definition_dict):
+        log.warning('Frondict: %s' % definition_dict)
         if not isinstance(definition_dict, dict):
             raise PipelineError('Unexpected argument type %s expecting dict' % type(definition_dict))
 
-        for key in REQUIRED_DEF_KEYS:
-            if key not in definition_dict:
-                raise PipelineError('Pipeline definition is missing {}' % type(definition_dict))
-
-        tasks = definition_dict['tasks']
+        tasks = definition_dict['actions']
         plugins = definition_dict.get('plugins', [])
         return Pipeline(tasks, plugins, state=definition_dict)
 
 
     @staticmethod
     def from_yaml(file_path, params):
+        log.warning('From yaml: %s %s' % (file_path, params))
         if not isinstance(file_path, basestring):
             raise PipelineError('Unexpected argument type %s expecting string' % type(file_path))
 
@@ -85,7 +90,7 @@ class Pipeline(object):
                 log.exception(e)
                 err_msg = e.problem
                 err_msg += ' (line: {})'.format(e.problem_mark.line)
-                raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s' % err_msg)
+                raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s - %s' % (file_path, err_msg))
 
 
         PIPELINES_SCHEMA.validate(pipeline_def)
@@ -113,6 +118,7 @@ class Pipeline(object):
         self.load_tasks(tasks)
 
     def load_plugins(self, plugins):
+        log.debug("Loading plugins: %s" % plugins)
         for plugin in plugins:
             self._load_plugin(plugin)
 
@@ -136,6 +142,7 @@ class Pipeline(object):
         for task in self.tasks:
             if self._should_run(task, pipeline_context):
                 result_obj = self._run_task(task)
+
                 pipeline_context.results.append(result_obj)
                 pipeline_context['prev_result'] = result_obj
                 if result_obj.get('status') != 0:
@@ -179,8 +186,12 @@ class Pipeline(object):
             log.warning('Unexpected error running task: %s' % e)
             log.exception(e)
             status = 1
+            results = [TaskResult(EXECUTION_FAILED, 'Unknown Error')]
 
         result = results[0]
+
+        if not result:
+            raise PipelineError('Result still missing')
 
         self.plugin_mgr.trigger('on_task_finish', task, result)
         log.debug('Task finished. Result: %s' % result)
@@ -215,21 +226,18 @@ class Pipeline(object):
 
         return task
 
-def _parse_class(class_path):
-    plugin_dict = class_path
-
-    plugin_class = plugin_dict.pop('class')
+def _parse_class(plugin_path):
     try:
-        module, class_name = plugin_class.rsplit('.', 1)
+        module, class_name = plugin_path.rsplit('.', 1)
         m = importlib.import_module(module)
 
     except ImportError:
-        raise PluginError('Could not import plugin {}'.format(plugin_class))
+        raise PluginError('Could not import plugin {}'.format(plugin_path))
 
     if not hasattr(m, class_name):
-        raise PluginError('Could not find class for plugin {}'.format(plugin_class))
+        raise PluginError('Could not find class for plugin {}'.format(plugin_path))
 
-    return getattr(m, plugin_class)
+    return getattr(m, plugin_path)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:

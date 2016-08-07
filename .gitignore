@@ -3,7 +3,6 @@
 
 *.pyc
 *.pyo
-fixtures/workspace
 *.egg-info
 
 node_modules
