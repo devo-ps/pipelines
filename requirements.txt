@@ -6,6 +6,7 @@ sh==1.11
 tornado==4.3
 docopt==0.6.2
 schema==0.5.0
+dotmap==1.2.0
 
 #
 # Dev

@@ -1,13 +1,14 @@
 import json
 import logging
 from pipelines.plugins.stdout_logger import StdoutLogger
+from pipelines.plugins.status_logger import StatusLogger
 from pipelines.plugin.exceptions import PluginError
 
 RETRY_COUNT = 2
 
 log = logging.getLogger()
 
-class FileLogger2(StdoutLogger):
+class FileLogger(StdoutLogger):
 
     def __init__(self, file_path):
         super(FileLogger, self).__init__()

@@ -25,7 +25,7 @@ class PluginManager():
                 log.error('Unknown error running callback {} hook {}, aborting.'.format(
                     cb.__name__, event_name)
                 )
-                raise
+                raise e
         return results
 
     def get_plugin_count(self, hook_name=None):
