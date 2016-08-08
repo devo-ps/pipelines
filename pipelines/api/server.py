@@ -88,8 +88,11 @@ class GetPipelinesHandler(BaseHandler):
             slug = _slugify_file(path)
             full_path = os.path.join(workspace, slug)
             if os.path.isdir(full_path):
+                # expect to have runs
                 ids = list(_run_id_iterator(full_path))
                 pipelines.append({'slug': slug, 'run_ids': ids})
+            else:
+                pipelines.append({'slug': slug, 'run_ids': []})
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
