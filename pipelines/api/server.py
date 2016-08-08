@@ -100,7 +100,7 @@ class GetLogsHandler(BaseHandler):
 
     def get(self, pipeline_slug, task_id):
         workspace = self.settings['workspace_path']
-        log.debug('Getting all pipelines')
+        log.debug('Getting pipeline logs')
 
         with open(os.path.join(workspace, pipeline_slug, task_id, 'output.log')) as f:
             self.write(json.dumps({'output': f.read()}, indent=2))
@@ -110,7 +110,7 @@ class GetStatusHandler(BaseHandler):
 
     def get(self, pipeline_slug, task_id):
         workspace = self.settings['workspace_path']
-        log.debug('Getting all pipelines')
+        log.debug('Getting pipeline status')
 
         with open(os.path.join(workspace, pipeline_slug, task_id, 'status.json')) as f:
             self.write(f.read())
