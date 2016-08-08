@@ -89,7 +89,7 @@ class GetPipelinesHandler(BaseHandler):
             full_path = os.path.join(workspace, slug)
             if os.path.isdir(full_path):
                 ids = list(_run_id_iterator(full_path))
-                pipelines.append({ 'slug': slug, 'run_ids': ids })
+                pipelines.append({'slug': slug, 'run_ids': ids})
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 

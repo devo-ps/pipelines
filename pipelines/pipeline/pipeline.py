@@ -1,15 +1,12 @@
-import importlib
-import json
-import logging
-import re
-
 import os
-
 import sys
+
+import importlib
+import logging
 
 import yaml
 
-import pipelines.plugins
+# import pipelines.plugins
 from dotmap import DotMap
 from pipelines.plugins import builtin_plugins
 from pipelines.pipeline.exceptions import PipelineError
