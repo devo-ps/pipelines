@@ -151,8 +151,8 @@ def make_app(workspace='fixtures/workspace'):
         workspace_path=workspace
     )
 
-def main(config):
-    app = make_app(config.get('workspace'))
+def main(config={}):
+    app = make_app(config.get('workspace', 'fixtures/workspace'))
     app.listen(int(config.get('port', 8888)), address=config.get('host', '127.0.0.1'))
     print('Starting ioloop')
     io_loop = IOLoop.current()

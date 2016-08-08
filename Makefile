@@ -18,7 +18,8 @@ NOSETESTS := nosetests
 .PHONY: test
 
 test:
-	PYTHONPATH=./pipelines $(NOSETESTS) -d -v -w test
+	# PYTHONPATH=./pipelines $(NOSETESTS) -d -v -w test/*
+	PYTHONPATH=. $(NOSETESTS) -d -v -w test/*
 
 pep8:
 	@echo "#############################################"
