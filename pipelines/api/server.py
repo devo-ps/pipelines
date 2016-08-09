@@ -154,9 +154,14 @@ class GetLogsHandler(PipelinesRequestHandler):
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline logs')
 
-        with open(os.path.join(workspace, pipeline_slug, task_id, 'output.log')) as f:
-            self.write(json.dumps({'output': f.read()}, indent=2))
+        logfile_path = os.path.join(workspace, pipeline_slug, task_id, 'output.log')
+        if not os.path.exists(logfile_path):
+            self.write(json.dumps({}))
             self.finish()
+        else:
+            with open(logfile_path) as f:
+                self.write(json.dumps({'output': f.read()}, indent=2))
+                self.finish()
 
 class GetStatusHandler(PipelinesRequestHandler):
 
@@ -165,9 +170,14 @@ class GetStatusHandler(PipelinesRequestHandler):
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline status')
 
-        with open(os.path.join(workspace, pipeline_slug, task_id, 'status.json')) as f:
-            self.write(f.read())
+        statusfile_path = os.path.join(workspace, pipeline_slug, task_id, 'status.log')
+        if not os.path.exists(statusfile_path):
+            self.write(json.dumps({}))
             self.finish()
+        else:
+            with open(statusfile_path) as f:
+                self.write(f.read())
+                self.finish()
 
 class RunPipelineHandler(PipelinesRequestHandler):
     @gen.coroutine
