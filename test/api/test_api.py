@@ -45,7 +45,7 @@ class TestAPIs(AsyncHTTPTestCase):
         '''
         Run an existing pipeline
         '''
-        url = '/api/pipelines/sample_pipe2/run'
+        url = '/api/pipelines/sample-deploy/run'
         response = self.fetch(url, method='POST', body='')
         self.assertEqual(response.code, 200)
 
@@ -62,7 +62,7 @@ class TestAPIs(AsyncHTTPTestCase):
         '''
         Fetch the status of a pipeline run
         '''
-        url = ("/api/pipelines/sample_pipe2/"
+        url = ("/api/pipelines/sample-deploy/"
         "50ec8b7b-ea4f-4df3-9362-1912b971c406/status")
     
         response = self.fetch(url)
@@ -81,7 +81,7 @@ class TestAPIs(AsyncHTTPTestCase):
         '''
         Fetching logs from saved pipeline's run
         '''
-        url = ("/api/pipelines/sample_pipe2/50ec8b7b-ea4f-4df3-9362-1912b971c406/log")
+        url = ("/api/pipelines/sample-deploy/f3387895-bdcf-4261-9d3f-4214d64db520/log")
         response = self.fetch(url)
         self.assertEqual(response.code, 200)
 
@@ -121,6 +121,8 @@ class TestAPIs(AsyncHTTPTestCase):
         resp_status2 = self.fetch(url_status % (pipeline_id, task_id))
         self.assertTrue(resp_status2.code, 200)
         json_status2 = json.loads(resp_status2.body)
+        print 'ddd'
+        print json_status2
         self.assertEqual(json_status2['status'], 'success')
 
 
