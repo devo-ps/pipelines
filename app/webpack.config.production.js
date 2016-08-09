@@ -13,7 +13,7 @@ config.profile = false;
 config.devtool = '#source-map';
 
 config.output = {
-  path: './client/dist',
+  path: '../pipelines/app_dist/client/dist',
   pathInfo: true,
   publicPath: '/client/dist/',
   filename: 'bundle.[hash].min.js'
@@ -46,7 +46,7 @@ config.plugins = config.plugins.concat([
 
                 if (!stats.errors.length) {
                     var inFileName = "index.tpl.html";
-                    var outFileName = "index.html";
+                    var outFileName = "../pipelines/app_dist/index.html";
                     var html = FileSystem.readFileSync(Path.join(__dirname, inFileName), "utf8");
 
                     var htmlOutput = html.replace(

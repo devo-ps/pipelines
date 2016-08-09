@@ -38,6 +38,8 @@ setup(
         'requests==2.9.1',
         'sh==1.11',
         'tornado==4.3',
-        'docopt==0.6.2'
+        'docopt==0.6.2',
+        'dotmap==1.1.16',
+        'schema==0.5.0'
     ],
 )

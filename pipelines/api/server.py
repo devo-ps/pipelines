@@ -17,6 +17,8 @@ from tornado.web import (
     authenticated,
     StaticFileHandler
 )
+
+from pipelines import PipelinesError
 from pipelines.pipeline.pipeline import Pipeline
 from concurrent.futures import ThreadPoolExecutor
 from tornado import concurrent, ioloop
@@ -38,6 +40,10 @@ log = logging.getLogger('applog')
 
 class PipelinesRequestHandler(RequestHandler):
     def get_current_user(self):
+        if not self.settings.get('auth'):
+            # No authentication required
+            return 'guest'
+
         user_cookie = self.get_secure_cookie("user")
         if user_cookie:
             return json.loads(user_cookie)
@@ -186,6 +192,9 @@ class AuthStaticFileHandler(StaticFileHandler, PipelinesRequestHandler):
         return super(AuthStaticFileHandler, self).get(*args, **kwargs)
 
 def make_app(workspace='fixtures/workspace', auth=None):
+    if not os.path.isdir(workspace):
+        raise PipelinesError('Workspace is not a valid directory: %s' % workspace)
+
     auth_dict=None
     if auth:
         auth_dict = {
@@ -193,13 +202,15 @@ def make_app(workspace='fixtures/workspace', auth=None):
             'username': auth[0],
             'password': auth[1]
         }
+
+
     return Application([
         url(r"/api/pipelines/", GetPipelinesHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/run", RunPipelineHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
         (r"/login", LoginHandler),
-        (r'/(.*)', AuthStaticFileHandler, {'path': 'app', "default_filename": "index.html"}),
+        (r'/(.*)', AuthStaticFileHandler, {'path': _get_static_path('app'), "default_filename": "index.html"}),
     ],
         workspace_path=workspace,
         auth=auth_dict,
@@ -207,6 +218,13 @@ def make_app(workspace='fixtures/workspace', auth=None):
         debug="True",
         cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="  # TODO: make configurable
     )
+
+def _get_static_path(subpath):
+    this_path = os.path.realpath(__file__)
+    this_dir = os.path.dirname(this_path)
+    ret = os.path.join(this_dir, 'pipelines', 'app_dist')
+    print 'Serving %s' % ret
+    return ret
 
 def main(config):
     app = make_app(config.get('workspace'), config.get('auth'))
