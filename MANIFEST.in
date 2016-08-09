@@ -1,3 +1,2 @@
-include *.html *.js *.css
-recursive-include pipelines/app_dist *
-recursive-include app_dist *
+recursive-include pipelines/api/app_dist *
+

@@ -21,6 +21,9 @@ setup(
     package_dir={ 
         'pipelines': 'pipelines',
     },
+    package_data={
+        'pipelines.api': ['app_dist/*.html', 'app_dist/client/dist/*']
+    },
     packages=[
         'pipelines',
         'pipelines.pipeline',
