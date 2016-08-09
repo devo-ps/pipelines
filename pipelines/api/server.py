@@ -23,6 +23,8 @@ from pipelines.pipeline.pipeline import Pipeline
 from concurrent.futures import ThreadPoolExecutor
 from tornado import concurrent, ioloop
 
+PIPELINES_EXT = ('yml', 'yaml')
+
 def conf_logging():
     logger = logging.getLogger('applog')
     logger.setLevel(logging.DEBUG)
@@ -69,17 +71,18 @@ class AsyncRunner(object):
         self.io_loop = ioloop.IOLoop.current()
 
     @concurrent.run_on_executor
-    def run(self, yaml_filepath, folder_path):
-        pipe = Pipeline.from_yaml(yaml_filepath, params={
+    def run(self, pipeline_file, folder_path):
+        pipe = Pipeline.from_yaml(pipeline_file, params={
             'status_file': os.path.join(folder_path, 'status.json'),
             'log_file': os.path.join(folder_path, 'output.log')
         })
         return pipe.run()
 
-def _file_iterator(folder, extension):
+def _file_iterator(folder, extensions):
     for path in os.listdir(folder):
-        if path.endswith('.%s' % extension):
-            yield path
+        for ext in extensions:
+            if path.endswith('.%s' % ext):
+                yield path
 
 def _slugify_file(filename):
     basename = filename.rsplit('/', 1)[-1]
@@ -130,12 +133,15 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         workspace = self.settings['workspace_path']
         log.debug('Getting all pipelines')
         pipelines = []
-        for path in _file_iterator(workspace, extension='yaml'):
+        for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
             slug = _slugify_file(path)
             full_path = os.path.join(workspace, slug)
             if os.path.isdir(full_path):
+                # expect to have runs
                 ids = list(_run_id_iterator(full_path))
-                pipelines.append({ 'slug': slug, 'run_ids': ids })
+                pipelines.append({'slug': slug, 'run_ids': ids})
+            else:
+                pipelines.append({'slug': slug, 'run_ids': []})
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
@@ -146,7 +152,7 @@ class GetLogsHandler(PipelinesRequestHandler):
 
     def get(self, pipeline_slug, task_id):
         workspace = self.settings['workspace_path']
-        log.debug('Getting all pipelines')
+        log.debug('Getting pipeline logs')
 
         with open(os.path.join(workspace, pipeline_slug, task_id, 'output.log')) as f:
             self.write(json.dumps({'output': f.read()}, indent=2))
@@ -157,7 +163,7 @@ class GetStatusHandler(PipelinesRequestHandler):
     def get(self, pipeline_slug, task_id):
         print 'STATUS'
         workspace = self.settings['workspace_path']
-        log.debug('Getting all pipelines')
+        log.debug('Getting pipeline status')
 
         with open(os.path.join(workspace, pipeline_slug, task_id, 'status.json')) as f:
             self.write(f.read())
@@ -169,11 +175,15 @@ class RunPipelineHandler(PipelinesRequestHandler):
         workspace = self.settings['workspace_path']
         log.debug('Running pipeline')
 
-        # payload = json.loads(self.request.body.decode())
-        yaml_filepath = os.path.join(workspace, '%s.yaml' % pipeline_slug)
+        # Guess the pipeline extension
+        pipeline_filepath = None
+        for ext in PIPELINES_EXT:
+            yaml_filepath = os.path.join(workspace, '%s.%s' % (pipeline_slug, ext))
+            if os.path.exists(yaml_filepath):
+                pipeline_filepath = yaml_filepath
+                break
 
-        if not os.path.exists(yaml_filepath):
-            print 'not found %s' % yaml_filepath
+        if not pipeline_filepath:
             raise HTTPError(404, 'Pipeline not found')
 
         task_id = str(uuid4())
@@ -184,7 +194,7 @@ class RunPipelineHandler(PipelinesRequestHandler):
         self.finish()
 
         runner = AsyncRunner()
-        yield runner.run(yaml_filepath, folder_path)
+        yield runner.run(pipeline_filepath, folder_path)
 
 class AuthStaticFileHandler(StaticFileHandler, PipelinesRequestHandler):
     @authenticated
@@ -227,12 +237,12 @@ def _get_static_path(subpath):
     return ret
 
 def main(config):
-    app = make_app(config.get('workspace'), config.get('auth'))
+    app = make_app(config.get('workspace', 'fixtures/workspace'), config.get('auth'))
     app.listen(
             int(config.get('port', 8888)),
             address=config.get('host', '127.0.0.1'),
-
     )
+
     print('Starting ioloop')
     io_loop = IOLoop.current()
     io_loop.start()

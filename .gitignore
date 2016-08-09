@@ -9,4 +9,4 @@ node_modules
 npm-debug.log
 assets.json
 .DS_Store
-
+dist
