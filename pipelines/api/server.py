@@ -222,7 +222,7 @@ def make_app(workspace='fixtures/workspace', auth=None):
 def _get_static_path(subpath):
     this_path = os.path.realpath(__file__)
     this_dir = os.path.dirname(this_path)
-    ret = os.path.join(this_dir, 'pipelines', 'app_dist')
+    ret = os.path.join(this_dir, 'app_dist')
     print 'Serving %s' % ret
     return ret
 
