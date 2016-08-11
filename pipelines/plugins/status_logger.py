@@ -1,8 +1,11 @@
 import json
+import logging
 
 from pipelines.plugin.base_plugin import BasePlugin
 from pipelines.plugin.exceptions import PluginError
 
+
+log = logging.getLogger('pipelines')
 
 class StatusLogger(BasePlugin):
     hook_prefix = ''
@@ -32,6 +35,6 @@ class StatusLogger(BasePlugin):
         if self.file_path:
             with open(self.file_path, 'w+') as f:
                 json.dump(status, f, indent=2)
-        else:
-            # Write to stdout
-            print(json.dumps(status, indent=2))
+        # else:
+        #     # Write to stdout
+        #     print(json.dumps(status, indent=2))

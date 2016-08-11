@@ -23,22 +23,11 @@ from pipelines.pipeline.pipeline import Pipeline
 from concurrent.futures import ThreadPoolExecutor
 from tornado import concurrent, ioloop
 
+from pipelines.utils import conf_logging
+
 PIPELINES_EXT = ('yml', 'yaml')
 
-def conf_logging():
-    logger = logging.getLogger('applog')
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    logger.propagate = False
-
-    ch = logging.StreamHandler()
-    ch.setFormatter(formatter)
-    ch.setLevel(logging.DEBUG)
-
-    logger.addHandler(ch)
-
-conf_logging()
-log = logging.getLogger('applog')
+log = logging.getLogger('pipelines')
 
 class PipelinesRequestHandler(RequestHandler):
     def get_current_user(self):
@@ -146,8 +135,6 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         self.finish()
 
 
-
-
 class GetLogsHandler(PipelinesRequestHandler):
 
     def get(self, pipeline_slug, task_id):
@@ -245,17 +232,18 @@ def _get_static_path(subpath):
     this_path = os.path.realpath(__file__)
     this_dir = os.path.dirname(this_path)
     ret = os.path.join(this_dir, 'app_dist')
-    print 'Serving %s' % ret
+    log.debug('Serving %s' % ret)
     return ret
 
 def main(config):
+    conf_logging()
     app = make_app(config.get('workspace', 'fixtures/workspace'), config.get('auth'))
     app.listen(
             int(config.get('port', 8888)),
             address=config.get('host', '127.0.0.1'),
     )
 
-    print('Starting ioloop')
+    log.info('Starting ioloop: {}'.format(config))
     io_loop = IOLoop.current()
     io_loop.start()
 

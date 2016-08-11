@@ -1,9 +1,12 @@
 import json
+import logging
 from copy import copy
 
 
 EXECUTION_SUCCESSFUL = 0
 EXECUTION_FAILED = 1
+
+log = logging.getLogger('pipelines')
 
 class Task(object):
     def __init__(self, name, executor, args, always_run):
@@ -29,17 +32,19 @@ class Task(object):
         return Task(name, executor, task_args, always_run)
 
 
-class TaskResult(object):
+class TaskResult(dict):
     def __init__(self, status, message=''):
-        self.status = status
-        self.message = message
+        self['status'] = status
+        self['message'] = message
+
+    @property
+    def status(self):
+        return self.get('status')
+
+    @property
+    def message(self):
+        return self.get('message')
+
 
     def is_successful(self):
         return self.status == EXECUTION_SUCCESSFUL
-
-    def __str__(self):
-        obj = {
-            'status': self.status,
-            'message': self.message
-        }
-        return json.dumps(obj)

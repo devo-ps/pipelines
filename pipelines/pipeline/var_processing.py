@@ -1,9 +1,18 @@
+import logging
+from copy import copy
 import re
 
 from pipelines.pipeline.exceptions import PipelineError
+from dotmap import DotMap
 
+log = logging.getLogger('pipelines')
 
-def substitute_variables(vars, obj):
+def substitute_variables(pipeline_context, obj):
+
+    prepped_vars = pipeline_context.toDict()
+    prepped_vars = copy(prepped_vars)
+    prepped_vars.update(prepped_vars.get('vars'))  # Flatten vars
+    prepped_vars = DotMap(prepped_vars)
 
     pattern = re.compile(r'\{\{' + r'[\s]{0,2}' + r'(?P<var>[\w-]+)' + r'[\s]{0,2}' + r'\}\}')
 
@@ -15,10 +24,10 @@ def substitute_variables(vars, obj):
 
             variable_name = match.groupdict()['var']
 
-            if variable_name not in vars:
+            if variable_name not in prepped_vars:
                 raise PipelineError('Missing variable: {}'.format(variable_name))
 
-            value = vars[variable_name]
+            value = prepped_vars[variable_name]
 
             substituted += str(value)
 

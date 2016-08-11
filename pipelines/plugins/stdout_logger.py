@@ -4,7 +4,7 @@ from datetime import datetime
 from pipelines.plugin.base_plugin import BasePlugin
 from pipelines.plugin.utils import datetime_serializer
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
 
 
 class StdoutLogger(BasePlugin):
@@ -37,9 +37,9 @@ class StdoutLogger(BasePlugin):
     @classmethod
     def from_dict(cls, conf_dict):
         if 'log_file' in conf_dict:
-            print 'Found Log File for stdout logger: %s' % conf_dict['log_file']
+            log.debug('Found Log File for stdout logger: %s' % conf_dict['log_file'])
         else:
-            print 'No Log File for stdout logger'
+            log.debug('No Log File for stdout logger')
         return cls(conf_dict.get('log_file'))
 
     def on_pipeline_start(self, *args):
@@ -87,6 +87,7 @@ class StdoutLogger(BasePlugin):
         if self.log_file:
             with open(self.log_file, 'a') as f:
                 f.write(to_write)
+                f.write('\n')
         else:
             print(to_write)
 

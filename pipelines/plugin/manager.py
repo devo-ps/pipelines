@@ -4,7 +4,7 @@ from pipelines.plugin.base_plugin import BasePlugin
 from pipelines.plugin.exceptions import PluginError
 from pipelines.plugin.utils import class_name
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
 
 
 class PluginManager():

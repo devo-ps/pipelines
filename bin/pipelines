@@ -22,6 +22,7 @@ import os
 
 from pipelines import __version__
 from pipelines.api import server
+from pipelines.utils import conf_logging
 
 
 def parse_config(config_file):

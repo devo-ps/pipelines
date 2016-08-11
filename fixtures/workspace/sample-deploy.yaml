@@ -3,8 +3,9 @@
 # The `id` of the pipeline is defined by the filename; `sample-deploy`
 
 vars:
- slack_url: XXXX
+ slack_url: https://hooks.slack.com/services/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
  code_branch: dev
+
 
 triggers:
   # By default you can trigger the pipeline by hitting `http://example.com/wh/SECRET` (where `SECRET` is displayed in
@@ -14,9 +15,12 @@ triggers:
     schedule: XXX
 
 actions:
+ - 'echo "{{ slack_url }}"'
  - type: bash
    cmd: echo ansible-playbook deploy.yml -i hosts -u root -k -v --extra-vars "branch={{ code_branch }}"
+ - 'echo third task'
+ - 'ls333 -la'
 # - type: slack
-#   message: 'Deployed !!'    # "Depoyed {{ code_branch }} with status {{ tasks.0.status }}!" # Big question: how do we format and assign stdout
+#   message: 'Deployed {{ code_branch }}. Status: {{ status }}'    # "Depoyed {{ code_branch }} with status {{ tasks.0.status }}!" # Big question: how do we format and assign stdout
 #   always_run: true
-# - 'echo "done"'
+ - 'echo "{{status}}"'

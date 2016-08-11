@@ -4,7 +4,8 @@ from pipelines.plugins.base_executor import BaseExecutorPlugin
 from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
 from pipelines.plugin.exceptions import PluginError
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
+
 RETRY_COUNT = 2
 
 class SlackExecutor(BaseExecutorPlugin):
@@ -17,7 +18,6 @@ class SlackExecutor(BaseExecutorPlugin):
         pass
 
     def execute(self, args_dict):
-        print 'Slacking %s' % args_dict
         if 'message' not in args_dict:
             raise PluginError('BashExecutor got incorrect arguments, got: {}'.format(
                 args_dict.keys()
@@ -42,7 +42,7 @@ class SlackExecutor(BaseExecutorPlugin):
             log.warning('Could not successfully send webhook. Status: {}'.format(resp.status_code))
             return TaskResult(EXECUTION_FAILED, 'Sending slack notification failed')
 
-        return TaskResult(EXECUTION_SUCCESSFUL, 'Sending slack notification failed')
+        return TaskResult(EXECUTION_SUCCESSFUL, 'Sending slack notification successful')
 
     def _parse_args_dict(self, args_dict):
         return args_dict['message']
