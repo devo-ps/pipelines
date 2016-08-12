@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from pipelines.pipeline.task import Task, TaskResult
 
+log = logging.getLogger('pipelines')
 
 def class_name(obj):
     if isinstance(obj, type):

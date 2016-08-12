@@ -2,13 +2,15 @@
 '''
 Usage: 
     pipelines (--version|--help)
-    pipelines api [--config=<config>] [--host=<host>] [--port=<port>] [--workspace=<workspace>]
+    pipelines api [--config=<config>] [--host=<host>] [--port=<port>] [--workspace=<workspace>] [--username=<username>] [--password=<password>]
 
 Options:
     --config=<config>           Path to config file [default: /etc/pipelines/pipelines.conf]
     --host=<host>               Bind address [default: 127.0.0.1]
     --port=<port>               Bind port [default: 8888]
-    --workspace=<workspace>     Location of the pipelines and runs [default: /var/lib/pipelines/workspace] 
+    --username=<port>           Admin Username [default: admin]
+    --password=<port>           Admin Password [default: admin]
+    --workspace=<workspace>     Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
 
 Help:
     pipelines api       Starts pipelines' API
@@ -20,6 +22,7 @@ import os
 
 from pipelines import __version__
 from pipelines.api import server
+from pipelines.utils import conf_logging
 
 
 def parse_config(config_file):
@@ -39,6 +42,11 @@ if __name__ == '__main__':
             'host': args.get('--host'),
             'port': args.get('--port')
         }
+        if '--username' in args and '--password' in args:
+            username = args.get('--username')
+            password = args.get('--password')
+            options['auth'] = (username, password)
+
         try:
             server.main(options)
         except KeyboardInterrupt:

@@ -6,7 +6,7 @@ from pipelines.plugin.exceptions import PluginError
 
 RETRY_COUNT = 2
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
 
 class FileLogger(StdoutLogger):
 

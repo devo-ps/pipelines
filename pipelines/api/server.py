@@ -6,31 +6,40 @@ import os
 import re
 from uuid import uuid4
 
+import tornado
 from tornado import gen
 from tornado.ioloop import IOLoop
-from tornado.web import RequestHandler, Application, url, HTTPError
+from tornado.web import (
+    RequestHandler,
+    Application,
+    url,
+    HTTPError,
+    authenticated,
+    StaticFileHandler
+)
+
+from pipelines import PipelinesError
 from pipelines.pipeline.pipeline import Pipeline
 from concurrent.futures import ThreadPoolExecutor
 from tornado import concurrent, ioloop
 
+from pipelines.utils import conf_logging
+
 PIPELINES_EXT = ('yml', 'yaml')
 
-def conf_logging():
-    logger = logging.getLogger('applog')
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    logger.propagate = False
+log = logging.getLogger('pipelines')
 
-    ch = logging.StreamHandler()
-    ch.setFormatter(formatter)
-    ch.setLevel(logging.DEBUG)
+class PipelinesRequestHandler(RequestHandler):
+    def get_current_user(self):
+        if not self.settings.get('auth'):
+            # No authentication required
+            return 'guest'
 
-    logger.addHandler(ch)
+        user_cookie = self.get_secure_cookie("user")
+        if user_cookie:
+            return json.loads(user_cookie)
+        return None
 
-conf_logging()
-log = logging.getLogger('applog')
-
-class BaseHandler(RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -78,8 +87,37 @@ def _is_valid_uuid(uuid):
     match = regex.match(uuid)
     return bool(match)
 
-class GetPipelinesHandler(BaseHandler):
+def _authenticate_user(auth_settings, username, password):
+    if username != auth_settings['username'] or password != auth_settings['password']:
+        return False
+    return True
 
+
+class LoginHandler(PipelinesRequestHandler):
+    def get(self):
+        print self.current_user
+        self.write('<html><body><form action="/login" method="post">'
+                   'Username: <input type="text" name="username"><br/>'
+                   'Password: <input type="text" name="password"><br/>'
+                   '<input type="submit" value="Sign in">'
+                   '</form></body></html>')
+
+    def post(self):
+        if _authenticate_user(
+                self.settings['auth'],
+                self.get_argument('username'),
+                self.get_argument('password')
+        ):
+            self.set_secure_cookie("user", tornado.escape.json_encode(self.get_argument("username")))
+            print 'set secure cookie'
+            self.redirect("/index.html")
+        else:
+            self.redirect("/login")
+
+
+class GetPipelinesHandler(PipelinesRequestHandler):
+
+    @authenticated
     def get(self):
         workspace = self.settings['workspace_path']
         log.debug('Getting all pipelines')
@@ -96,27 +134,41 @@ class GetPipelinesHandler(BaseHandler):
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
-class GetLogsHandler(BaseHandler):
+
+class GetLogsHandler(PipelinesRequestHandler):
 
     def get(self, pipeline_slug, task_id):
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline logs')
 
-        with open(os.path.join(workspace, pipeline_slug, task_id, 'output.log')) as f:
-            self.write(json.dumps({'output': f.read()}, indent=2))
+        logfile_path = os.path.join(workspace, pipeline_slug, task_id, 'output.log')
+        if not os.path.exists(logfile_path):
+            self.write(json.dumps({}))
             self.finish()
+        else:
+            with open(logfile_path) as f:
+                self.write(json.dumps({'output': f.read()}, indent=2))
+                self.finish()
 
-class GetStatusHandler(BaseHandler):
+class GetStatusHandler(PipelinesRequestHandler):
 
     def get(self, pipeline_slug, task_id):
+        print 'STATUS'
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline status')
 
-        with open(os.path.join(workspace, pipeline_slug, task_id, 'status.json')) as f:
-            self.write(f.read())
+        statusfile_path = os.path.join(workspace, pipeline_slug, task_id, 'status.json')
+        if not os.path.exists(statusfile_path):
+            print 'Does not exist %s' % statusfile_path
+            self.write(json.dumps({}))
             self.finish()
+        else:
+            print 'Exists %s' % statusfile_path
+            with open(statusfile_path) as f:
+                self.write(f.read())
+                self.finish()
 
-class RunPipelineHandler(BaseHandler):
+class RunPipelineHandler(PipelinesRequestHandler):
     @gen.coroutine
     def post(self, pipeline_slug):
         workspace = self.settings['workspace_path']
@@ -143,21 +195,55 @@ class RunPipelineHandler(BaseHandler):
         runner = AsyncRunner()
         yield runner.run(pipeline_filepath, folder_path)
 
+class AuthStaticFileHandler(StaticFileHandler, PipelinesRequestHandler):
+    @authenticated
+    def get(self, *args, **kwargs):
+        return super(AuthStaticFileHandler, self).get(*args, **kwargs)
 
-def make_app(workspace='fixtures/workspace'):
+def make_app(workspace='fixtures/workspace', auth=None):
+    if not os.path.isdir(workspace):
+        raise PipelinesError('Workspace is not a valid directory: %s' % workspace)
+
+    auth_dict=None
+    if auth:
+        auth_dict = {
+            'type': 'static',
+            'username': auth[0],
+            'password': auth[1]
+        }
+
+
     return Application([
         url(r"/api/pipelines/", GetPipelinesHandler),
-        url(r"/api/pipelines/([0-9a-zA-Z_]+)/run", RunPipelineHandler),
-        url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
-        url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
+        url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/run", RunPipelineHandler),
+        url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
+        url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
+        (r"/login", LoginHandler),
+        (r'/(.*)', AuthStaticFileHandler, {'path': _get_static_path('app'), "default_filename": "index.html"}),
     ],
-        workspace_path=workspace
+        workspace_path=workspace,
+        auth=auth_dict,
+        login_url= "/login",
+        debug="True",
+        cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="  # TODO: make configurable
     )
 
-def main(config={}):
-    app = make_app(config.get('workspace', 'fixtures/workspace'))
-    app.listen(int(config.get('port', 8888)), address=config.get('host', '127.0.0.1'))
-    print('Starting ioloop')
+def _get_static_path(subpath):
+    this_path = os.path.realpath(__file__)
+    this_dir = os.path.dirname(this_path)
+    ret = os.path.join(this_dir, 'app_dist')
+    log.debug('Serving %s' % ret)
+    return ret
+
+def main(config):
+    conf_logging()
+    app = make_app(config.get('workspace', 'fixtures/workspace'), config.get('auth'))
+    app.listen(
+            int(config.get('port', 8888)),
+            address=config.get('host', '127.0.0.1'),
+    )
+
+    log.info('Starting ioloop: {}'.format(config))
     io_loop = IOLoop.current()
     io_loop.start()
 

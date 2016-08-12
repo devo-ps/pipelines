@@ -5,7 +5,7 @@ from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_
 from pipelines.plugin.exceptions import PluginError
 from sh import ErrorReturnCode
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
 
 class BashExecuteError(PluginError):
     def __init__(self, stderr, code):
@@ -68,7 +68,7 @@ class BashExecutor(BaseExecutorPlugin):
 
     @classmethod
     def from_dict(cls, conf_dict):
-        return cls(conf_dict.get('log_file'))
+        return cls(conf_dict.get('cmd_log_file'))
 
 if __name__ == '__main__':
     from plugin.utils import setup_logging

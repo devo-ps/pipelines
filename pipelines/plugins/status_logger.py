@@ -1,8 +1,11 @@
 import json
+import logging
 
 from pipelines.plugin.base_plugin import BasePlugin
 from pipelines.plugin.exceptions import PluginError
 
+
+log = logging.getLogger('pipelines')
 
 class StatusLogger(BasePlugin):
     hook_prefix = ''
@@ -10,6 +13,7 @@ class StatusLogger(BasePlugin):
         'on_pipeline_start',
         'on_pipeline_finish',
     )
+    file_path = None
 
     def __init__(self, file_path=None):
         super(StatusLogger, self).__init__()
@@ -19,11 +23,7 @@ class StatusLogger(BasePlugin):
 
     @classmethod
     def from_dict(cls, conf_dict):
-        if 'status_file' not in conf_dict:
-            if not isinstance(conf_dict['status_file'], basestring):
-                raise PluginError('File logger has invalid status_file parameter')
-
-        return StatusLogger(conf_dict['status_file'])
+        return StatusLogger(conf_dict.get('status_file'))
 
     def on_pipeline_start(self, *args):
         self._write({'status': 'processing'})
@@ -35,6 +35,6 @@ class StatusLogger(BasePlugin):
         if self.file_path:
             with open(self.file_path, 'w+') as f:
                 json.dump(status, f, indent=2)
-        else:
-            # Write to stdout
-            print(json.dumps(status, indent=2))
+        # else:
+        #     # Write to stdout
+        #     print(json.dumps(status, indent=2))

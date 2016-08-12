@@ -5,6 +5,7 @@ from pipelines.plugins.status_logger import StatusLogger
 # from pipelines.plugins.file_logger import FileLogger
 from pipelines.plugins.stdout_logger import StdoutLogger
 from pipelines.plugins.webhook_logger import WebhookLogger
+from pipelines.plugins.slack_executor import SlackExecutor
 
 builtin_plugins = {
     'stdout_logger': StdoutLogger,
@@ -13,5 +14,6 @@ builtin_plugins = {
     'webhook_logger': WebhookLogger,
     'bash': BashExecutor,
     'python': PythonExecutor,
-    'dummy': DummyExecutor
+    'dummy': DummyExecutor,
+    'slack': SlackExecutor
 }

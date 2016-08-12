@@ -5,15 +5,13 @@ from pipelines.plugin.exceptions import PluginError
 
 RETRY_COUNT = 2
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
 
 class WebhookLogger(StdoutLogger):
 
-    webhook_url = 'https://hooks.slack.com/services/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'
-
     def __init__(self, webhook_url):
         super(WebhookLogger, self).__init__()
-
+        self.webhook_url = webhook_url
         self.write_on = ['on_pipeline_finish']
 
     @classmethod

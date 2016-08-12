@@ -5,7 +5,14 @@ from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_
 from pipelines.plugin.exceptions import PluginError
 from os import path
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
+
+
+'''
+
+THIS HAS NOT BEEN UPDATED/TESED PROPERLY
+
+'''
 
 class PythonExecutor(BashExecutor):
     hook_prefix = 'python'
