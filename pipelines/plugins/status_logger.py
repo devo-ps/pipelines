@@ -28,8 +28,8 @@ class StatusLogger(BasePlugin):
     def on_pipeline_start(self, *args):
         self._write({'status': 'processing'})
 
-    def on_pipeline_finish(self, *args):
-        self._write({'status': 'success'})
+    def on_pipeline_finish(self, pipeline_context):
+        self._write({'status': pipeline_context['status']})
 
     def _write(self, status):
         if self.file_path:

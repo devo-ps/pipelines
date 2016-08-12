@@ -167,7 +167,7 @@ class Pipeline(object):
             else:
                 log.debug('Skipping task: {}'.format(task.name))
         log.debug('Pipeline finished. Status: {}'.format(pipeline_context['status']))
-        self.plugin_mgr.trigger('on_pipeline_finish')
+        self.plugin_mgr.trigger('on_pipeline_finish', pipeline_context)
 
     def _should_run(self, task, pipeline_context):
 
@@ -200,7 +200,7 @@ class Pipeline(object):
         except Exception as e:
             log.warning('Unexpected error running task: %s' % e)
             log.exception(e)
-            results = [TaskResult(EXECUTION_FAILED, 'Unknown Error')]
+            results = [TaskResult(EXECUTION_FAILED, 'Unknown Error: %s')]
 
         result = results[0]
 

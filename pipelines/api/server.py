@@ -159,11 +159,10 @@ class GetStatusHandler(PipelinesRequestHandler):
 
         statusfile_path = os.path.join(workspace, pipeline_slug, task_id, 'status.json')
         if not os.path.exists(statusfile_path):
-            print 'Does not exist %s' % statusfile_path
+            log.debug('Status file does not exist %s' % statusfile_path)
             self.write(json.dumps({}))
             self.finish()
         else:
-            print 'Exists %s' % statusfile_path
             with open(statusfile_path) as f:
                 self.write(f.read())
                 self.finish()

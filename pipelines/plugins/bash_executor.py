@@ -52,7 +52,7 @@ class BashExecutor(BaseExecutorPlugin):
         stdout = ''
         f = None
         if self.log_file:
-            f = open(self.log_file, 'w+')
+            f = open(self.log_file, 'a+')
 
         try:
             for line in bash(_in=bash_input, _iter=True):
@@ -68,7 +68,7 @@ class BashExecutor(BaseExecutorPlugin):
 
     @classmethod
     def from_dict(cls, conf_dict):
-        return cls(conf_dict.get('cmd_log_file'))
+        return cls(conf_dict.get('log_file'))
 
 if __name__ == '__main__':
     from plugin.utils import setup_logging
