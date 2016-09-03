@@ -1,0 +1,222 @@
+/* Egg Magic */
+
+@import '_variables'; // Variables (colors, layout, spacing & typography)
+@import '_defaults'; // Styling defaults
+@import 'partials/_dropdown';
+@import 'partials/_modal';
+@import 'partials/_loading';
+// @import 'partials/_notifications';
+
+/* GENERAL */
+
+$width: 800px;
+
+.wrapper {
+  margin: 0 auto;
+  max-width: $width;
+  text-align: left;
+  width: 90%;
+}
+
+.controls {
+  float: right;
+}
+
+.icon {
+  background: transparent;
+  border: 0;
+  line-height: 1;
+  outline: none;
+  padding: 0;
+}
+
+.loading {
+  @include loading;
+}
+
+.tabs {
+  border-bottom: 1px solid $line;
+  @include clearfix;
+  @include font-size($small);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  a {
+    border-bottom: 2px solid transparent;
+    color: $grey;
+    float: left;
+    margin-left: 1.5*$space;
+    padding: $space/3 $space/2 ($space/3 - 2);
+    &.active {
+      border-color: $green;
+      color: #FFF;
+    }
+    &:hover {
+      color: #FFF;
+    }
+  }
+}
+
+/* HEADER */
+
+#header {
+  border-bottom: 1px solid $line;
+  @include clearfix;
+  margin-bottom: $space;
+  padding: $space 0 $space/2;
+  h1 {
+    @include font-size($larger);
+    font-weight: bold;
+    margin: 0;
+    a {
+      color: #FFF;
+    }
+  }
+  .links {
+    float: right;
+    @include font-size($small);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    a {
+      float: left;
+      margin-left: $space;
+      img {
+        border-radius: $space;
+        float: left;
+        margin-right: $space/4;
+        width: $space;
+      }
+    }
+  }
+}
+
+#main {
+  > .wrapper > .header {
+    @include font-size($smaller);
+    padding-bottom: $space/2;
+    .search {
+      border-radius: $space;
+      padding: $space/8 $space/2;
+    }
+  }
+  .item {
+    margin-bottom: $space/2;
+    &.active {
+      .header {
+        border-radius: $radius $radius 0 0;
+      }
+    }
+    .header {
+      background: $light;
+      border-radius: $radius;
+      padding: $space/3;
+      position: relative;
+    }
+    h2 {
+      font-size: inherit;
+      margin: 0;
+      & + small {
+        @include font-size($small);
+        opacity: 0.5;
+      }
+    }
+    .body {
+      background: $black;
+      border: 1px solid $line;
+      border-top: 0;
+      .console {
+        color: $green;
+        font-family: $code;
+        @include font-size($small);
+        line-height: 160%;
+        margin: 0;
+        max-height: 264px;
+        overflow: auto;
+        padding: $space/2 1.5*$space/2;
+        white-space: pre-line;
+      }
+      .toolbar {
+        border-top: 1px solid $line;
+        @include font-size($smaller);
+        padding: $space/3;
+        vertical-align: middle;
+        a,
+        .icon {
+          color: $grey;
+          svg {
+            fill: $grey;
+          }
+          &:hover {
+            color: #FFF;
+            svg {
+              fill: #FFF;
+            }
+          }
+        }
+        .dropdown .options {
+          svg {
+            float: right;
+            margin-left: $space/6;
+            width: $space/2;
+          }
+          .error {
+            color: $red;
+          }
+          .ok {
+            color: $green;
+          }
+        }
+        > * {
+          vertical-align: middle;
+        }
+        .icon {
+          @include tooltip(top, tint($light, 5%));
+        }
+      }
+    }
+
+    .run {
+      $loading_thickness: 4px;
+      $loading_size: 32px;
+      $img_size: 24px;
+      background: none;
+      border: 0;
+      float: left;
+      height: $loading_size + 2*$loading_thickness;
+      margin-right: $space/2;
+      outline: none;
+      position: relative;
+      width: $loading_size + 2*$loading_thickness;
+      span {
+        display: none;
+      }
+      svg {
+        fill: $green;
+        left: $loading_thickness + ($loading_size - $img_size)/2;
+        position: absolute;
+        top: $loading_thickness + ($loading_size - $img_size)/2;
+      }
+      &:after {
+        animation: spin 3*$ease linear infinite;
+        border: $loading_thickness solid rgba(0, 0, 0, 0.2);
+        border-top: $loading_thickness solid $green;
+        border-radius: 50%;
+        bottom: 0;
+        content: '';
+        height: $loading_size;
+        left: 0;
+        margin: auto;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: $loading_size;
+        z-index: 999;
+      }
+    }
+
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

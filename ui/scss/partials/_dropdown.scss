@@ -1,0 +1,45 @@
+
+/* Dropdown */
+
+.dropdown {
+  @include dropdown(top);
+  > *:first-child {
+    cursor: pointer;
+  }
+  > a,
+  .options > a {
+    color: inherit;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  .options {
+    background: tint($light, 5%);
+    border-radius: $radius;
+    box-shadow: $shadow;
+    box-sizing: border-box;
+    > * {
+      display: block;
+      padding: $space/12 $space;
+      white-space: nowrap;
+      @include transition-property(background, color);
+      @include transition-duration($ease);
+      &.active {
+        color: #FFF;
+      }
+      &:hover {
+        background: tint($light, 10%);
+        color: #FFF;
+      }
+      &:first-child {
+        border-radius: $radius $radius 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 $radius $radius;
+      }
+      &.separated {
+        border-top: 1px solid $line;
+      }
+    }
+  }
+}
