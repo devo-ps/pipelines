@@ -1190,7 +1190,7 @@ body.modal #modal,
     border: 1px solid #282828;
     border-top: 0; }
     #main .item .body .console {
-      color: #02BB4F;
+      color: #FFF;
       font-family: "Lucida Sans Typewriter", "Lucida Console", monaco, "Bitstream Vera Sans Mono", monospace;
       font-size: 12px;
       font-size: 1.2rem;
@@ -1199,6 +1199,7 @@ body.modal #modal,
       max-height: 264px;
       overflow: auto;
       padding: 12px 18px;
+      position: relative;
       white-space: pre-line; }
     #main .item .body .toolbar {
       border-top: 1px solid #282828;

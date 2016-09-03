@@ -47,7 +47,7 @@ $width: 800px;
     margin-left: 1.5*$space;
     padding: $space/3 $space/2 ($space/3 - 2);
     &.active {
-      border-color: $green;
+      border-color: $primary;
       color: #FFF;
     }
     &:hover {
@@ -124,7 +124,7 @@ $width: 800px;
       border: 1px solid $line;
       border-top: 0;
       .console {
-        color: $green;
+        color: #FFF;
         font-family: $code;
         @include font-size($small);
         line-height: 160%;
@@ -132,6 +132,7 @@ $width: 800px;
         max-height: 264px;
         overflow: auto;
         padding: $space/2 1.5*$space/2;
+        position: relative;
         white-space: pre-line;
       }
       .toolbar {
@@ -190,7 +191,7 @@ $width: 800px;
         display: none;
       }
       svg {
-        fill: $green;
+        fill: $primary;
         left: $loading_thickness + ($loading_size - $img_size)/2;
         position: absolute;
         top: $loading_thickness + ($loading_size - $img_size)/2;
@@ -198,7 +199,7 @@ $width: 800px;
       &:after {
         animation: spin 3*$ease linear infinite;
         border: $loading_thickness solid rgba(0, 0, 0, 0.2);
-        border-top: $loading_thickness solid $green;
+        border-top: $loading_thickness solid $primary;
         border-radius: 50%;
         bottom: 0;
         content: '';
