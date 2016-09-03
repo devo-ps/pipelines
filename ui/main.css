@@ -1173,11 +1173,18 @@ body.modal #modal,
   margin-bottom: 12px; }
   #main .item.active .header {
     border-radius: 2px 2px 0 0; }
+  #main .item.active .body {
+    display: block; }
   #main .item .header {
     background: #282828;
     border-radius: 2px;
     padding: 8px;
     position: relative; }
+    #main .item .header:hover {
+      background: #373737;
+      cursor: pointer; }
+      #main .item .header:hover + .body {
+        border-color: #373737; }
   #main .item h2 {
     font-size: inherit;
     margin: 0; }
@@ -1188,7 +1195,8 @@ body.modal #modal,
   #main .item .body {
     background: #181818;
     border: 1px solid #282828;
-    border-top: 0; }
+    border-top: 0;
+    display: none; }
     #main .item .body .console {
       color: #FFF;
       font-family: "Lucida Sans Typewriter", "Lucida Console", monaco, "Bitstream Vera Sans Mono", monospace;
