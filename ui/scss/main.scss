@@ -108,6 +108,60 @@ $width: 800px;
         display: block;
       }
     }
+    $loading_thickness: 1px;
+    $loading_size: 38px;
+    $img_size: 24px;
+    &.running {
+      .run,
+      .run:hover {
+        background: none;
+        cursor: not-allowed;
+        svg {
+          fill: $primary;
+        }
+        &:after {
+          animation: spin 3*$ease linear infinite;
+          border: $loading_thickness solid $black;
+          border-top: $loading_thickness solid $primary;
+        }
+      }
+    }
+    .run {
+      float: left;
+      height: $loading_size + 2*$loading_thickness;
+      margin-right: $space/2;
+      position: relative;
+      @include tooltip(top, tint($light, 10%));
+      width: $loading_size + 2*$loading_thickness;
+      svg {
+        fill: $grey;
+        left: $loading_thickness + ($loading_size - $img_size)/2;
+        position: absolute;
+        top: $loading_thickness + ($loading_size - $img_size)/2;
+      }
+      &:after {
+        border: $loading_thickness solid $grey;
+        border-radius: 50%;
+        bottom: 0;
+        content: '';
+        height: $loading_size;
+        left: 0;
+        margin: auto;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: $loading_size;
+        z-index: 999;
+      }
+      &:hover {
+        &:after {
+          border-color: #FFF;
+        }
+        svg {
+          fill: #FFF;
+        }
+      }
+    }
     .header {
       background: $light;
       border-radius: $radius;
@@ -189,46 +243,6 @@ $width: 800px;
         }
       }
     }
-
-    .run {
-      $loading_thickness: 4px;
-      $loading_size: 32px;
-      $img_size: 24px;
-      background: none;
-      border: 0;
-      float: left;
-      height: $loading_size + 2*$loading_thickness;
-      margin-right: $space/2;
-      outline: none;
-      position: relative;
-      width: $loading_size + 2*$loading_thickness;
-      span {
-        display: none;
-      }
-      svg {
-        fill: $primary;
-        left: $loading_thickness + ($loading_size - $img_size)/2;
-        position: absolute;
-        top: $loading_thickness + ($loading_size - $img_size)/2;
-      }
-      &:after {
-        animation: spin 3*$ease linear infinite;
-        border: $loading_thickness solid rgba(0, 0, 0, 0.2);
-        border-top: $loading_thickness solid $primary;
-        border-radius: 50%;
-        bottom: 0;
-        content: '';
-        height: $loading_size;
-        left: 0;
-        margin: auto;
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: $loading_size;
-        z-index: 999;
-      }
-    }
-
   }
 }
 
