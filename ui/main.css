@@ -1179,24 +1179,36 @@ body.modal #modal,
     background: #282828;
     border-radius: 2px;
     padding: 8px;
-    position: relative; }
+    position: relative;
+    -webkit-transition-property: background;
+    -moz-transition-property: background;
+    transition-property: background;
+    -webkit-transition-duration: 0.2s;
+    -moz-transition-duration: 0.2s;
+    transition-duration: 0.2s; }
+    #main .item .header h2 {
+      font-size: inherit;
+      margin: 0; }
+      #main .item .header h2 + small {
+        font-size: 12px;
+        font-size: 1.2rem;
+        opacity: 0.5; }
     #main .item .header:hover {
       background: #373737;
       cursor: pointer; }
       #main .item .header:hover + .body {
         border-color: #373737; }
-  #main .item h2 {
-    font-size: inherit;
-    margin: 0; }
-    #main .item h2 + small {
-      font-size: 12px;
-      font-size: 1.2rem;
-      opacity: 0.5; }
   #main .item .body {
     background: #181818;
     border: 1px solid #282828;
     border-top: 0;
-    display: none; }
+    display: none;
+    -webkit-transition-property: border;
+    -moz-transition-property: border;
+    transition-property: border;
+    -webkit-transition-duration: 0.2s;
+    -moz-transition-duration: 0.2s;
+    transition-duration: 0.2s; }
     #main .item .body .console {
       color: #FFF;
       font-family: "Lucida Sans Typewriter", "Lucida Console", monaco, "Bitstream Vera Sans Mono", monospace;

@@ -113,6 +113,16 @@ $width: 800px;
       border-radius: $radius;
       padding: $space/3;
       position: relative;
+      @include transition-property(background);
+      @include transition-duration($ease);
+      h2 {
+        font-size: inherit;
+        margin: 0;
+        & + small {
+          @include font-size($small);
+          opacity: 0.5;
+        }
+      }
       &:hover {
         background: tint($light, 7%);
         cursor: pointer;
@@ -121,19 +131,13 @@ $width: 800px;
         }
       }
     }
-    h2 {
-      font-size: inherit;
-      margin: 0;
-      & + small {
-        @include font-size($small);
-        opacity: 0.5;
-      }
-    }
     .body {
       background: $black;
       border: 1px solid $line;
       border-top: 0;
       display: none;
+      @include transition-property(border);
+      @include transition-duration($ease);
       .console {
         color: #FFF;
         font-family: $code;
