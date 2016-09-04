@@ -30,7 +30,7 @@ html {
 body {
   background: $background;
   color: #FFF;
-  font-weight: 300;
+  font-weight: 500;
   position: relative;
   text-align: center;
   -webkit-font-smoothing: antialiased;
@@ -38,7 +38,7 @@ body {
 
 a {
   cursor: pointer;
-  color: $primary;
+  color: $grey;
   text-decoration: none;
   @include transition-property(color);
   @include transition-duration($ease);

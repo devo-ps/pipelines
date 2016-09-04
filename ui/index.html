@@ -34,7 +34,7 @@
       </header>
 
       <section class='body'>
-        <article class='item pipeline running' onclick='toggleItem(this)'>
+        <article class='item pipeline error' onclick='toggleItem(this)'>
           <header class='header'>
             <button class='icon run'>
               <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
@@ -44,14 +44,52 @@
             </button>
 
             <h2>Deploy staging Starbucks.cn</h2>
-            <small class='status ok'>Run 6 minutes ago</small>
+            <span class='history'>
+              <div class='status error'><span>Error	&middot; 2 minutes ago</span></div>
+              <div class='status ok'><span>Success &middot; 3 minutes ago</span></div>
+              <div class='status error'><span>Error &middot; 10 minutes ago</span></div>
+              <div class='status ok'><span>Success &middot; yesterday</span></div>
+              <div class='status ok'><span>Success &middot; 2 days ago</span></div>
+            </span>
           </header>
 
           <section class='body'>
             <nav class='tabs'>
+              <button class='icon fullscreen'>
+                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
+                  <path stroke-width='0.2' stroke-linejoin='round' d='M 9.49263,13.0931L 10.9068,14.5073L 6.41421,19L 10,19L 10,21L 3,21L 3,14L 5,14L 5,17.5858L 9.49263,13.0931 Z M 10.9069,9.49266L 9.49265,10.9069L 5,6.41422L 5,10L 3,10L 3,3.00001L 10,3L 10,5L 6.41421,5L 10.9069,9.49266 Z M 14.5074,13.0931L 19,17.5858L 19,14L 21,14L 21,21L 14,21L 14,19L 17.5858,19L 13.0932,14.5073L 14.5074,13.0931 Z M 13.0931,9.49265L 17.5858,5L 14,5L 14,3L 21,3L 21,10L 19,10L 19,6.41421L 14.5073,10.9069L 13.0931,9.49265 Z '/>
+                </svg>
+                <span>Fullscreen</span>
+              </button>
+
               <a class='logs active'>Logs</a>
               <a class='configuration'>Configuration</a>
             </nav>
+
+            <header class='toolbar'>
+              <button class='icon previous'>
+                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
+	                 <path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/>
+                 </svg>
+                 <span>Previous</span>
+               </button>
+              <span class='dropdown'>
+                <div class='options'>
+                  <a class='status error active'>Error	&middot; 2 minutes ago</a>
+                  <a class='status ok'>Success &middot; 3 minutes ago</a>
+                  <a class='status error'>Error &middot; 10 minutes ago</a>
+                  <a class='status ok'>Success &middot; yesterday</a>
+                  <a class='status ok'>Success &middot; 2 days ago</a>
+                </div>
+                <a class='status success'>Error	&middot; 2 minutes ago</a>
+              </span>
+              <button class='icon next'>
+                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
+                	<path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/>
+                </svg>
+                <span>Next</span>
+              </button>
+            </header>
 
             <div class='console'>stderr  Done.
 Running depmod.
@@ -71,41 +109,10 @@ Found linux image: /boot/vmlinuz-3.13.0-68-generic
 Found initrd image: /boot/initrd.img-3.13.0-68-generic
 Found memtest86+ image: /boot/memtest86+.elf
 Found memtest86+ image: /boot/memtest86+.bin</div>
-            <footer class='toolbar'>
-              <div class='controls'>
-                <button class='icon fullscreen'>
-                  <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
-                  	<path stroke-width='0.2' stroke-linejoin='round' d='M 9.49263,13.0931L 10.9068,14.5073L 6.41421,19L 10,19L 10,21L 3,21L 3,14L 5,14L 5,17.5858L 9.49263,13.0931 Z M 10.9069,9.49266L 9.49265,10.9069L 5,6.41422L 5,10L 3,10L 3,3.00001L 10,3L 10,5L 6.41421,5L 10.9069,9.49266 Z M 14.5074,13.0931L 19,17.5858L 19,14L 21,14L 21,21L 14,21L 14,19L 17.5858,19L 13.0932,14.5073L 14.5074,13.0931 Z M 13.0931,9.49265L 17.5858,5L 14,5L 14,3L 21,3L 21,10L 19,10L 19,6.41421L 14.5073,10.9069L 13.0931,9.49265 Z '/>
-                  </svg>
-                  <span>Fullscreen</span>
-                </button>
-              </div>
-
-              <button class='icon previous'>
-                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
-	                 <path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/>
-                 </svg>
-                 <span>Previous</span>
-               </button>
-              <span class='dropdown'>
-                <a class='status success'>6 min ago (j8yrjSu23j)</a>
-                <div class='options'>
-                  <a class='status ok'>6 min ago (j8yrjSu23j)</a>
-                  <a class='status error'>6 min ago (j8yrjSu23j)</a>
-                  <a class='status ok active'>6 min ago (j8yrjSu23j)</a>
-                </div>
-              </span>
-              <button class='icon next'>
-                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
-                	<path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/>
-                </svg>
-                <span>Next</span>
-              </button>
-            </footer>
           </section>
         </article>
 
-        <article class='item pipeline' onclick='toggleItem(this)'>
+        <article class='item pipeline running active' onclick='toggleItem(this)'>
           <header class='header'>
             <button class='icon run'>
               <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
@@ -115,14 +122,52 @@ Found memtest86+ image: /boot/memtest86+.bin</div>
             </button>
 
             <h2>Deploy staging Starbucks.cn</h2>
-            <small class='status ok'>Run 6 minutes ago</small>
+            <span class='history'>
+              <div class='status error'><span>Error	&middot; 2 minutes ago</span></div>
+              <div class='status ok'><span>Success &middot; 3 minutes ago</span></div>
+              <div class='status error'><span>Error &middot; 10 minutes ago</span></div>
+              <div class='status ok'><span>Success &middot; yesterday</span></div>
+              <div class='status ok'><span>Success &middot; 2 days ago</span></div>
+            </span>
           </header>
 
           <section class='body'>
             <nav class='tabs'>
+              <button class='icon fullscreen'>
+                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
+                  <path stroke-width='0.2' stroke-linejoin='round' d='M 9.49263,13.0931L 10.9068,14.5073L 6.41421,19L 10,19L 10,21L 3,21L 3,14L 5,14L 5,17.5858L 9.49263,13.0931 Z M 10.9069,9.49266L 9.49265,10.9069L 5,6.41422L 5,10L 3,10L 3,3.00001L 10,3L 10,5L 6.41421,5L 10.9069,9.49266 Z M 14.5074,13.0931L 19,17.5858L 19,14L 21,14L 21,21L 14,21L 14,19L 17.5858,19L 13.0932,14.5073L 14.5074,13.0931 Z M 13.0931,9.49265L 17.5858,5L 14,5L 14,3L 21,3L 21,10L 19,10L 19,6.41421L 14.5073,10.9069L 13.0931,9.49265 Z '/>
+                </svg>
+                <span>Fullscreen</span>
+              </button>
+
               <a class='logs active'>Logs</a>
               <a class='configuration'>Configuration</a>
             </nav>
+
+            <header class='toolbar'>
+              <button class='icon previous'>
+                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
+	                 <path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/>
+                 </svg>
+                 <span>Previous</span>
+               </button>
+              <span class='dropdown'>
+                <div class='options'>
+                  <a class='status error active'>Error	&middot; 2 minutes ago</a>
+                  <a class='status ok'>Success &middot; 3 minutes ago</a>
+                  <a class='status error'>Error &middot; 10 minutes ago</a>
+                  <a class='status ok'>Success &middot; yesterday</a>
+                  <a class='status ok'>Success &middot; 2 days ago</a>
+                </div>
+                <a class='status success'>Error	&middot; 2 minutes ago</a>
+              </span>
+              <button class='icon next'>
+                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
+                	<path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/>
+                </svg>
+                <span>Next</span>
+              </button>
+            </header>
 
             <div class='console'>stderr  Done.
 Running depmod.
@@ -142,37 +187,6 @@ Found linux image: /boot/vmlinuz-3.13.0-68-generic
 Found initrd image: /boot/initrd.img-3.13.0-68-generic
 Found memtest86+ image: /boot/memtest86+.elf
 Found memtest86+ image: /boot/memtest86+.bin</div>
-            <footer class='toolbar'>
-              <div class='controls'>
-                <button class='icon fullscreen'>
-                  <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
-                  	<path stroke-width='0.2' stroke-linejoin='round' d='M 9.49263,13.0931L 10.9068,14.5073L 6.41421,19L 10,19L 10,21L 3,21L 3,14L 5,14L 5,17.5858L 9.49263,13.0931 Z M 10.9069,9.49266L 9.49265,10.9069L 5,6.41422L 5,10L 3,10L 3,3.00001L 10,3L 10,5L 6.41421,5L 10.9069,9.49266 Z M 14.5074,13.0931L 19,17.5858L 19,14L 21,14L 21,21L 14,21L 14,19L 17.5858,19L 13.0932,14.5073L 14.5074,13.0931 Z M 13.0931,9.49265L 17.5858,5L 14,5L 14,3L 21,3L 21,10L 19,10L 19,6.41421L 14.5073,10.9069L 13.0931,9.49265 Z '/>
-                  </svg>
-                  <span>Fullscreen</span>
-                </button>
-              </div>
-
-              <button class='icon previous'>
-                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
-	                 <path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/>
-                 </svg>
-                 <span>Previous</span>
-               </button>
-              <span class='dropdown'>
-                <a class='status success'>6 min ago (j8yrjSu23j)</a>
-                <div class='options'>
-                  <a class='status ok'>6 min ago (j8yrjSu23j)</a>
-                  <a class='status error'>6 min ago (j8yrjSu23j)</a>
-                  <a class='status ok active'>6 min ago (j8yrjSu23j)</a>
-                </div>
-              </span>
-              <button class='icon next'>
-                <svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'>
-                	<path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/>
-                </svg>
-                <span>Next</span>
-              </button>
-            </footer>
           </section>
           </article>
         </section>

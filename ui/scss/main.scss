@@ -54,6 +54,19 @@ $width: 800px;
       color: #FFF;
     }
   }
+  .icon {
+    float: right;
+    margin: $space/3 $space/2 0 0;
+    @include tooltip(top, $light);
+    svg {
+      fill: $grey;
+    }
+    &:hover {
+      svg {
+        fill: #FFF;
+      }
+    }
+  }
 }
 
 /* HEADER */
@@ -97,12 +110,22 @@ $width: 800px;
       border-radius: $space;
       padding: $space/8 $space/2;
     }
+    .button {
+      @include transition-property(transform);
+      @include transition-duration($ease);
+      &:hover {
+        @include transform(scale(1.03));
+      }
+    }
   }
   .item {
     margin-bottom: $space/2;
     &.active {
       .header {
         border-radius: $radius $radius 0 0;
+        .status:before {
+          opacity: 1;
+        }
       }
       .body {
         display: block;
@@ -126,18 +149,63 @@ $width: 800px;
         }
       }
     }
+    &:not(.running) {
+      .run {
+        &:hover {
+          @include transform(scale(1.1));
+          &:after {
+            border-color: #FFF;
+          }
+          svg {
+            fill: #FFF;
+            opacity: 0;
+          }
+          span {
+            color: #FFF;
+            opacity: 1;
+          }
+        }
+        &:active {
+          @include transform(scale(1));
+          &:after {
+            border-color: $primary;
+          }
+          svg {
+            fill: $primary;
+            opacity: 1;
+          }
+          span {
+            color: #FFF;
+            opacity: 0;
+          }
+        }
+      }
+    }
     .run {
       float: left;
       height: $loading_size + 2*$loading_thickness;
       margin-right: $space/2;
       position: relative;
-      @include tooltip(top, tint($light, 10%));
       width: $loading_size + 2*$loading_thickness;
+      @include transition-property(transform);
+      @include transition-duration($ease);
+      svg,
+      span {
+        @include font-size($micro);
+        position: absolute;
+        text-transform: uppercase;
+        @include transition-property(color, fill, opacity);
+        @include transition-duration($ease);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
       svg {
         fill: $grey;
-        left: $loading_thickness + ($loading_size - $img_size)/2;
-        position: absolute;
-        top: $loading_thickness + ($loading_size - $img_size)/2;
+      }
+      span {
+        color: $grey;
+        opacity: 0;
       }
       &:after {
         border: $loading_thickness solid $grey;
@@ -150,21 +218,30 @@ $width: 800px;
         position: absolute;
         right: 0;
         top: 0;
+        @include transition-property(border);
+        @include transition-duration($ease);
         width: $loading_size;
         z-index: 999;
       }
-      &:hover {
-        &:after {
-          border-color: #FFF;
-        }
-        svg {
-          fill: #FFF;
-        }
+    }
+    .status {
+      &:before {
+        background: $green;
+        border-radius: $space;
+        display: inline-block;
+        content: '';
+        @include font-size($small);
+        height: $space/3;
+        width: $space/3;
+      }
+      &.error:before {
+        background: $red;
       }
     }
     .header {
       background: $light;
       border-radius: $radius;
+      @include clearfix;
       padding: $space/3;
       position: relative;
       @include transition-property(background);
@@ -172,9 +249,25 @@ $width: 800px;
       h2 {
         font-size: inherit;
         margin: 0;
-        & + small {
-          @include font-size($small);
-          opacity: 0.5;
+      }
+      .status {
+        display: inline-block;
+        @include tooltip(top, $light);
+        &:before {
+          margin: 0 $space/8 0 0;
+          opacity: 0.2;
+          @include transition-property(opacity, transform);
+          @include transition-duration($ease);
+        }
+        &:hover {
+          &:before {
+            @include transform(scale(1.3));
+          }
+        }
+        &:first-child {
+          &:before {
+            opacity: 1;
+          }
         }
       }
       &:hover {
@@ -182,6 +275,9 @@ $width: 800px;
         cursor: pointer;
         & + .body {
           border-color: tint($light, 7%);
+        }
+        .status:before {
+          opacity: 1;
         }
       }
     }
@@ -205,41 +301,47 @@ $width: 800px;
         white-space: pre-line;
       }
       .toolbar {
-        border-top: 1px solid $line;
+        border-bottom: 1px solid $line;
+        @include clearfix;
+        color: $grey;
         @include font-size($smaller);
         padding: $space/3;
         vertical-align: middle;
         a,
         .icon {
-          color: $grey;
           svg {
             fill: $grey;
           }
           &:hover {
-            color: #FFF;
             svg {
               fill: #FFF;
             }
           }
         }
-        .dropdown .options {
-          svg {
-            float: right;
-            margin-left: $space/6;
-            width: $space/2;
+        .dropdown {
+          > a {
+            padding: 0 $space/2;
           }
-          .error {
-            color: $red;
+          .status:before {
+            margin-right: $space/4;
           }
-          .ok {
-            color: $green;
+          .options {
+            svg {
+              float: right;
+              margin-left: $space/6;
+              width: $space/2;
+            }
           }
         }
         > * {
+          float: left;
           vertical-align: middle;
         }
+        > .fullscreen {
+          float: right;
+        }
         .icon {
-          @include tooltip(top, tint($light, 5%));
+          @include tooltip(top, tint($light, 10%));
         }
       }
     }

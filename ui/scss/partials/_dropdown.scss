@@ -2,14 +2,16 @@
 /* Dropdown */
 
 .dropdown {
-  @include dropdown(top);
+  @include dropdown;
   > *:first-child {
     cursor: pointer;
   }
   > a,
   .options > a {
     color: inherit;
-    &:hover {
+    &:hover,
+    &.active {
+      color: #FFF;
       text-decoration: none;
     }
   }
@@ -20,16 +22,12 @@
     box-sizing: border-box;
     > * {
       display: block;
-      padding: $space/12 $space;
+      padding: $space/6 $space/2;
       white-space: nowrap;
       @include transition-property(background, color);
       @include transition-duration($ease);
-      &.active {
-        color: #FFF;
-      }
       &:hover {
         background: tint($light, 10%);
-        color: #FFF;
       }
       &:first-child {
         border-radius: $radius $radius 0 0;
