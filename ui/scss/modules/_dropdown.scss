@@ -1,0 +1,61 @@
+@mixin dropdown($position: bottom, $hover: true) {
+  display: inline-block;
+  position: relative;
+  .options {
+    display: block;
+    opacity: 0;
+    position: absolute;
+    @if $position == top {
+      bottom: 100%;
+      margin-bottom: -3px;
+    }
+    @else if $position == bottom {
+      margin-top: -3px;
+      top: 100%;
+    }
+    @include transition-property(margin, opacity);
+    @include transition-duration($ease);
+    visibility: hidden;
+    z-index: 999;
+    > a {
+      display: block;
+      float: none;
+      white-space: nowrap;
+      width: auto;
+    }
+  }
+  &.active .options {
+    @if $position == top {
+      margin-bottom: 0;
+    }
+    @else if $position == bottom {
+      margin-top: 0;
+    }
+    opacity: 1;
+    visibility: visible;
+  }
+  @if $hover == true {
+    &:hover {
+      .options {
+        @if $position == top {
+          margin-bottom: 0;
+        }
+        @else if $position == bottom {
+          margin-top: 0;
+        }
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+    .options:hover {
+      @if $position == top {
+        margin-bottom: 0;
+      }
+      @else if $position == bottom {
+        margin-top: 0;
+      }
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "egg",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Wiredcraft/egg.git"
+  },
+  "author": "Ronan Berder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Wiredcraft/egg/issues"
+  },
+  "homepage": "https://wiredcraft.com/egg",
+  "dependencies": {
+    "gulp": "*",
+    "gulp-sass": "*",
+    "node-bourbon": "*"
+  }
+}
