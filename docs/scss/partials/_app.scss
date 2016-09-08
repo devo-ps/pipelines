@@ -1,0 +1,311 @@
+#menu,
+#navigation {
+  bottom: 0;
+  color: #FFF;
+  overflow: auto;
+  position: fixed;
+  top: 0;
+  .select {
+    select {
+      @include button(shade($black, 10%), false, false);
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+      padding: $space/6 $space $space/6 $space/3;
+    }
+  }
+  .button {
+    padding: $space/12 $space/3;
+  }
+  input {
+    background: rgba(0, 0, 0, 0.1);
+    padding: $space/12 $space/3;
+    &:hover {
+      background: rgba(0, 0, 0, 0.2);
+    }
+    &:focus {
+      background: #FFF;
+      color: $black;
+    }
+  }
+  svg {
+    display: block;
+    fill: #FFF;
+    height: 1.5*$space/2;
+  }
+  h2,
+  h3 {
+    color: inherit;
+    line-height: 160%;
+    margin: 0;
+  }
+  > * {
+    > h3 {
+      @include font-size($pico);
+      letter-spacing: 1px;
+    }
+    > a {
+      color: inherit;
+      display: block;
+      &:hover,
+      &.active {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+#menu {
+  background: $black;
+  box-shadow: 10px 0 0 rgba(0, 0, 0, 0.1);
+  left: 0;
+  padding-bottom: $menu_footer;
+  width: $menu;
+  .body {
+    .select {
+      display: inline-block;
+      margin: 0 1.5*$space/3 $space/3;
+      select {
+        width: 100%;
+      }
+    }
+    h3 {
+      padding: $space/3 1.5*$space/3;
+      opacity: 0.4;
+    }
+    img {
+      border-radius: $radius;
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+      float: left;
+      height: $space;
+      margin: (-$space/12) $space/4 0 0;
+    }
+    > a {
+      border-left: 2px solid transparent;
+      color: inherit;
+      cursor: pointer;
+      display: block;
+      opacity: 0.5;
+      padding: $space/3 1.5*$space/3;
+      @include transition-property(opacity);
+      @include transition-duration($ease);
+      svg,
+      img {
+        float: left;
+        margin: 1px $space/8 0 0;
+      }
+      &:hover,
+      &.active {
+        opacity: 1;
+        text-decoration: none;
+      }
+      &.active {
+        border-color: $blue;
+      }
+    }
+  }
+  .footer {
+    background: $black;
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
+    bottom: 0;
+    @include clearfix;
+    position: fixed;
+    text-align: center;
+    width: $menu;
+    > * {
+      box-sizing: border-box;
+      color: #FFF;
+      cursor: pointer;
+      display: block;
+      float: left;
+      @include font-size($micro);
+      opacity: 0.5;
+      padding: $space/2 0;
+      width: 50%;
+      @include transition-property(opacity);
+      @include transition-duration($ease);
+      &:hover {
+        opacity: 1;
+        text-decoration: none;
+      }
+      svg,
+      img {
+        display: block;
+        height: $space;
+        margin: 0 auto $space/6;
+      }
+    }
+  }
+}
+
+#navigation {
+  background: tint($black, 7%);
+  left: $menu;
+  width: $navigation;
+  .header {
+    border-bottom: 1px solid $black;
+    @include font-size($small);
+    padding: $space/3 $space/2;
+    input {
+      border-radius: $space;
+      padding: $space/12 $space/2;
+    }
+    .controls {
+      float: right;
+    }
+  }
+  .body {
+    a {
+      border-bottom: 1px solid $black;
+      padding: $space/3 $space/2;
+      h2 {
+        opacity: 0.5;
+      }
+      small {
+        opacity: 0.25;
+      }
+      &.active {
+        background: $blue;
+      }
+      &.active,
+      &:hover {
+        h2 {
+          opacity: 1;
+        }
+        small {
+          opacity: 0.5;
+        }
+      }
+    }
+    h2 {
+      font-size: inherit;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+$sidebar: 288px;
+
+#content {
+  background: $background;
+  margin-left: $menu + $navigation;
+  &.loading:after {
+    left: $menu + $navigation;
+    position: fixed;
+  }
+  input:not([type=submit]),
+  textarea,
+  .select select {
+    width: 100%;
+  }
+  .description {
+    color: tint($black, 40%);
+  }
+  .sidebar {
+    bottom: 0;
+    box-sizing: border-box;
+    @include clearfix;
+    overflow: auto;
+    padding: $space 1.5*$space $space $space;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: $sidebar;
+    & + .body {
+      padding-right: $sidebar;
+    }
+    input,
+    .primary,
+    .select,
+    .select select {
+      width: 100%;
+    }
+    .switch {
+      float: right;
+      & + label {
+        margin: 0 $space/2 0 0;
+      }
+    }
+    .primary {
+      margin-bottom: $space/2;
+    }
+    .danger {
+      background: transparent;
+      border: 0;
+      float: right;
+      line-height: 1;
+      outline: none;
+      padding: 0;
+      position: relative;
+      @include tooltip();
+      vertical-align: middle;
+      @include tooltip(bottom);
+      svg {
+        fill: rgba(0, 0, 0, 0.2);
+        @include transition-property(fill);
+        @include transition-duration($ease);
+      }
+      &:hover {
+        svg {
+          fill: $red;
+        }
+      }
+    }
+  }
+  .body {
+    box-sizing: border-box;
+    padding: $space 1.5*$space;
+  }
+}
+
+/* The switch - the box around the slider */
+$switch_size: 12px;
+$switch_padding: 4px;
+
+.switch {
+  float: left;
+  height: $switch_size + 2*$switch_padding;
+  margin: 0;
+  opacity: 1;
+  position: relative;
+  width: 2*$switch_size + 2*$switch_padding;
+  input {
+    display: none;
+    &:checked + .slider {
+      background: $blue;
+    }
+    &:checked + .slider:before {
+      @include transform(translateX($switch_size));
+    }
+  }
+  .slider {
+    background: rgba(0, 0, 0, 0.1);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1) inset;
+    border-radius: 2*$switch_size;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    @include transition-duration($ease);
+    &:before {
+      background: #FFF;
+      box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      bottom: $switch_padding;
+      content: '';
+      height: $switch_size;
+      left: $switch_padding;
+      position: absolute;
+      width: $switch_size;
+      @include transition-duration($ease);
+    }
+  }
+  & + label {
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 0 0 $space/3;
+    vertical-align: bottom;
+  }
+}
