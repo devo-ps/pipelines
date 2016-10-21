@@ -1,0 +1,6 @@
+---
+tasks:
+  - ls /tmp
+vars: 
+  whatever: woot
+plugins: []

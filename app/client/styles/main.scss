@@ -1,0 +1,173 @@
+@import "normalize.scss";
+
+body {
+  font-family: "Helvetica Neue", serif;
+  font-size: 16px;
+}
+
+.content {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  width: 100%;
+}
+section {
+  margin: auto;
+  width: 760px;
+}
+
+.icon {
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  fill: currentColor;
+  cursor: pointer;
+
+  &-run{
+    color: green;
+  }
+  &-running {
+    color: #777;
+  }
+  &-checkmark {
+    color: green;
+  }
+}
+
+.pipeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    margin-top: 15px;
+  }
+}
+
+.panel {
+  display: block;
+  padding: 10px 25px;
+  border: 1px solid #ddd;
+  &-content {
+    width: 80%;
+  }
+  &-control {
+    width: 20%;
+    text-align: right;
+  }
+  &-content,
+  &-control {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+}
+.task {
+  &-action {
+    margin-right: 10px;
+  }
+  &-summary {
+    p {
+      margin: 0;
+      color: #777;
+    }
+  }
+  &-summary,
+  &-action {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+.collapse {
+  display: none;
+
+  &.in {
+    display: block;
+    min-height: 60px;
+  }
+}
+.details {
+  .logs {    
+    margin: 15px 5px;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+    padding: 10px;
+    // max-height: 400px;
+    overflow-y: auto;
+  }
+  .loading {
+    display: block;
+    text-align: center;
+  }
+}
+
+.spinning {
+  animation-name:spin;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.disabled {
+  pointer-events: none;
+  cursor: none;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.job-id {
+  width: 60px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  background: #ddd;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+.task-details {
+  border: 1px solid #ddd;
+  border-top: none;
+  
+  li {
+    margin: 0;
+    text-align: center;
+    padding: 10px;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    &.active {
+      border-right: none; 
+    }
+    span {
+      margin-right: 5px;
+    }
+  }
+  nav .icon {
+    font-size: 10px;
+  }
+}
+
+.collapse {
+  display: none;
+
+  &.in      { display: block; }
+  tr&.in    { display: table-row; }
+  tbody&.in { display: table-row-group; }
+}
+
+.collapsing {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  transition-property: "height, visibility";
+  transition-duration: .35s;
+  transition-timing-function: ease;
+}

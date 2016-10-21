@@ -1,0 +1,2 @@
+class PluginError(RuntimeError):
+    pass

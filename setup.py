@@ -1,29 +1,48 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python
+import os
+import sys
+import shutil
+
+from pipelines import __version__, __author__
+
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
-
 setup(
-    name='plines',
-    version='0.1.0',
-    author=u'Juha Suomalainen',
-    author_email='none@none.com',
-    packages=[
-       'pipelineplugins',
-       'pipelineworm',
-       'pluginworm',
-    ],
-    package_dir={
-        '': 'lib'
+    name='pipelines',
+    version=__version__,
+    description='Pipelines',
+    url = 'https://getpipelines.com',
+    author=__author__,
+    author_email='pipelines@wirecraft.com',
+    license='MIT',
+    package_dir={ 
+        'pipelines': 'pipelines',
     },
-    scripts=[ 'scripts/pline'],
-    url='http://bitbucket.org/bruno/django-geoportail',
-    license='Proprietary Wiredcraft',
-    description='Tool to run pipelines',
-    long_description=open('README.md').read(),
-    install_requires=[
-          'docopt', 'PyYAML', 'requests', 'sh'
-      ],
+    package_data={
+        'pipelines.api': ['app_dist/*.html', 'app_dist/client/dist/*']
+    },
+    packages=[
+        'pipelines',
+        'pipelines.pipeline',
+        'pipelines.api',
+        'pipelines.plugins',
+        'pipelines.plugin'
+    ],
+    scripts=[
+        'bin/pipelines'
+    ],
+    install_requires = [
+        'futures==3.0.5',
+        'Jinja2==2.8',
+        'PyYAML==3.11',
+        'requests==2.9.1',
+        'sh==1.11',
+        'tornado==4.3',
+        'docopt==0.6.2',
+        'dotmap==1.1.16',
+        'schema==0.5.0'
+    ],
 )

@@ -1,0 +1,11 @@
+.*
+!.gitignore
+
+*.pyc
+*.pyo
+*.egg-info
+
+node_modules
+npm-debug.log
+assets.json
+.DS_Store

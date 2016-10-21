@@ -1,0 +1,2 @@
+recursive-include pipelines/api/app_dist *
+
