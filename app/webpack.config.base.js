@@ -14,6 +14,9 @@ Object.assign(env, {
   build: (env.production || env.staging)
 });
 
+
+var bourbonPaths = require('bourbon').includePaths
+
 module.exports = {
   target: 'web',
 
@@ -36,7 +39,10 @@ module.exports = {
       'node_modules',
       'client'
     ],
-    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx']
+    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.scss'],
+    alias:  {
+      styles: 'client/styles',
+    }
   },
 
   plugins: [
@@ -50,7 +56,7 @@ module.exports = {
 
   module: {
     loaders: [
-      {test: /\.scss$/, loader: 'style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded'}
+      {test: /\.scss$/, loader: 'style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded?includePaths[]=' + bourbonPaths }
     ],
 
     noParse: /\.min\.js/

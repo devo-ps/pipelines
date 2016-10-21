@@ -1,0 +1,22 @@
+$box: 264px;
+
+.card {
+  display: block;
+  margin: 4*$space auto 0;
+  width: $box;
+  input,
+  .primary {
+    @include font-size($larger);
+    line-height: 160%;
+    padding: $space/3;
+    width: 100%;
+  }
+  small {
+    color: rgba(255, 255, 255, 0.4);
+    display: block;
+    letter-spacing: 1px;
+    margin-top: $space/4;
+    text-align: center;
+    text-transform: uppercase;
+  }
+}

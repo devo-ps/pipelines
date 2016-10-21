@@ -8,8 +8,8 @@ Options:
     --config=<config>           Path to config file [default: /etc/pipelines/pipelines.conf]
     --host=<host>               Bind address [default: 127.0.0.1]
     --port=<port>               Bind port [default: 8888]
-    --username=<port>           Admin Username [default: admin]
-    --password=<port>           Admin Password [default: admin]
+    --username=<port>           Admin Username
+    --password=<port>           Admin Password
     --workspace=<workspace>     Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
 
 Help:
@@ -45,7 +45,8 @@ if __name__ == '__main__':
         if '--username' in args and '--password' in args:
             username = args.get('--username')
             password = args.get('--password')
-            options['auth'] = (username, password)
+            if username and password:
+                options['auth'] = (username, password)
 
         try:
             server.main(options)

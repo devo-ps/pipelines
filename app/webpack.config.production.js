@@ -13,7 +13,7 @@ config.profile = false;
 config.devtool = '#source-map';
 
 config.output = {
-  path: '../pipelines/api/app_dist/client/dist',
+  path: 'client/dist',
   pathInfo: true,
   publicPath: '/client/dist/',
   filename: 'bundle.[hash].min.js'

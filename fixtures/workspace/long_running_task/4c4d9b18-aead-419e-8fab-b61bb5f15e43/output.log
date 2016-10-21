@@ -1,0 +1,12 @@
+2016:10:21 18:17:27: Pipeline started
+2016:10:21 18:17:27: Task started: Task-1
+Pre sleep task
+2016:10:21 18:17:27: Task finished, name: Task-1, status: 0, msg: Pre sleep task
+
+2016:10:21 18:17:27: Task started: Task-2
+2016:10:21 18:17:57: Task finished, name: Task-2, status: 0, msg: 
+2016:10:21 18:17:57: Task started: Task-3
+Post sleep task
+2016:10:21 18:17:57: Task finished, name: Task-3, status: 0, msg: Post sleep task
+
+2016:10:21 18:17:57: Pipeline finished. Duration: 30.15s, 0 failed tasks
