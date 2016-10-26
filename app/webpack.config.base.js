@@ -39,7 +39,7 @@ module.exports = {
       'node_modules',
       'client'
     ],
-    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.scss'],
+    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.scss', '.css'],
     alias:  {
       styles: 'client/styles',
     }
@@ -56,7 +56,8 @@ module.exports = {
 
   module: {
     loaders: [
-      {test: /\.scss$/, loader: 'style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded?includePaths[]=' + bourbonPaths }
+      {test: /\.scss$/, loader: 'style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded?includePaths[]=' + bourbonPaths},
+      {test: /\.css$/, loader: 'style-loader!css-loader'}
     ],
 
     noParse: /\.min\.js/

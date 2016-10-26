@@ -126,16 +126,18 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         log.debug('Getting all pipelines')
         pipelines = []
         for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
-            pipeline_def = yaml.load(open(os.path.join(workspace, path)))
+            with open(os.path.join(workspace, path)) as f:
+                yaml_string = f.read()
+            pipeline_def = yaml.load(yaml_string)
             slug = _slugify_file(path)
             full_path = os.path.join(workspace, slug)
             if os.path.isdir(full_path):
                 # expect to have runs
                 ids = list(_run_id_iterator(full_path))
                 runs = _fetch_runs(full_path, ids)
-                pipelines.append({'slug': slug, 'run_ids': ids, 'runs': runs, 'definition': pipeline_def})
+                pipelines.append({'slug': slug, 'run_ids': ids, 'runs': runs, 'definition': pipeline_def, 'raw': yaml_string })
             else:
-                pipelines.append({'slug': slug, 'run_ids': [], 'definition': pipeline_def})
+                pipelines.append({'slug': slug, 'run_ids': [], 'definition': pipeline_def, 'raw': yaml_string})
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
@@ -155,7 +157,9 @@ class GetPipelineHandler(PipelinesRequestHandler):
         else:
             raise HTTPError(404, 'Pipeline not found')
 
-        pipeline_def = yaml.load(open(file_path))
+        with open(file_path) as f:
+            yaml_string = f.read()
+        pipeline_def = yaml.load(yaml_string)
 
         # expect to have runs
         ids = list(_run_id_iterator(folder_path))
@@ -164,7 +168,8 @@ class GetPipelineHandler(PipelinesRequestHandler):
         ret = {
             'slug': pipeline_slug,
             'run_ids': ids,
-            'definition': pipeline_def
+            'definition': pipeline_def,
+            'raw': yaml_string
         }
         if runs:
             ret['runs'] = runs
