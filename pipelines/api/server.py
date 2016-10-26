@@ -1,6 +1,7 @@
 
 import json
 import logging
+import yaml
 
 import os
 import re
@@ -33,8 +34,9 @@ class PipelinesRequestHandler(RequestHandler):
     def get_current_user(self):
         if not self.settings.get('auth'):
             # No authentication required
+            print 'No auth required'
             return 'guest'
-
+        print 'Auth required %s' % self.settings.get('auth')
         user_cookie = self.get_secure_cookie("user")
         if user_cookie:
             return json.loads(user_cookie)
@@ -95,7 +97,7 @@ def _authenticate_user(auth_settings, username, password):
 
 class LoginHandler(PipelinesRequestHandler):
     def get(self):
-        print self.current_user
+        log.debug('Login page')
         self.write('<html><body><form action="/login" method="post">'
                    'Username: <input type="text" name="username"><br/>'
                    'Password: <input type="text" name="password"><br/>'
@@ -119,25 +121,87 @@ class GetPipelinesHandler(PipelinesRequestHandler):
 
     @authenticated
     def get(self):
+        log.debug('Get pipelines')
         workspace = self.settings['workspace_path']
         log.debug('Getting all pipelines')
         pipelines = []
         for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
+            with open(os.path.join(workspace, path)) as f:
+                yaml_string = f.read()
+            pipeline_def = yaml.load(yaml_string)
             slug = _slugify_file(path)
             full_path = os.path.join(workspace, slug)
             if os.path.isdir(full_path):
                 # expect to have runs
                 ids = list(_run_id_iterator(full_path))
-                pipelines.append({'slug': slug, 'run_ids': ids})
+                runs = _fetch_runs(full_path, ids)
+                pipelines.append({'slug': slug, 'run_ids': ids, 'runs': runs, 'definition': pipeline_def, 'raw': yaml_string })
             else:
-                pipelines.append({'slug': slug, 'run_ids': []})
+                pipelines.append({'slug': slug, 'run_ids': [], 'definition': pipeline_def, 'raw': yaml_string})
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
+class GetPipelineHandler(PipelinesRequestHandler):
+
+    @authenticated
+    def get(self, pipeline_slug):
+        log.debug('Get pipeline %s' % pipeline_slug)
+        workspace = self.settings['workspace_path']
+
+        folder_path = os.path.join(workspace, pipeline_slug)
+        file_path = ''
+        if os.path.exists(folder_path + '.yml'):
+            file_path = folder_path + '.yml'
+        elif os.path.exists(folder_path + '.yaml'):
+            file_path = folder_path + '.yaml'
+        else:
+            raise HTTPError(404, 'Pipeline not found')
+
+        with open(file_path) as f:
+            yaml_string = f.read()
+        pipeline_def = yaml.load(yaml_string)
+
+        # expect to have runs
+        ids = list(_run_id_iterator(folder_path))
+        runs = _fetch_runs(folder_path, ids)
+
+        ret = {
+            'slug': pipeline_slug,
+            'run_ids': ids,
+            'definition': pipeline_def,
+            'raw': yaml_string
+        }
+        if runs:
+            ret['runs'] = runs
+        self.write(json.dumps(ret, indent=2))
+        self.finish()
+
+
+
+def _fetch_runs(path, run_ids):
+    ret = []
+
+    for run_id in run_ids:
+        item = {'id': run_id}
+        run_status_path = os.path.join(path, run_id, 'status.json')
+        if os.path.isfile(run_status_path):
+            with open(run_status_path) as f:
+                try:
+                    run_status = json.load(f)
+                    item.update(run_status)
+                except ValueError:
+                    log.warning('Failed to parse json file. Skipping. File: %s' % run_status_path)
+        else:
+            log.debug('Run status file doesn\'t exist: %s' % run_status_path)
+
+        ret.append(item)
+    ret.sort(key=lambda run: run.get('start_time'), reverse=True)
+    return ret
 
 class GetLogsHandler(PipelinesRequestHandler):
 
     def get(self, pipeline_slug, task_id):
+        log.debug('Get logs: {}, {}'.format(pipeline_slug,task_id))
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline logs')
 
@@ -153,7 +217,7 @@ class GetLogsHandler(PipelinesRequestHandler):
 class GetStatusHandler(PipelinesRequestHandler):
 
     def get(self, pipeline_slug, task_id):
-        print 'STATUS'
+        log.debug('Get status of: {}, {}'.format(pipeline_slug,task_id))
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline status')
 
@@ -167,9 +231,14 @@ class GetStatusHandler(PipelinesRequestHandler):
                 self.write(f.read())
                 self.finish()
 
+
+
+
+
 class RunPipelineHandler(PipelinesRequestHandler):
     @gen.coroutine
     def post(self, pipeline_slug):
+        log.debug('Run pipeline: {}'.format(pipeline_slug))
         workspace = self.settings['workspace_path']
         log.debug('Running pipeline')
 
@@ -214,6 +283,7 @@ def make_app(workspace='fixtures/workspace', auth=None):
 
     return Application([
         url(r"/api/pipelines/", GetPipelinesHandler),
+        url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/", GetPipelineHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/run", RunPipelineHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
         url(r"/api/pipelines/([0-9a-zA-Z_\-]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),

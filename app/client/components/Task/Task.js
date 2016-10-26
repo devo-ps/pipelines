@@ -12,11 +12,13 @@ export default class Task extends Component {
   constructor(props) {
     super(props);
     this.state = {open: false, runTasks: [], historyTasks: []};
+    console.log('aa', props)
   }
 
   componentDidMount () {
-    const {task} = this.props
 
+    const {task} = this.props
+    console.log('aa', this.props)
     if (task.run_ids && task.run_ids.length > 0) {
       let temp = task.run_ids
 
