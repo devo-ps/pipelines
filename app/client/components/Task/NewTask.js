@@ -15,11 +15,12 @@ export default class NewTask extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {open: false, runTasks: [], runs: [], task: props.task, tab: 'logs', intervals: {}, logs: {}};
-    console.log('initial', this.state.task)
+
+    this.state = {open: false, runTasks: [], runs: [], task: props.task, tab: 'logs', intervals: {}, logs: {}, promptHolder: props.task.definition.prompt};
   }
 
   componentDidMount () {
+    console.log('did mount')
     const {task} = this.props
 
     if (task.run_ids && task.run_ids.length > 0) {
@@ -43,6 +44,9 @@ export default class NewTask extends Component {
         var activeRunId = task.runs[0].id
         this.setState({activeRunId: activeRunId})
         this.refreshLogs(activeRunId)
+        this.fetchTriggers(task.slug)
+      } else {
+        console.log('else', task)
       }
 
     }
@@ -59,6 +63,15 @@ export default class NewTask extends Component {
       })
   }
 
+  fetchTriggers(slug){
+    console.log('Fetching triggers for',  slug)
+    return API.getTriggers(slug)
+      .then((result) => {
+        this.setState({triggers: result.triggers})
+        console.log('ff', result)
+      })
+  }
+
   getRunWithId (targetId) {
     var runs = this.state.task.runs;
     if (!runs){
@@ -72,28 +85,42 @@ export default class NewTask extends Component {
     return undefined
   }
 
-  onRun (e) {
-    var task = this.state.task
-    var this_run = {status: 'running', id: '0'}
-    var runs = this.state.task.runs;
-    runs.unshift(this_run)
-    this.setState({
-      open: true,
-      task: task,
-      status: 'running',
-      activeRunId: '0'
-    })
+  onRun (params, ev) {
+    ev.stopPropagation();
+    console.log('onRun', params)
+    if (Object.keys(this.state.promptHolder).length && !params){
 
-    API.runPipeline(task.slug)
-      .then((data) => {
-        console.log('Pipeline run, new task id: ', data.task_id)
+      // Ask for params
+      console.log('onRun ask for params', this.state.promptHolder, params)
+      this.setState({showPrompt: true})
+    }
+    else {
+        params = params || {}
+        var task = this.state.task
+        var this_run = {status: 'running', id: '0'}
+        var runs = this.state.task.runs;
+        runs.unshift(this_run)
+        var that = this;
         this.setState({
+          open: true,
           task: task,
-          activeRunId: data.task_id
+          status: 'running',
+          activeRunId: '0'
         })
-        this.pollingLog(data.task_id)
-        this.pollPipeline()
-      })
+
+        API.runPipeline(task.slug, params)
+          .then((data) => {
+            console.log('Pipeline run, new task id: ', data.task_id)
+            that.setState({
+              task: task,
+              activeRunId: data.task_id
+            })
+            that.pollingLog(data.task_id)
+            that.pollPipeline()
+          })
+        this.setState({showPrompt: false})
+    }
+
   }
 
   toggleMenu () {
@@ -253,6 +280,41 @@ export default class NewTask extends Component {
     })
   }
 
+
+  handlePropFormChange(key, e) {
+    var promptHolder = this.state.promptHolder;
+    console.log('123', promptHolder, this.state)
+    promptHolder[key] = e.target.value;
+    this.setState({promptHolder: promptHolder})
+  }
+
+  getPromptFieldsHtml() {
+    if (this.state.task.definition.prompt){
+      var that = this;
+      var fields =  Object.keys(this.state.promptHolder).map(function(key){
+        return (
+          <span key={key}>
+            <label>{key}</label>
+            <input type='text' value={that.state.promptHolder[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
+          </span>
+        )
+      });
+
+
+      return (
+        <div className={`prompt-tooltip ${this.state.showPrompt ? 'active' : 'inactive'}`}>
+          <span>Please input fields:</span>
+          <span>{fields}</span>
+          <button onClick={this.onRun.bind(this, this.state.promptHolder)} >Run</button>
+          <button onClick={::this.hidePrompt} >Cancel</button>
+        </div>
+      )
+    }
+  }
+
+  hidePrompt(){
+    this.setState({showPrompt: false})
+  }
   render () {
     const {task} = this.props
     const {runTasks, runs} = this.state
@@ -274,12 +336,18 @@ export default class NewTask extends Component {
           return input.replace(regex, '<b style="color: gray">$1</b>')
         }
       };
-      console.log('asdf', this.state.logs[activeRunObj.id], this.state, activeRunObj)
       tabContent2 = (
         <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id])} } >
         </div>
       );
     } else {
+       tabContent =(
+           <header className='toolbar'>
+               <span className='status'>
+                 webhooks: {this.state.triggers.map(function(item){ return <span>{item.webhook_id}</span>})}
+               </span>
+           </header>
+         )
        tabContent2 = (<div className='console' >{this.state.task.raw }</div>);
     }
 
@@ -289,7 +357,9 @@ export default class NewTask extends Component {
           onclick2='toggleItem(this)'
         >
           <header className='header' onClick={::this.toggleItem}>
-            <button className='icon run' onClick={::this.onRun}>
+            {this.getPromptFieldsHtml()}
+
+            <button className='icon run' onClick={this.onRun.bind(this, undefined)}>
               <span className='svg icon' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
               <span>Run</span>
             </button>

@@ -7,6 +7,9 @@ vars:
  code_branch: dev
 
 
+triggers:
+ - name: gh-webhook
+
 triggers: []
   # By default you can trigger the pipeline by hitting `http://example.com/wh/SECRET` (where `SECRET` is displayed in
   # the Web UI). Maybe we can make overridable.

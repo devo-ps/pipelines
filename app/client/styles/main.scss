@@ -294,6 +294,17 @@ $width: 800px;
           opacity: 1;
         }
       }
+      .prompt-tooltip {
+          display: none;
+          z-index: 1000;
+          position: absolute;
+          background-color: white;
+          color: gray;
+
+          &.active {
+            display: block
+          }
+        }
     }
     .body {
       background: $black;
@@ -315,6 +326,7 @@ $width: 800px;
         white-space: pre;
       }
       .toolbar {
+
         border-bottom: 1px solid $line;
         @include clearfix;
         color: $grey;

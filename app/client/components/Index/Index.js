@@ -1,5 +1,4 @@
 import React, { Component, PropTypes } from 'react';
-import Task from '../Task/Task';
 import NewTask from '../Task/NewTask';
 import {getAllPipelines} from '../../api';
 import 'styles/main'
@@ -25,7 +24,7 @@ export default class Index extends Component {
     console.log('rend', this.state.pipelines)
     if (this.state.pipelines.length === 0) {
       return (
-        <p ref="empty">Index is empty.</p>
+        <p ref="empty loading">Loading...</p>
       );
     }
 

@@ -4,7 +4,7 @@ import superagent from 'superagent'
 //const API_URL = 'https://pipelines.service.wiredcraft.com:4443/api/pipelines'
 const API_URL = 'http://localhost:8888/api/pipelines'
 
-function request(method, url) {
+function request(method, url, body) {
   return superagent(method, `${API_URL}${url}`)
     .set('Accept', 'application/json')
 }
@@ -28,9 +28,12 @@ export function getAllPipelines() {
   })
 }
 
-export function runPipeline(pipeline) {
+export function runPipeline(pipeline, params) {
+  console.log('api.runPipeline', pipeline, params)
+  params = params || {}
   return new Promise((resolve, reject) => {
     request('POST', `/${pipeline}/run`)
+    .send({'prompt': params})
     .end((err, res) => {
       if (err) return reject(err)
       resolve(res.text)
@@ -60,6 +63,18 @@ export function getPipeline(pipeline) {
   })
   .then(bodyParser)
 }
+
+export function getTriggers(pipeline) {
+  return new Promise((resolve, reject) => {
+    request('GET', `/${pipeline}/triggers`)
+    .end((err, res) => {
+      if (err) return reject(err)
+      resolve(res.text)
+    })
+  })
+  .then(bodyParser)
+}
+
 
 export function getPipelineLog(pipeline, taskId) {
   return new Promise((resolve, reject) => {

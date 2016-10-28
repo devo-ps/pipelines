@@ -1,0 +1,42 @@
+2016:10:26 17:25:26: Pipeline started
+2016:10:26 17:25:26: Task started: Task-1
+Pre sleep task
+2016:10:26 17:25:26: Task finished, name: Task-1, status: 0, msg: Pre sleep task
+
+2016:10:26 17:25:26: Task started: Task-2
+2016:10:26 17:25:30: Task finished, name: Task-2, status: 0, msg: 
+2016:10:26 17:25:30: Task started: Task-3
+2016:10:26 17:25:34: Task finished, name: Task-3, status: 0, msg: 
+2016:10:26 17:25:34: Task started: Task-4
+2016:10:26 17:25:38: Task finished, name: Task-4, status: 0, msg: 
+2016:10:26 17:25:38: Task started: Task-5
+2016:10:26 17:25:43: Task finished, name: Task-5, status: 0, msg: 
+2016:10:26 17:25:43: Task started: Task-6
+2016:10:26 17:25:47: Task finished, name: Task-6, status: 0, msg: 
+2016:10:26 17:25:47: Task started: Task-7
+2016:10:26 17:25:51: Task finished, name: Task-7, status: 0, msg: 
+2016:10:26 17:25:51: Task started: Task-8
+2016:10:26 17:25:55: Task finished, name: Task-8, status: 0, msg: 
+2016:10:26 17:25:55: Task started: Task-9
+2016:10:26 17:25:59: Task finished, name: Task-9, status: 0, msg: 
+2016:10:26 17:25:59: Task started: Task-10
+2016:10:26 17:26:03: Task finished, name: Task-10, status: 0, msg: 
+2016:10:26 17:26:03: Task started: Task-11
+2016:10:26 17:26:07: Task finished, name: Task-11, status: 0, msg: 
+2016:10:26 17:26:07: Task started: Task-12
+2016:10:26 17:26:11: Task finished, name: Task-12, status: 0, msg: 
+2016:10:26 17:26:11: Task started: Task-13
+2016:10:26 17:26:15: Task finished, name: Task-13, status: 0, msg: 
+2016:10:26 17:26:15: Task started: Task-14
+2016:10:26 17:26:19: Task finished, name: Task-14, status: 0, msg: 
+2016:10:26 17:26:19: Task started: Task-15
+2016:10:26 17:26:23: Task finished, name: Task-15, status: 0, msg: 
+2016:10:26 17:26:23: Task started: Task-16
+2016:10:26 17:26:27: Task finished, name: Task-16, status: 0, msg: 
+2016:10:26 17:26:27: Task started: Task-17
+2016:10:26 17:26:31: Task finished, name: Task-17, status: 0, msg: 
+2016:10:26 17:26:31: Task started: Task-18
+Post sleep task
+2016:10:26 17:26:31: Task finished, name: Task-18, status: 0, msg: Post sleep task
+
+2016:10:26 17:26:31: Pipeline finished. Duration: 1.0m 5.0s, 0 failed tasks

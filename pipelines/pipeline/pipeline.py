@@ -1,4 +1,5 @@
 import importlib
+import json
 import logging
 import os
 import sys
@@ -21,7 +22,7 @@ from pipelines.plugin.exceptions import PluginError
 from pipelines.plugin.manager import PluginManager
 from schema import Or, Schema, Optional
 
-from pipelines.utils import conf_logging
+from pipelines.utils import conf_logging, deepmerge
 
 log = logging.getLogger('pipelines')
 
@@ -63,6 +64,9 @@ PIPELINES_SCHEMA = Schema({
     Optional('plugins'): [
         basestring
     ],
+    Optional('prompt'): {
+        basestring: basestring
+    },
     Optional('triggers'): [{
         'type': Or('webhook', 'cron'),
         Optional('schedule'): basestring
@@ -98,7 +102,6 @@ class Pipeline(object):
                 err_msg = e.problem
                 err_msg += ' (line: {})'.format(e.problem_mark.line)
                 raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s - %s' % (file_path, err_msg))
-
 
         PIPELINES_SCHEMA.validate(pipeline_def)
 
@@ -142,17 +145,20 @@ class Pipeline(object):
     def _task_executor_valid(self, task_type):
         return bool(self.plugin_mgr.get_plugin('{}.execute'.format(task_type)))
 
-    def run(self, trigger_data={}):
+
+    def run(self, params={}):
         self.plugin_mgr.trigger('on_pipeline_start')
 
-        pipeline_context = DotMap({
+        pipeline_context ={
             'results': [],
             'vars': self.context.get('vars'),
-            'trigger_data': trigger_data,
             'status': PIPELINE_STATUS_OK,
             'prev_result': None
-        })
-        log.debug('Pipeline starting.')
+        }
+        pipeline_context = deepmerge(pipeline_context, params)
+        pipeline_context = DotMap(pipeline_context)
+
+        log.debug('Pipeline starting. context: %s' % pipeline_context)
         for task in self.tasks:
             if self._should_run(task, pipeline_context):
                 task.args = substitute_variables(pipeline_context, task.args)

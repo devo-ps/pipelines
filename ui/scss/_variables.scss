@@ -1,0 +1,51 @@
+/* Colors from http://clrs.cc/ */
+
+$aqua: #7FDBFF !default;
+$black: #181818;
+$blue: #0A93FF;
+$fuchsia: #F012BE !default;
+$green: #02BB4F;
+$grey: #999;
+$lime: #01FF70 !default;
+$maroon: #85144b !default;
+$navy: #001f3f !default;
+$olive: #3D9970 !default;
+$orange: #FF851B !default;
+$purple: #B10DC9 !default;
+$red: #FF6059;
+$silver: #DDDDDD !default;
+$teal: #00D6D8;
+$yellow: #FFDC00 !default;
+
+$primary: $green;
+$secondary: $blue;
+
+$light: #282828;
+$line: $light;
+$background: $black;
+
+/* Sizes */
+
+$pico: 10 !default;
+$micro: 11 !default;
+$small: 12 !default;
+$smaller: 14 !default;
+$regular: 16 !default;
+$larger: 18 !default;
+$large: 24 !default;
+$huge: 32 !default;
+$gigantic: 48 !default;
+$humongous: 64 !default;
+
+/* Fonts */
+
+$body: 'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$headline: $body;
+$code: 'Lucida Sans Typewriter', 'Lucida Console', monaco, 'Bitstream Vera Sans Mono', monospace !default;
+
+/* Misc */
+
+$ease: 0.2s !default;
+$space: 24px !default;
+$radius: 2px !default;
+$shadow: rgba(0, 0, 0, 0.05) 0 1px 0 0 !default;

@@ -14,7 +14,12 @@ triggers:
   - type: cron
     schedule: XXX
 
+prompt:
+ code_branch: dev
+ your_name: ''
+
 actions:
+ - 'echo "{{ webhook_content.aaaaa }}"'
  - 'echo "{{ slack_url }}"'
  - type: bash
    cmd: echo ansible-playbook deploy.yml -i hosts -u root -k -v --extra-vars "branch={{ code_branch }}"
