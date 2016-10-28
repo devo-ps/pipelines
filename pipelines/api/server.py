@@ -1,37 +1,43 @@
-
-import json
-import logging
-
 import os
 import re
+import json
 import yaml
+import logging
+import tornado
+import filelock
 from uuid import uuid4
-
+from concurrent.futures import ThreadPoolExecutor
 from tornado import gen
 from tornado.ioloop import IOLoop
-from tornado.web import RequestHandler, Application, url, HTTPError
-from pipelines.pipeline.pipeline import Pipeline
-from concurrent.futures import ThreadPoolExecutor
 from tornado import concurrent, ioloop
+from tornado.web import (
+    RequestHandler,
+    Application,
+    url,
+    HTTPError,
+    authenticated,
+    StaticFileHandler
+)
+from pipelines import PipelinesError
+from pipelines.utils import conf_logging
+from pipelines.pipeline.pipeline import Pipeline
 
-WEB_HOOK_CONFIG = 'webhook.json'
+WEB_HOOK_CONFIG = '.pipeline-store.json'
+PIPELINES_EXT = ('yml', 'yaml')
 
-def conf_logging():
-    logger = logging.getLogger('applog')
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    logger.propagate = False
+log = logging.getLogger('pipelines')
 
-    ch = logging.StreamHandler()
-    ch.setFormatter(formatter)
-    ch.setLevel(logging.DEBUG)
+class PipelinesRequestHandler(RequestHandler):
+    def get_current_user(self):
+        if not self.settings.get('auth'):
+            # No authentication required
+            return 'guest'
+        print 'Auth required %s' % self.settings.get('auth')
+        user_cookie = self.get_secure_cookie("user")
+        if user_cookie:
+            return json.loads(user_cookie)
+        return None
 
-    logger.addHandler(ch)
-
-conf_logging()
-log = logging.getLogger('applog')
-
-class BaseHandler(RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Headers", "x-requested-with")
@@ -52,17 +58,18 @@ class AsyncRunner(object):
         self.io_loop = ioloop.IOLoop.current()
 
     @concurrent.run_on_executor
-    def run(self, yaml_filepath, folder_path):
-        pipe = Pipeline.from_yaml(yaml_filepath, params={
+    def run(self, pipeline_file, folder_path, params={}):
+        pipe = Pipeline.from_yaml(pipeline_file, params={
             'status_file': os.path.join(folder_path, 'status.json'),
             'log_file': os.path.join(folder_path, 'output.log')
         })
-        return pipe.run()
+        return pipe.run(params=params)
 
-def _file_iterator(folder, extension):
+def _file_iterator(folder, extensions):
     for path in os.listdir(folder):
-        if path.endswith('.%s' % extension):
-            yield path
+        for ext in extensions:
+            if path.endswith('.%s' % ext):
+                yield path
 
 def _slugify_file(filename):
     basename = filename.rsplit('/', 1)[-1]
@@ -78,103 +85,85 @@ def _is_valid_uuid(uuid):
     match = regex.match(uuid)
     return bool(match)
 
-def _get_webhook_id(dict):
-    if not os.path.exists(WEB_HOOK_CONFIG):
-        return str(uuid4())
-    json_data = open(WEB_HOOK_CONFIG).read()
-    m = json.loads(json_data)
-    for k,v in m.items():
-        if cmp(dict, v) == 0:
+def _get_webhook_id(trigger_identifier, wh_config):
+
+    for k,v in wh_config.items():
+        if trigger_identifier == v:
             return k
     return str(uuid4())
 
-def _get_slug_trigger(webhook_id):
-    if not os.path.exists(WEB_HOOK_CONFIG):
-        raise HTTPError(404, 'Webhook config not found')
-    json_data = open(WEB_HOOK_CONFIG).read()
-    try:
-        m = json.loads(json_data)[webhook_id]
-    except KeyError as ke:
-        return ()
-    log.debug('wh content %s', m)
-    return (m['slug'], m['wh_name'])
+def _get_pipeline_filepath(workspace, slug):
+    for ext in PIPELINES_EXT:
+        yaml_filepath = os.path.join(workspace, '%s.%s' % (slug, ext))
+        if os.path.exists(yaml_filepath):
+            return yaml_filepath
+            break
+    return None
 
-class GetPipelinesHandler(BaseHandler):
-
-    def get(self):
-        workspace = self.settings['workspace_path']
-        log.debug('Getting all pipelines')
-        pipelines = []
-        for path in _file_iterator(workspace, extension='yaml'):
-            slug = _slugify_file(path)
-            full_path = os.path.join(workspace, slug)
-            if os.path.isdir(full_path):
-                ids = list(_run_id_iterator(full_path))
-                pipelines.append({ 'slug': slug, 'run_ids': ids })
-        self.write(json.dumps(pipelines, indent=2))
-        self.finish()
-
-class GetLogsHandler(BaseHandler):
-
-    def get(self, pipeline_slug, task_id):
-        workspace = self.settings['workspace_path']
-        log.debug('Getting all pipelines')
-
-        with open(os.path.join(workspace, pipeline_slug, task_id, 'output.log')) as f:
-            self.write(json.dumps({'output': f.read()}, indent=2))
-            self.finish()
-
-class GetStatusHandler(BaseHandler):
-
-    def get(self, pipeline_slug, task_id):
-        workspace = self.settings['workspace_path']
-        log.debug('Getting all pipelines')
-
-        with open(os.path.join(workspace, pipeline_slug, task_id, 'status.json')) as f:
-            self.write(f.read())
-            self.finish()
-
-def _run_pipeline(handler, workspace, slug):
-    yaml_filepath = os.path.join(workspace, '%s.yaml' % slug)
-    log.debug('_run_pipeline')
-    if not os.path.exists(yaml_filepath):
-        print('not found %s' % yaml_filepath)
+def _run_pipeline(handler, workspace, pipeline_slug, params={}):
+    log.debug('Running pipeline %s with params %s' % (pipeline_slug, json.dumps(params)))
+    # Guess the pipeline extension
+    pipeline_filepath = _get_pipeline_filepath(workspace, pipeline_slug)
+    if not pipeline_filepath:
         raise HTTPError(404, 'Pipeline not found')
 
     task_id = str(uuid4())
-    folder_path = os.path.join(workspace, slug, task_id)
+    folder_path = os.path.join(workspace, pipeline_slug, task_id)
     os.makedirs(folder_path)
 
     handler.write(json.dumps({'task_id': task_id}, indent=2))
     handler.finish()
 
     runner = AsyncRunner()
-    yield runner.run(yaml_filepath, folder_path)
+    yield runner.run(pipeline_filepath, folder_path, params)
 
 
-class RunPipelineHandler(BaseHandler):
-    @gen.coroutine
-    def post(self, pipeline_slug):
-        workspace = self.settings['workspace_path']
-        log.debug('Running pipeline')
-        return _run_pipeline(self, workspace, pipeline_slug)
+def _authenticate_user(auth_settings, username, password):
+    if username != auth_settings['username'] or password != auth_settings['password']:
+        return False
+    return True
 
-class WebhookHandler(BaseHandler):
+class WebhookHandler(RequestHandler):
+    def _get_wh_context(self, webhook_id, workspace):
+        conf_path = os.path.join(workspace, WEB_HOOK_CONFIG)
+        if not os.path.exists(conf_path):
+            raise HTTPError(404, 'Webhook config not found')
+
+        with open(conf_path) as f:
+            try:
+                json_data = json.load(f)
+                webhook_context = json_data[webhook_id]
+                log.debug('wh context %s', webhook_context)
+                return webhook_context
+            except KeyError as ke:
+                raise HTTPError(500, 'Invalid webhook config')
+        return None
+
     @gen.coroutine
     def post(self, webhook_id):
+        log.debug('WebhookHandler: %s' % webhook_id)
         workspace = self.settings['workspace_path']
-        t = _get_slug_trigger(webhook_id)
-        if len(t) == 2:
-            slug = t[0] #TODO may need the trigger name as well T.B.D
-            return _run_pipeline(self, workspace, slug)
+        wh_context = self._get_wh_context(webhook_id, workspace)
+        if not wh_context:
+            raise HTTPError(404, 'Not found')
 
-class GetTriggersHandler(BaseHandler):
+        params = {'webhook_content': {'raw': self.request.body}}
+        if self.request.body:
+            try:
+                json_body = tornado.escape.json_decode(self.request.body)
+                params['webhook_content'].update(json_body)
+            except ValueError:
+                pass
 
+        return _run_pipeline(self, workspace, wh_context['slug'], params=params)
+
+class GetTriggersHandler(PipelinesRequestHandler):
+
+    @authenticated
     def get(self, pipeline_slug):
         workspace = self.settings['workspace_path']
         log.debug('get triggers')
-
-        yaml_filepath = os.path.join(workspace, '%s.yaml' % pipeline_slug)
+        yaml_filepath = _get_pipeline_filepath(workspace, pipeline_slug)
 
         if not os.path.exists(yaml_filepath):
             print('not found %s' % yaml_filepath)
@@ -186,34 +175,249 @@ class GetTriggersHandler(BaseHandler):
                 log.debug(pipeline_def)
             except yaml.YAMLError as e:
                 log.exception(e)
-                raise HTTPError(500, 'Invali yaml config')
+                raise HTTPError(500, 'Invalid yaml config')
             mapping = {}
-            for trigger in pipeline_def['triggers']:
-                id = _get_webhook_id({ 'slug': pipeline_slug, 'wh_name': trigger['name'] })
-                trigger['webhook_id'] =  id
-                mapping[id] = { 'slug': pipeline_slug, 'wh_name': trigger['name'] }
-            log.debug(mapping)
-            with open(WEB_HOOK_CONFIG, 'w') as wh_file:
-                json.dump(mapping, wh_file, indent=2)
+
+            with filelock.FileLock(os.path.join(workspace, '.pipelinelock')):
+                config_path = os.path.join(workspace, WEB_HOOK_CONFIG)
+                wh_config = {}
+                if os.path.isfile(config_path):
+                    with open(config_path) as wh_file:
+                        wh_config = json.load(wh_file)
+
+                for index, trigger in enumerate(pipeline_def['triggers']):
+                    if trigger.get('type') == 'webhook':
+                        wh_identifier = {
+                            'slug': pipeline_slug,
+                            'index': index,
+                            'type': trigger.get('type')
+                        }
+                        id = _get_webhook_id(wh_identifier, wh_config)
+                        trigger['webhook_id'] = id
+                        mapping[id] = wh_identifier
+                print 'mappings'
+                print mapping
+                print pipeline_def
+                with open(config_path, 'w') as wh_file:
+                    json.dump(mapping, wh_file, indent=2)
+
             self.write(json.dumps({'triggers': pipeline_def['triggers']}, indent=2))
             self.finish()
 
-def make_app(workspace='fixtures/workspace'):
+class LoginHandler(PipelinesRequestHandler):
+    def get(self):
+        log.debug('Login page')
+        self.write('<html><body><form action="/login" method="post">'
+                   'Username: <input type="text" name="username"><br/>'
+                   'Password: <input type="text" name="password"><br/>'
+                   '<input type="submit" value="Sign in">'
+                   '</form></body></html>')
+
+    def post(self):
+        if _authenticate_user(
+                self.settings['auth'],
+                self.get_argument('username'),
+                self.get_argument('password')
+        ):
+            self.set_secure_cookie("user", tornado.escape.json_encode(self.get_argument("username")))
+            print 'set secure cookie'
+            self.redirect("/index.html")
+        else:
+            self.redirect("/login")
+
+
+class GetPipelinesHandler(PipelinesRequestHandler):
+
+    @authenticated
+    def get(self):
+        log.debug('Get pipelines')
+        workspace = self.settings['workspace_path']
+        log.debug('Getting all pipelines')
+        pipelines = []
+        for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
+            with open(os.path.join(workspace, path)) as f:
+                yaml_string = f.read()
+            pipeline_def = yaml.load(yaml_string)
+            slug = _slugify_file(path)
+            full_path = os.path.join(workspace, slug)
+            if os.path.isdir(full_path):
+                # expect to have runs
+                ids = list(_run_id_iterator(full_path))
+                runs = _fetch_runs(full_path, ids)
+                pipelines.append({'slug': slug, 'run_ids': ids, 'runs': runs, 'definition': pipeline_def, 'raw': yaml_string })
+            else:
+                pipelines.append({'slug': slug, 'run_ids': [], 'definition': pipeline_def, 'raw': yaml_string})
+        self.write(json.dumps(pipelines, indent=2))
+        self.finish()
+
+class GetPipelineHandler(PipelinesRequestHandler):
+
+    @authenticated
+    def get(self, pipeline_slug):
+        log.debug('Get pipeline %s' % pipeline_slug)
+        workspace = self.settings['workspace_path']
+
+        folder_path = os.path.join(workspace, pipeline_slug)
+        file_path = ''
+        if os.path.exists(folder_path + '.yml'):
+            file_path = folder_path + '.yml'
+        elif os.path.exists(folder_path + '.yaml'):
+            file_path = folder_path + '.yaml'
+        else:
+            raise HTTPError(404, 'Pipeline not found')
+
+        with open(file_path) as f:
+            yaml_string = f.read()
+        pipeline_def = yaml.load(yaml_string)
+
+        # expect to have runs
+        ids = list(_run_id_iterator(folder_path))
+        runs = _fetch_runs(folder_path, ids)
+
+        ret = {
+            'slug': pipeline_slug,
+            'run_ids': ids,
+            'definition': pipeline_def,
+            'raw': yaml_string
+        }
+        if runs:
+            ret['runs'] = runs
+        self.write(json.dumps(ret, indent=2))
+        self.finish()
+
+
+
+def _fetch_runs(path, run_ids):
+    ret = []
+
+    for run_id in run_ids:
+        item = {'id': run_id}
+        run_status_path = os.path.join(path, run_id, 'status.json')
+        if os.path.isfile(run_status_path):
+            with open(run_status_path) as f:
+                try:
+                    run_status = json.load(f)
+                    item.update(run_status)
+                except ValueError:
+                    log.warning('Failed to parse json file. Skipping. File: %s' % run_status_path)
+        else:
+            log.debug('Run status file doesn\'t exist: %s' % run_status_path)
+
+        ret.append(item)
+    ret.sort(key=lambda run: run.get('start_time'), reverse=True)
+    return ret
+
+class GetLogsHandler(PipelinesRequestHandler):
+
+    def get(self, pipeline_slug, task_id):
+        log.debug('Get logs: {}, {}'.format(pipeline_slug,task_id))
+        workspace = self.settings['workspace_path']
+        log.debug('Getting pipeline logs')
+
+        logfile_path = os.path.join(workspace, pipeline_slug, task_id, 'output.log')
+        if not os.path.exists(logfile_path):
+            self.write(json.dumps({}))
+            self.finish()
+        else:
+            with open(logfile_path) as f:
+                self.write(json.dumps({'output': f.read()}, indent=2))
+                self.finish()
+
+class GetStatusHandler(PipelinesRequestHandler):
+
+    def get(self, pipeline_slug, task_id):
+        log.debug('Get status of: {}, {}'.format(pipeline_slug,task_id))
+        workspace = self.settings['workspace_path']
+        log.debug('Getting pipeline status')
+
+        statusfile_path = os.path.join(workspace, pipeline_slug, task_id, 'status.json')
+        if not os.path.exists(statusfile_path):
+            log.debug('Status file does not exist %s' % statusfile_path)
+            self.write(json.dumps({}))
+            self.finish()
+        else:
+            with open(statusfile_path) as f:
+                self.write(f.read())
+                self.finish()
+
+
+
+
+
+class RunPipelineHandler(PipelinesRequestHandler):
+    @gen.coroutine
+    def post(self, pipeline_slug):
+        log.debug('Run pipeline: {}'.format(pipeline_slug))
+        workspace = self.settings['workspace_path']
+        log.debug('Running pipeline')
+
+        try:
+            json_body = tornado.escape.json_decode(self.request.body)
+        except ValueError:
+            raise HTTPError(400, 'Bad Request')
+
+        prompted_params = json_body.get('prompt', {})
+        return _run_pipeline(self, workspace, pipeline_slug, params=prompted_params)
+
+    def options(self, pipeline_slug):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with, Content-Type")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        self.finish()
+
+
+class AuthStaticFileHandler(StaticFileHandler, PipelinesRequestHandler):
+    @authenticated
+    def get(self, *args, **kwargs):
+        return super(AuthStaticFileHandler, self).get(*args, **kwargs)
+
+def make_app(workspace='fixtures/workspace', auth=None):
+    if not os.path.isdir(workspace):
+        raise PipelinesError('Workspace is not a valid directory: %s' % workspace)
+
+    auth_dict=None
+    if auth:
+        auth_dict = {
+            'type': 'static',
+            'username': auth[0],
+            'password': auth[1]
+        }
+
+    slug_regexp = '[0-9a-zA-Z_\-]+'
     return Application([
         url(r"/api/pipelines/", GetPipelinesHandler),
-        url(r"/api/pipelines/([0-9a-zA-Z_]+)/run", RunPipelineHandler),
-        url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/status", GetStatusHandler),
-        url(r"/api/pipelines/([0-9a-zA-Z_]+)/([0-9a-zA-Z_\-]+)/log", GetLogsHandler),
-        url(r"/api/pipelines/([0-9a-zA-Z_]+)/triggers", GetTriggersHandler),
-        url(r"/api/webhook/([0-9a-zA-Z_\-]+)", WebhookHandler)
+        url(r"/api/pipelines/({slug})/".format(slug=slug_regexp), GetPipelineHandler),
+        url(r"/api/pipelines/({slug})/run".format(slug=slug_regexp), RunPipelineHandler),
+        url(r"/api/pipelines/({slug})/({slug})/status".format(slug=slug_regexp), GetStatusHandler),
+        url(r"/api/pipelines/({slug})/({slug})/log".format(slug=slug_regexp), GetLogsHandler),
+        url(r"/api/pipelines/({slug})/triggers".format(slug=slug_regexp), GetTriggersHandler),
+        url(r"/api/webhook/({slug})".format(slug=slug_regexp), WebhookHandler),
+        (r"/login", LoginHandler),
+        (r'/(.*)', AuthStaticFileHandler, {'path': _get_static_path('app'), "default_filename": "index.html"}),
     ],
-        workspace_path=workspace
+        workspace_path=workspace,
+        auth=auth_dict,
+        login_url= "/login",
+        debug="True",
+        cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="  # TODO: make configurable
     )
 
+def _get_static_path(subpath):
+    this_path = os.path.realpath(__file__)
+    this_dir = os.path.dirname(this_path)
+    ret = os.path.join(this_dir, 'app_dist')
+    log.debug('Serving %s' % ret)
+    return ret
+
 def main(config):
-    app = make_app(config.get('workspace'))
-    app.listen(int(config.get('port', 8888)), address=config.get('host', '127.0.0.1'))
-    print('Starting ioloop')
+    conf_logging()
+    app = make_app(config.get('workspace', 'fixtures/workspace'), config.get('auth'))
+    app.listen(
+            int(config.get('port', 8888)),
+            address=config.get('host', '127.0.0.1'),
+    )
+
+    log.info('Starting ioloop: {}'.format(config))
     io_loop = IOLoop.current()
     io_loop.start()
 

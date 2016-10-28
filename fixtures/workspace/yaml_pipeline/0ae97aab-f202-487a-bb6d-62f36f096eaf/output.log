@@ -1,0 +1,34 @@
+2016:10:21 14:58:16: Pipeline started
+2016:10:21 14:58:16: Task started: Task-1
+Test pipeline: yaml_pipeline
+2016:10:21 14:58:16: Task finished, name: Task-1, status: 0, msg: Test pipeline: yaml_pipeline
+
+2016:10:21 14:58:16: Task started: Task-2
+test
+2016:10:21 14:58:16: Task finished, name: Task-2, status: 0, msg: test
+
+2016:10:21 14:58:16: Task started: Task-3
+third task
+2016:10:21 14:58:16: Task finished, name: Task-3, status: 0, msg: third task
+
+2016:10:21 14:58:16: Task started: Task-4
+2			bin			pipelines
+MANIFEST.in		docs			requirements.txt
+Makefile		etc			setup.py
+README.md		extension		somelogfile.log
+README.rst		fixtures		tasker
+api			lib			test
+app			npm-debug.log
+2016:10:21 14:58:16: Task finished, name: Task-4, status: 0, msg: 2			bin			pipelines
+MANIFEST.in		docs			requirements.txt
+Makefile		etc			setup.py
+README.md		extension		somelogfile.log
+README.rst		fixtures		tasker
+api			lib			test
+app			npm-debug.log
+
+2016:10:21 14:58:16: Task started: Task-5
+success
+2016:10:21 14:58:16: Task finished, name: Task-5, status: 0, msg: success
+
+2016:10:21 14:58:16: Pipeline finished. Duration: 0.25s, 0 failed tasks

@@ -1,0 +1,22 @@
+2016:10:26 18:22:18: Pipeline started
+2016:10:26 18:22:18: Task started: Task-1
+Pre sleep task
+2016:10:26 18:22:18: Task finished, name: Task-1, status: 0, msg: Pre sleep task
+
+2016:10:26 18:22:18: Task started: Task-2
+2016:10:26 18:22:22: Task finished, name: Task-2, status: 0, msg: 
+2016:10:26 18:22:22: Task started: Task-3
+2016:10:26 18:22:26: Task finished, name: Task-3, status: 0, msg: 
+2016:10:26 18:22:26: Task started: Task-4
+2016:10:26 18:22:30: Task finished, name: Task-4, status: 0, msg: 
+2016:10:26 18:22:30: Task started: Task-5
+2016:10:26 18:22:34: Task finished, name: Task-5, status: 0, msg: 
+2016:10:26 18:22:34: Task started: Task-6
+2016:10:26 18:22:38: Task finished, name: Task-6, status: 0, msg: 
+2016:10:26 18:22:38: Task started: Task-7
+2016:10:26 18:22:42: Task finished, name: Task-7, status: 0, msg: 
+2016:10:26 18:22:42: Task started: Task-8
+2016:10:26 18:22:46: Task finished, name: Task-8, status: 0, msg: 
+2016:10:26 18:22:46: Task started: Task-9
+2016:10:26 18:22:50: Task finished, name: Task-9, status: 0, msg: 
+2016:10:26 18:22:50: Task started: Task-10

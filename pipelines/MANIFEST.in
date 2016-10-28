@@ -1,0 +1,2 @@
+include *.html *.js *.css
+recursive-include app_dist *

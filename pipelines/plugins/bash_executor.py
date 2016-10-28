@@ -1,4 +1,3 @@
-import json
 import logging
 
 from pipelines.plugins.base_executor import BaseExecutorPlugin
@@ -6,7 +5,7 @@ from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_
 from pipelines.plugin.exceptions import PluginError
 from sh import ErrorReturnCode
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
 
 class BashExecuteError(PluginError):
     def __init__(self, stderr, code):
@@ -53,7 +52,7 @@ class BashExecutor(BaseExecutorPlugin):
         stdout = ''
         f = None
         if self.log_file:
-            f = open(self.log_file, 'w+')
+            f = open(self.log_file, 'a+')
 
         try:
             for line in bash(_in=bash_input, _iter=True):
@@ -72,7 +71,7 @@ class BashExecutor(BaseExecutorPlugin):
         return cls(conf_dict.get('log_file'))
 
 if __name__ == '__main__':
-    from pluginworm.utils import setup_logging
+    from plugin.utils import setup_logging
     setup_logging(logging.WARNING)
     b = BashExecutor()
     r = b.execute({'cmd': 'echo "test" && echo "test2"'})

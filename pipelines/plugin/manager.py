@@ -4,7 +4,8 @@ from pipelines.plugin.base_plugin import BasePlugin
 from pipelines.plugin.exceptions import PluginError
 from pipelines.plugin.utils import class_name
 
-log = logging.getLogger()
+log = logging.getLogger('pipelines')
+
 
 class PluginManager():
     def __init__(self):
@@ -13,8 +14,8 @@ class PluginManager():
     def get_plugin(self, name):
         return self.plugins.get(name)
 
-    def trigger(self, hook_name, *args):
-        callbacks = self.plugins.get(hook_name, [])
+    def trigger(self, event_name, *args):
+        callbacks = self.plugins.get(event_name, [])
         results = []
         for cb in callbacks:
             try:
@@ -22,7 +23,7 @@ class PluginManager():
                 results.append(ret)
             except Exception as e:
                 log.error('Unknown error running callback {} hook {}, aborting.'.format(
-                    cb.__name__, hook_name)
+                    cb.__name__, event_name)
                 )
                 raise
         return results

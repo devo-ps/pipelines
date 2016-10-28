@@ -1,0 +1,380 @@
+/* Egg Magic */
+
+@import '_variables'; // Variables (colors, layout, spacing & typography)
+@import '_defaults'; // Styling defaults
+@import 'partials/_dropdown';
+@import 'partials/_modal';
+@import 'partials/_loading';
+// @import 'partials/_notifications';
+
+/* GENERAL */
+
+$width: 800px;
+
+.wrapper {
+  margin: 0 auto;
+  max-width: $width;
+  text-align: left;
+  width: 90%;
+}
+
+.controls {
+  float: right;
+}
+
+.icon {
+  background: transparent;
+  border: 0;
+  line-height: 1;
+  outline: none;
+  padding: 0;
+}
+
+.loading {
+  @include loading;
+}
+
+.tabs {
+  border-bottom: 1px solid $line;
+  @include clearfix;
+  @include font-size($small);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  a {
+    border-bottom: 2px solid transparent;
+    color: $grey;
+    float: left;
+    margin-left: 1.5*$space;
+    padding: $space/3 $space/2 ($space/3 - 2);
+    &.active {
+      border-color: $primary;
+      color: #FFF;
+    }
+    &:hover {
+      color: #FFF;
+    }
+  }
+  .icon {
+    float: right;
+    margin: $space/3 $space/2 0 0;
+    @include tooltip(top, $light);
+    svg {
+      fill: $grey;
+    }
+    &:hover {
+      svg {
+        fill: #FFF;
+      }
+    }
+  }
+}
+
+/* HEADER */
+
+#header {
+  border-bottom: 1px solid $line;
+  @include clearfix;
+  margin-bottom: $space;
+  padding: $space 0 $space/2;
+  h1 {
+    @include font-size($larger);
+    font-weight: bold;
+    margin: 0;
+    a {
+      color: #FFF;
+    }
+  }
+  .links {
+    float: right;
+    @include font-size($small);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    a {
+      float: left;
+      margin-left: $space;
+      img {
+        border-radius: $space;
+        float: left;
+        margin-right: $space/4;
+        width: $space;
+      }
+    }
+  }
+}
+
+#main {
+  > .wrapper > .header {
+    @include font-size($smaller);
+    padding-bottom: $space/2;
+    .button {
+      padding: $space/12 1.5*$space/2;
+    }
+    input {
+      background: $light;
+      border: 1px solid $light;
+      color: #FFF;
+      padding: $space/12 $space/2;
+      @include transition-property(background, border);
+      @include transition-duration($ease);
+      width: 50%;
+      &:hover {
+        background: tint($light, 5%);
+        border-color: tint($light, 5%);
+      }
+      &:active,
+      &:focus {
+        background: tint($light, 10%);
+        border-color: tint($light, 10%);
+      }
+    }
+  }
+  .item {
+    margin-bottom: $space/2;
+    &.active {
+      .header {
+        border-radius: $radius $radius 0 0;
+        .status:before {
+          opacity: 1;
+        }
+      }
+      .body {
+        display: block;
+      }
+    }
+    $loading_thickness: 1px;
+    $loading_size: 38px;
+    $img_size: 24px;
+    &.running {
+      .run,
+      .run:hover {
+        cursor: not-allowed;
+        svg {
+          fill: #FFF;
+        }
+        &:after {
+          animation: spin 3*$ease linear infinite;
+          border: $loading_thickness solid $black;
+          border-top: $loading_thickness solid #FFF;
+        }
+      }
+    }
+    &:not(.running) {
+      .run {
+        &:hover {
+          @include transform(scale(1.1));
+          &:after {
+            background: rgba($primary, 1);
+            border-color: $primary;
+          }
+          svg {
+            fill: #FFF;
+            opacity: 0;
+          }
+          span {
+            color: #FFF;
+            opacity: 1;
+          }
+        }
+        &:active {
+          @include transform(scale(1));
+          &:after {
+            background: rgba($primary, 0);
+            border-color: $primary;
+          }
+          svg {
+            fill: #FFF;
+            opacity: 1;
+          }
+          span {
+            color: #FFF;
+            opacity: 0;
+          }
+        }
+      }
+    }
+    .run {
+      float: left;
+      height: $loading_size + 2*$loading_thickness;
+      margin-right: $space/2;
+      position: relative;
+      width: $loading_size + 2*$loading_thickness;
+      @include transition-property(transform);
+      @include transition-duration($ease);
+      svg,
+      span {
+        @include font-size($micro);
+        position: absolute;
+        text-transform: uppercase;
+        @include transition-property(color, fill, opacity);
+        @include transition-duration($ease);
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      svg {
+        fill: $grey;
+        z-index: 999;
+      }
+      span {
+        color: $grey;
+        opacity: 0;
+        z-index: 999;
+      }
+      &:after {
+        background: rgba($primary, 0);
+        border: $loading_thickness solid $grey;
+        border-radius: 50%;
+        bottom: 0;
+        content: '';
+        height: $loading_size;
+        left: 0;
+        margin: auto;
+        position: absolute;
+        right: 0;
+        top: 0;
+        @include transition-property(border);
+        @include transition-duration($ease);
+        width: $loading_size;
+        z-index: 998;
+      }
+    }
+    .status {
+      &:before {
+        background: $green;
+        border-radius: $space;
+        display: inline-block;
+        content: '';
+        @include font-size($small);
+        height: $space/3;
+        width: $space/3;
+      }
+      &.error:before {
+        background: $red;
+      }
+    }
+    .header {
+      background: $light;
+      border-radius: $radius;
+      @include clearfix;
+      padding: $space/3;
+      position: relative;
+      @include transition-property(background);
+      @include transition-duration($ease);
+      h2 {
+        font-size: inherit;
+        margin: 0;
+      }
+      .status {
+        display: inline-block;
+        @include tooltip(top, $light);
+        &:before {
+          margin: 0 $space/8 0 0;
+          opacity: 0.2;
+          @include transition-property(opacity, transform);
+          @include transition-duration($ease);
+        }
+        &:hover {
+          &:before {
+            @include transform(scale(1.3));
+          }
+        }
+        &:first-child {
+          &:before {
+            opacity: 1;
+          }
+        }
+      }
+      &:hover {
+        background: tint($light, 7%);
+        cursor: pointer;
+        & + .body {
+          border-color: tint($light, 7%);
+        }
+        .status:before {
+          opacity: 1;
+        }
+      }
+      .prompt-tooltip {
+          display: none;
+          z-index: 1000;
+          position: absolute;
+          background-color: white;
+          color: gray;
+
+          &.active {
+            display: block
+          }
+        }
+    }
+    .body {
+      background: $black;
+      border: 1px solid $line;
+      border-top: 0;
+      display: none;
+      @include transition-property(border);
+      @include transition-duration($ease);
+      .console {
+        color: #FFF;
+        font-family: $code;
+        @include font-size($small);
+        line-height: 160%;
+        margin: 0;
+        max-height: 264px;
+        overflow: auto;
+        padding: $space/2 1.5*$space/2;
+        position: relative;
+        white-space: pre;
+      }
+      .toolbar {
+
+        border-bottom: 1px solid $line;
+        @include clearfix;
+        color: $grey;
+        @include font-size($smaller);
+        padding: $space/3;
+        vertical-align: middle;
+        a,
+        .icon {
+          svg {
+            fill: $grey;
+          }
+          &:hover {
+            svg {
+              fill: #FFF;
+            }
+          }
+        }
+        .dropdown {
+          > a {
+            padding: 0 $space/2;
+          }
+          .status:before {
+            margin-right: $space/4;
+          }
+          .options {
+            svg {
+              float: right;
+              margin-left: $space/6;
+              width: $space/2;
+            }
+          }
+        }
+        > * {
+          float: left;
+          vertical-align: middle;
+        }
+        > .fullscreen {
+          float: right;
+        }
+        .icon {
+          @include tooltip(top, tint($light, 10%));
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

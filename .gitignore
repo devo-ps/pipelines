@@ -3,6 +3,9 @@
 
 *.pyc
 *.pyo
-
 *.egg-info
-dist
+
+node_modules
+npm-debug.log
+assets.json
+.DS_Store
