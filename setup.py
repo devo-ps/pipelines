@@ -44,5 +44,6 @@ setup(
         'docopt==0.6.2',
         'dotmap==1.1.16',
         'schema==0.5.0'
+        'filelock==2.0.6'
     ],
 )

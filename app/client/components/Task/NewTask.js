@@ -15,8 +15,8 @@ export default class NewTask extends Component {
 
   constructor(props) {
     super(props);
-
-    this.state = {open: false, runTasks: [], runs: [], task: props.task, tab: 'logs', intervals: {}, logs: {}, promptHolder: props.task.definition.prompt};
+    var prompt = props.task.definition.prompt || {}
+    this.state = {open: false, runTasks: [], runs: [], task: props.task, tab: 'logs', intervals: {}, logs: {}, promptHolder: prompt};
   }
 
   componentDidMount () {
@@ -283,7 +283,6 @@ export default class NewTask extends Component {
 
   handlePropFormChange(key, e) {
     var promptHolder = this.state.promptHolder;
-    console.log('123', promptHolder, this.state)
     promptHolder[key] = e.target.value;
     this.setState({promptHolder: promptHolder})
   }
