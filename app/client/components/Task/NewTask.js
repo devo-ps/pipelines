@@ -16,7 +16,17 @@ export default class NewTask extends Component {
   constructor(props) {
     super(props);
     var prompt = props.task.definition.prompt || {}
-    this.state = {open: false, runTasks: [], runs: [], task: props.task, tab: 'logs', intervals: {}, logs: {}, promptHolder: prompt};
+    this.state = {
+        open: false,
+        runTasks: [],
+        runs: [],
+        task: props.task,
+        tab: 'logs',
+        intervals: {},
+        logs: {},
+        promptHolder: prompt,
+        triggers: []
+    };
   }
 
   componentDidMount () {
@@ -67,8 +77,8 @@ export default class NewTask extends Component {
     console.log('Fetching triggers for',  slug)
     return API.getTriggers(slug)
       .then((result) => {
-        this.setState({triggers: result.triggers})
-        console.log('ff', result)
+        var triggers = result.triggers || []
+        this.setState({triggers: triggers})
       })
   }
 
