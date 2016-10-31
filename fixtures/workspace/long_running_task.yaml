@@ -14,5 +14,5 @@ triggers: []
 
 actions:
  - 'echo "Pre sleep task"'
- - sleep 30
+ - "echo 'from time import sleep\nfor a in range(20):\n  print \"test\"\n  sleep(2)' | python"
  - 'echo "Post sleep task"'

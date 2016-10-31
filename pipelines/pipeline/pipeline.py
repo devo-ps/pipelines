@@ -6,6 +6,7 @@ import sys
 
 import importlib
 import logging
+from copy import deepcopy
 
 import yaml
 
@@ -155,8 +156,7 @@ class Pipeline(object):
             'status': PIPELINE_STATUS_OK,
             'prev_result': None
         }
-        pipeline_context = deepmerge(pipeline_context, params)
-        pipeline_context = DotMap(pipeline_context)
+        pipeline_context = DotMap(deepmerge(pipeline_context, params))
 
         log.debug('Pipeline starting. context: %s' % pipeline_context)
         for task in self.tasks:
@@ -202,16 +202,18 @@ class Pipeline(object):
         self._validate_executor_plugin(event_name)
 
         try:
-            results = self.plugin_mgr.trigger(event_name, task.args)
+            results = self.plugin_mgr.trigger(event_name, task.args)  # Run the task
+        except KeyboardInterrupt as e:
+            raise
         except Exception as e:
             log.warning('Unexpected error running task: %s' % e)
             log.exception(e)
-            results = [TaskResult(EXECUTION_FAILED, 'Unknown Error: %s')]
+            results = [TaskResult(EXECUTION_FAILED, 'Unknown Error: %s' % e)]
 
         result = results[0]
 
         if not result:
-            raise PipelineError('Result still missing')
+            raise PipelineError('Result still missing %s' % result)
 
         self.plugin_mgr.trigger('on_task_finish', task, result)
         log.debug('Task finished. Result: %s' % result)

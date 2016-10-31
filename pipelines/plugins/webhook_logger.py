@@ -15,7 +15,7 @@ class WebhookLogger(StdoutLogger):
         self.write_on = ['on_pipeline_finish']
 
     @classmethod
-    def from_dict(cls, conf_dict):
+    def from_dict(cls, conf_dict, event_mgr=None):
         if 'webhook_url' not in conf_dict:
             # raise PluginError('WebhookLogger is missing webhook_url'
             #                   'configuration parameter')

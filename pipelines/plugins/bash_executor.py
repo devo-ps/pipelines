@@ -17,8 +17,9 @@ class BashExecutor(BaseExecutorPlugin):
     hook_prefix = 'bash'
     hooks = ('execute',)
 
-    def __init__(self, log_file=None):
+    def __init__(self, log_file=None, event_mgr=None):
         self.log_file = log_file
+        self.event_mgr = event_mgr
 
     def _parse_args_dict(self, args_dict):
         if 'cmd' not in args_dict:
@@ -42,7 +43,7 @@ class BashExecutor(BaseExecutorPlugin):
             status = EXECUTION_FAILED
             stdout = e.stderr
 
-        return TaskResult(status, stdout)
+        return TaskResult(status, 'Bash task finished')
 
 
     def _run_bash(self, bash_input):
@@ -60,15 +61,20 @@ class BashExecutor(BaseExecutorPlugin):
                 stdout += line
                 if f:
                     f.write(line)
+
+                if self.event_mgr:
+                    if len(line)>0 and line[-1] == '\n':
+                        line = line[:-1]
+                    self.event_mgr.trigger('on_task_event', {'output': line})
         except ErrorReturnCode as e:
             log.debug('BashExec failed')
             raise BashExecuteError(e.stderr, e.exit_code)
-
         return stdout
 
     @classmethod
-    def from_dict(cls, conf_dict):
-        return cls(conf_dict.get('log_file'))
+    def from_dict(cls, conf_dict, event_mgr=None):
+        return cls(conf_dict.get('bash_log_file'), event_mgr)
+
 
 if __name__ == '__main__':
     from plugin.utils import setup_logging
