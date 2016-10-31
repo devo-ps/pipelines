@@ -2,19 +2,22 @@
   border-bottom: 1px solid $line;
   @include clearfix;
   margin-bottom: $space/2;
-  padding: $space/2 0 $space/2;
+  padding: $space/2 0;
+  a {
+    color: inherit;
+    &:hover {
+      color: $primary;
+      text-decoration: none;
+    }
+  }
   h1 {
     font-size: inherit;
     margin: 0;
-    a {
-      color: inherit;
-    }
   }
   .links {
     float: right;
     line-height: 1;
     a {
-      color: inherit;
       float: left;
       margin-left: $space;
       img {

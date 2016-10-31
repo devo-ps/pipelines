@@ -8,6 +8,9 @@
     border: 1px solid $line;
     margin-bottom: $space/2;
     @import '_run';
+    &:hover {
+      border-color: $grey;
+    }
     .status {
       &:before {
         background: $green;
@@ -67,6 +70,7 @@
         @include transform(scale(0.9));
         @include transition-property(opacity, transform);
         @include transition-duration($ease);
+        visibility: hidden;
         width: 240px;
         z-index: 9999;
         input {
@@ -75,12 +79,17 @@
         &.active {
           opacity: 1;
           @include transform(scale(1));
+          visibility: visible;
         }
       }
     }
     .body {
       border-top: 1px solid $line;
       display: none;
+      .status:before {
+        box-shadow: 0 0 0 1px #FFF;
+        margin-right: $space/4;
+      }
       .tabs {
         border-bottom: 1px solid $light;
         @include font-size($smaller);
@@ -95,7 +104,6 @@
           }
           &.active {
             border-bottom: 3px solid $blue;
-            color: $primary;
           }
         }
       }
@@ -121,10 +129,6 @@
           }
         }
         .menu {
-          .status:before {
-            box-shadow: 0 0 0 1px #FFF;
-            margin-right: $space/4;
-          }
           .options {
             max-height: 200px;
             overflow: auto;
@@ -153,9 +157,10 @@
         font-family: $code;
         @include font-size($small);
         line-height: 160%;
-        max-height: 264px;
+        height: 288px;
+        margin: 0 -1px -1px;
         overflow: auto;
-        padding: $space/2 1.5*$space/2;
+        padding: $space/2;
         position: relative;
         white-space: pre;
         time {
