@@ -7,6 +7,13 @@ import moment from 'moment';
 
 // require('highlight.js/styles/default.css');
 
+var log = function(){
+  // For easily enabling logs
+  if (true){
+    console.log.apply(console, arguments)
+  }
+}
+
 export default class NewTask extends Component {
 
   static propTypes = {
@@ -30,7 +37,7 @@ export default class NewTask extends Component {
   }
 
   componentDidMount () {
-    console.log('did mount')
+    log('Component mounted', this.props)
     const {task} = this.props
 
     if (task.run_ids && task.run_ids.length > 0) {
@@ -56,16 +63,16 @@ export default class NewTask extends Component {
         this.refreshLogs(activeRunId)
         this.fetchTriggers(task.slug)
       } else {
-        console.log('else', task)
+        log('No runs', task)
       }
-
     }
-
   }
 
   refreshLogs(runId){
+
     return API.getPipelineLog(this.state.task.slug, runId)
       .then((result) => {
+        log('Refreshed logs', runId)
         var logs = this.state.logs;
         logs[runId] = result.output;
         this.setState({logs: logs})
@@ -74,9 +81,9 @@ export default class NewTask extends Component {
   }
 
   fetchTriggers(slug){
-    console.log('Fetching triggers for',  slug)
     return API.getTriggers(slug)
       .then((result) => {
+        log('Fetched triggers for', slug)
         var triggers = result.triggers || []
         this.setState({triggers: triggers})
       })
@@ -97,17 +104,16 @@ export default class NewTask extends Component {
 
   onRun (params, ev) {
     ev.stopPropagation();
-    console.log('onRun', params)
+    log('onRun', params)
     if (Object.keys(this.state.promptHolder).length && !params){
-
       // Ask for params
-      console.log('onRun ask for params', this.state.promptHolder, params)
+      log('onRun ask for params', this.state.promptHolder, params)
       this.setState({showPrompt: true})
     }
     else {
         params = params || {}
         var task = this.state.task
-        var this_run = {status: 'running', id: '0'}
+        var this_run = {status: 'running', start_time: 'now', id: '0'}
         var runs = this.state.task.runs;
         runs.unshift(this_run)
         var that = this;
@@ -120,7 +126,9 @@ export default class NewTask extends Component {
 
         API.runPipeline(task.slug, params)
           .then((data) => {
-            console.log('Pipeline run, new task id: ', data.task_id)
+            log('Pipeline run, new task id: ', data.task_id, task.slug)
+            this_run.id = data.task_id;
+            runs.unshift(this_run)
             that.setState({
               task: task,
               activeRunId: data.task_id
@@ -151,14 +159,14 @@ export default class NewTask extends Component {
 
   pollPipeline(){
     if (this.pipelineInterval){
-      console.log('Already polling')
+      log('Already polling')
     } else {
         function refreshPipelineInner () {
-
             const {task} = this.props
             var that = this;
             return API.getPipeline(task.slug)
               .then((result) => {
+                console.log('Refreshed pipeline', task.slug, result)
                 if (result){
                     this.setState({task: result})
 
@@ -186,10 +194,8 @@ export default class NewTask extends Component {
   }
 
   pollingLog (runId) {
-    console.log('Starting pollingLog', runId)
-
     if (this.state.intervals[runId] != undefined){
-      console.log('Already polling for logs for task.')
+      log('Already polling for logs for task.')
       return
     }
     function getLog(){
@@ -206,6 +212,9 @@ export default class NewTask extends Component {
   }
 
   relativeTime(timestamp){
+    if (timestamp == 'now') {
+      return 'Now'
+    }
     return moment(timestamp, "YYYY-MM-DDThh:mm:ss.SSSSSS").fromNow();
   }
 
@@ -239,10 +248,8 @@ export default class NewTask extends Component {
   }
   getLogsToolbar(runsHtml) {
 
-      var activeRunObj = this.getRunWithId(this.state.activeRunId);
-      if (!activeRunObj){
-        activeRunObj = {};
-      }
+      var activeRunObj = this.getRunWithId(this.state.activeRunId) || {};
+      log('aacc', activeRunObj)
 
       var statusClass = activeRunObj.status == 'success'? 'ok' : 'error';
 
@@ -333,8 +340,7 @@ export default class NewTask extends Component {
 
     var tabContent = ''
     var tabContent2 = ''
-    var activeRunObj = this.getRunWithId(this.state.activeRunId)
-    if (!activeRunObj ) { activeRunObj  = {} }
+    var activeRunObj = this.getRunWithId(this.state.activeRunId) || {}
 
     if (this.state.tab == 'logs'){
 

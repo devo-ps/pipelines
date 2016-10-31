@@ -51,7 +51,7 @@ class SlackExecutor(BaseExecutorPlugin):
         return args_dict['message']
 
     @classmethod
-    def from_dict(cls, conf_dict):
+    def from_dict(cls, conf_dict, event_mgr=None):
         if 'slack_webhook' not in conf_dict:
             log.debug('SlackExecutor is missing slack_webhook parameter')
         else:

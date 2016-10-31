@@ -4,5 +4,5 @@ class BasePlugin(object):
     dry_run = False
 
     @classmethod
-    def from_dict(cls, conf_dict):
+    def from_dict(cls, conf_dict, event_mgr=None):
         return cls()

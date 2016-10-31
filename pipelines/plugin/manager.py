@@ -42,7 +42,7 @@ class PluginManager():
                 class_name(plugin_class))
             )
 
-        plugin = plugin_class.from_dict(conf_dict)
+        plugin = plugin_class.from_dict(conf_dict, self)
 
         for k in ['hook_prefix', 'hooks']:
             if not hasattr(plugin, k):

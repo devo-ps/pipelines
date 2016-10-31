@@ -1,55 +1,86 @@
-# Pipelines Command Line Tool
+# Pipelines
 
-Pipelines is a simple tool to manage running tasks.
+## What is Pipelines
 
-Pipeline definition file uses YAML syntax. Example:
+Pipelines is a simple tool with a web UI to manage running tasks. It supports triggering tasks manually throught a Web
+UI or using webhooks.
+
+Pipelines is composed of two three components:
+ - __Web UI__: User interface that allows users to run tasks, inspect logs and show the task details. It also support
+   username/password authentication.
+ - __Pipelines API__: This is the backend for the Web UI and webh
+ - __Pipelines library__: This component includescore logic for running pipelies such as reading task definitions,
+   handling logging and running the pipelines.
+
+
+## Getting started
+
+In order to run the pipelines on your own server you need to do the following:
+ - Ensure you have python and pip (you probably do)
+ - Run: `pip install git+git://github.com/Wiredcraft/pipelines@dev`
+ - Create a workspace anywhere in the filesystem (you'll have your task definitions, logs and temporary data here)
+ - Run the backend. This is up to you but you can run it manually (for quick testing), inside a screen (bit better) or
+   set up supervisord to run it (our recommendation). You can run it with: `pipelines api --workspace=(your-workspace) --username=(your-username) --password=(your-password)`
+
+## Writing task defititions
+
+
+The Pipeline definition file uses YAML syntax. Lets start with a simple example:
 
 ```yaml
-dry_run: False  # TODO
+---
+## Variables are exposed to all the tasks
 vars:
-  workspace: 'test'
-tasks:
- - executor: executors.dummy
-   cmd: "anything"
- - executor: executors.bash
-   cmd: "sleep 1 && echo {{workspace}} > ~/hhh"
- - executor: executors.python
-   virtualenv: /Users/juha/work/getpipeline/.venv
-   workdir: /Users/juha/work/getpipeline/test
-   script: test_script.py
-plugins:
-  - pipelineplugins.dummy_executor.DummyExecutor
-  - pipelineplugins.stdout_logger.StdoutLogger
-  - class: pipelineplugins.webhook_logger.WebhookLogger
-    webhook_url: 'https://hooks.slack.com/services/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'
-  - pipelineplugins.bash_executor.BashExecutor
-  - pipelineplugins.python_executor.PythonExecutor
+ slack_url: https://hooks.slack.com/services/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
+ code_branch: dev
+
+## Triggers define the automated ways to run the task
+triggers: []
+  # By default you can trigger the pipeline by hitting `http://example.com/wh/SECRET` (where `SECRET` is displayed in
+  # the Web UI). Maybe we can make overridable.
+
+## Actions are the steps tbat are run for this pipeline
+actions:
+ - 'echo "Pre sleep task for {{ code_branch }}"'
+ - "echo 'from time import sleep\nfor a in range(20):\n  print \"test\"\n  sleep(2)' | python"
+ - 'echo "Post sleep task"'
  ```
 
-## Installation
+__More complex actions__
 
- To install simply run:
- - `pip install git+git://github.com/Wiredcraft/getpipelines`
+The default mode for an action is a bash command. We also support more verbose style of defining actions where you can
+set more options. Here is an example of an action that send a message to slack channel:
+ ```
+- type: slack
+  message: 'Deployment finished with status {{ status }} for jekyllplus (api+client).'
+  always_run: true
+```
 
-## Usage
+Explanation of fields:
+ - `type` defines the execution method for this action, currently we only support `bash` (default) or `slack`.
+ - `always_run` overrides the default behavior where if action fails the following tasks are not ran.
+ - `message` is a slack specific field that defines the message that is posted to the slack channel.
 
-  - Normal usage: `pline sample_pipe.yaml`
-  - With more verbosity: `pline sample_pipe.yaml --verbose`
+__Webhooks__
 
-## Plugins
+If you want to run your pipeline by triggering it through a webhook you can enable it in the triggers section. For
+example:
+```
+triggers:
+  - type: webhook
+```
 
-Currently package includes following pugins:
- - Bash executor: Allow to run bash commands
- - Python executor: Run python scripts, supports virtualenv
- - STDOUT logger: Write log to stdout
- - Webhook logger: Send a report at the end of pipeline to webhook (can be used for slack integration).
- - Dummy executor: Just used for testing
+If you open the web-UI you can see the webhook URL that was generated for this pipeline. You can for example configure
+GitHub repository to trigger this task on every commit.
 
-There are event plugins that can hook to pipeline lifecycle with following events:
- - `on_pipeline_start`
- - `on_task_start`
- - `on_task_finish`
- - `on_pipeline_finish`
+__Field prompts__
 
- The executor plugins are specialized plugins that implement `execute` function.
+You can prompt users to manually input fields when they run the pipeine through the web-UI. To do this add a `prompt`
+section to your pipeline definition, for example:
+``
+prompt:
+ code_branch: dev
+```
 
+This example would ask the user to fill in a code_branch field when they try to run the pipeline with `dev` as default
+value. The prompted value will override any values defines in the `vars` section.

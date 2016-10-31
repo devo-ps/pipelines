@@ -23,7 +23,7 @@ class StatusLogger(BasePlugin):
             self.file_path = file_path
 
     @classmethod
-    def from_dict(cls, conf_dict):
+    def from_dict(cls, conf_dict, event_mgr=None):
         return StatusLogger(conf_dict.get('status_file'))
 
     def on_pipeline_start(self, *args):
