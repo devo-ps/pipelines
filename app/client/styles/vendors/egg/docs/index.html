@@ -1,0 +1,265 @@
+---
+version: v1.0.5
+---
+
+<!doctype html>
+<html>
+<head>
+  <title>egg, A Simple SASS Boilerplate</title>
+
+  <meta charset='utf-8'/>
+  <meta http-equiv='Content-Language' content='en'/>
+  <meta name='viewport' content='width=device-width, initial-scale=1'/>
+  <meta name='keywords' content='SCSS, SASS, CSS, framework, boilerplate, bourbon'/>
+  <meta name='description' content='A simple SASS boilerplate'>
+
+  <!-- CSS -->
+  <link rel='stylesheet' href='styles.css'>
+
+  <!-- Code highlighter (Highlight.js) -->
+  <link rel='stylesheet' href='http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css'>
+  <script src='http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js'></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+<body>
+  <header id='header'>
+    <div class='wrapper'>
+      <h1>egg</h1>
+      <a href='https://github.com/Wiredcraft/egg/archive/{{ page.version }}.zip' class='button primary'>Download {{ page.version }}</a>
+      <small>Or <a href='https://github.com/Wiredcraft/egg/' class='github'>fork the heck out of it on GitHub →</a></small>
+      <small class='credit'>Built with ♥ by <a href='https://wiredcraft.com'>Wiredcraft</a></small>
+    </div>
+  </header>
+
+  <section class='section' id='about'>
+    <div class='wrapper'>
+      <h2><a href='#introduction' id='introduction'>What is egg?</a></h2>
+      <p><strong>egg</strong> was built as an alternative to the many CSS/SASS
+         frameworks out there; Foundation, Bootstrap and the likes. It intends to
+         be minimalistic, solving as few problems as possible and providing developers
+         with the basic defaults and mixins to solve the problems they experience
+         designing their Web apps and websites.</p>
+      <p>It was designed with two core principles in mind;</p>
+      <ul>
+        <li><strong>Don't dictate HTML</strong>; while we do provide some defaults,
+            we mostly provide mixins for users to decide how they want to associate
+            style and markups rather than specific (and often heavy) classes and HTML structure.</li>
+        <li><strong>Don't solve too many prolems</strong>; we focused on the few
+            things that we think are difficult or important when building for the
+            Web; typography, modals, forms... The rest is best solved by developers
+            for their specific use case.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class='section' id='sink'>
+    <div class='wrapper'>
+      <h2><a href='#examples' id='examples'>Examples</a></h2>
+      <p>If you use <strong>egg</strong>'s defaults, you get a certain amount of
+         styles and elements out of the box. The kitchen sink should help you explore
+         the available styles and illustrate how you use them:</p>
+      <section class='excerpt' id='Typography'>
+        <header class='title'>Typography</header>
+        <div class='example'>
+          <h1>This is a headline 1</h1>
+          <h2>And a headline 2</h2>
+          <h3>And finally a headline 3</h3>
+          <p>This text last title is followed by a regular paragraph.</p>
+        </div>
+      </section>
+
+      <section class='excerpt' id='Buttons'>
+        <header class='title'>Buttons</header>
+        <div class='example'>
+          <p><button class='button'>Default button</button></p>
+          <p><button class='button primary'>Primary button</button></p>
+          <p><button class='button secondary'>Secondary button</button></p>
+          <p>
+            <span class='bundle'>
+              <button class='button'>Bundle</button><button class='button'>Of</button><button class='button'>Buttons</button>
+            </span>
+          </p>
+        </div>
+      </section>
+
+      <section class='excerpt' id='Menu'>
+        <header class='title'>Menu</header>
+        <div class='example'>
+          <span class='menu'>
+            <button class='button'>Dropdown menu</button>
+            <div class='options'>
+              <a href='#'>Profile</a>
+              <a href='#'>Settings</a>
+              <a href='#' class='separated'>Sign out</a>
+            </div>
+          </span>
+        </div>
+      </section>
+
+      <section class='excerpt' id='Tooltip'>
+        <header class='title'>Tooltip</header>
+        <div class='example'>
+          <p>This paragraph contains <u class='tooltip'>text which shows a tooltip on hover <span>Hello world!</span></u>.</p>
+        </div>
+      </section>
+
+      <section class='excerpt' id='Notifications'>
+        <header class='title'>Notifications</header>
+        <div class='example'>
+          <p class='notification'>Default notification</p>
+          <p class='notification info'>Info notification</p>
+          <p class='notification success'>Success notification</p>
+          <p class='notification warning'>Warning notification</p>
+          <p class='notification error'>Error notification</p>
+        </div>
+      </section>
+
+      <section class='excerpt' id='form'>
+        <header class='title'>Form</header>
+        <div class='example'>
+          <form>
+            <div class='field'>
+              <label>Email address</label>
+              <input type='email' placeholder='me@example.com'/>
+              <span class='description'>This email address must be valid</span>
+            </div>
+            <div class='field'>
+              <label>Send you a digest</label>
+              <span class='select'>
+                <select>
+                  <option>Every day</option>
+                  <option>Every week</option>
+                  <option>Every month</option>
+                </select>
+              </span>
+            </div>
+            <div class='field'>
+              <label>Comments</label>
+              <textarea></textarea>
+              <span class='description'>If you have any additional comment.</span>
+            </div>
+            <div class='actions'>
+              <button class='button'>Cancel</button>
+              <input class='button primary' type='submit' value='Register'/>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class='excerpt' id='Modal'>
+        <header class='title'>Modal (& overlay)</header>
+        <div class='example'>
+          <a class='button primary' id='button-modal' onclick='showModal()'>Show a modal</a>
+
+          <!-- Actual modal -->
+          <div id='overlay' onclick='hideModal()'>
+            <div id='modal' onclick='hideModal()'>
+              <header class='header'>
+                <a class='close' id='close-modal'>Close</a>
+                <h2>This is a modal</h2>
+              </header>
+              <section class='body'>
+                <p>Nothing fancy, just a modal that should be doing the job. You can fill it up with things, and stuff... I'm running out of ideas for placeholders.</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class='excerpt' id='Table'>
+        <header class='title'>Table</header>
+        <div class='example'>
+          <table>
+            <thead>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Email</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Paul Lambert</td>
+                <td>Paris, France</td>
+                <td>paul@example.com</td>
+              </tr>
+              <tr>
+                <td>John Smith</td>
+                <td>New York, USA</td>
+                <td>john@example.com</td>
+              </tr>
+              <tr>
+                <td>Chen Wang</td>
+                <td>Shanghai, China</td>
+                <td>chen@example.com</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class='section' id='use'>
+    <div class='wrapper'>
+      <article class='article'>
+        <h2><a href='#how-to' id='how-to'>How do I use it?</a></h2>
+        <p>First, you'll need to run `bower install` to add the normalize and
+           bourbon dependencies (or if you want to handle this differently, change
+           the way they're loaded in `egg.scss` for example). Then the fun starts:
+        <ul>
+          <li>Load <code>egg.css</code> (`@import egg.scss`) or use it as a starting
+              point for your styles.</li>
+          <li><code>_variables.scss</code> defines colors, font sizes, spacing &
+              typography. Enough if you just want to make a few adjustments.</li>
+          <li><code>modules/</code> contains a few mixins that addresses some of
+            the core issues (typography, spacing, buttons, etc).</li>
+          <li><code>vendors/</code> should contain 3rd party libraries (apart from
+            normalize and bourbon, although you could move it there and edit `egg.scss`).</li>
+          <li><code>partials/</code> is where you can organize code specific to
+              your style (e.g. `partials/header.scss` for the header). It includes
+              a few default styles from <strong>egg</strong> too (e.g. the modal).</li>
+        </ul>
+        <p>Simply copy the content of that folder wherever you want (for example
+           the `_scss` folder in your app).</p>
+        <p>We recommend you leave the <code>modules/</code> folder intact, however
+           the rest is fair game: change files in <code>partials/</code>, tweak
+           `_variables.scss` or choose to select includes and override styles in
+           `main.scss`, that's up to you. Go nuts!</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- JS -->
+  <!--[if lt IE 9]><script src='https://html5shim.googlecode.com/svn/trunk/html5.js'></script><![endif]-->
+  <script>
+    function hideModal() {
+      document.body.classList.remove('modal');
+      return;
+    }
+    function showModal() {
+      document.body.classList.add('modal');
+      return;
+    }
+
+    // Automatically display the source code after the examples
+    var examples = document.getElementsByClassName('example');
+    for (var i = 0; i < examples.length; i++) {
+      var preview = document.createElement('pre');
+      var code = document.createElement('code');
+      // Sanitizing the code (removing extra space/lines)
+      var text = examples[i].innerHTML;
+      var lines = text.split('\n');
+      lines.splice(0, 1);
+      lines.splice(lines.length - 1, 1);
+      lines = lines.map(function(str) { return str.substr(10); });
+      text = lines.join('\n');
+      // Putting it all back together
+      var content = document.createTextNode(text);
+      preview.appendChild(code);
+      code.appendChild(content);
+      examples[i].parentNode.insertBefore(preview, examples[i].nextSibling);
+    }
+  </script>
+
+</body>
+</html>

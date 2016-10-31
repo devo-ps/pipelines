@@ -3,9 +3,9 @@ import {Collapse} from 'react-bootstrap';
 import LoadingIcon from '../LoadingIcon'
 import * as API from '../../api'
 import moment from 'moment';
-var Highlight = require('react-syntax-highlight');
+// var Highlight = require('react-syntax-highlight');
 
-require('highlight.js/styles/default.css');
+// require('highlight.js/styles/default.css');
 
 export default class NewTask extends Component {
 
@@ -248,18 +248,18 @@ export default class NewTask extends Component {
 
      return (
        <header className='toolbar'>
-         <button className='icon previous'>
-           <span className='svg icon' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/></svg>"}}/>
-           <span>Previous</span>
-         </button>
-         <span className='dropdown'>
+         <span className='menu'>
            <div className='options'>
              { this.getRunsHtml(this.state.task.runs) }
            </div>
            <a className={`status ${statusClass}`}>{activeRunObj.status}	&middot; {activeRunObj && this.relativeTime(activeRunObj.start_time)}</a>
          </span>
+         <button className='icon previous'>
+           <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/></svg>"}}/>
+           <span>Previous</span>
+         </button>
          <button className='icon next'>
-           <span className='svg icon'
+           <div className='svg'
                  dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/></svg>"}}/>
            <span>Next</span>
          </button>
@@ -278,10 +278,10 @@ export default class NewTask extends Component {
           <span>
           {
             item.status === 'success'
-            ? <span className='svg icon' dangerouslySetInnerHTML={{__html:"<svg className='icon icon-checkmark'><use xlinkHref='#icon-checkmark'></use></svg>"}}/>
+            ? <span className='svg' dangerouslySetInnerHTML={{__html:"<svg className='icon icon-checkmark'><use xlinkHref='#icon-checkmark'></use></svg>"}}/>
             : item.status === 'running'
               ? ''
-              : <span className='svg icon' dangerouslySetInnerHTML={{__html:"<svg className='icon icon-cross'><use xlinkHref='#icon-cross'></use></svg>"}}/>
+              : <span className='svg' dangerouslySetInnerHTML={{__html:"<svg className='icon icon-cross'><use xlinkHref='#icon-cross'></use></svg>"}}/>
            }
           </span>
           <span className='job-id'>{item.id}</span>
@@ -302,20 +302,20 @@ export default class NewTask extends Component {
       var that = this;
       var fields =  Object.keys(this.state.promptHolder).map(function(key){
         return (
-          <span key={key}>
+          <div className="field" key={key}>
             <label>{key}</label>
             <input type='text' value={that.state.promptHolder[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
-          </span>
+          </div>
         )
       });
 
 
       return (
-        <div className={`prompt-tooltip ${this.state.showPrompt ? 'active' : 'inactive'}`}>
-          <span>Please input fields:</span>
+        <div className={`prompt ${this.state.showPrompt ? 'active' : 'inactive'}`}>
+          <p>Please input fields:</p>
           <span>{fields}</span>
-          <button onClick={this.onRun.bind(this, this.state.promptHolder)} >Run</button>
-          <button onClick={::this.hidePrompt} >Cancel</button>
+          <button className="button" onClick={::this.hidePrompt} >Cancel</button>
+          <button className="button primary" onClick={this.onRun.bind(this, this.state.promptHolder)} >Run</button>
         </div>
       )
     }
@@ -342,7 +342,7 @@ export default class NewTask extends Component {
       function highlight(input){
         var regex = /(\d\d\d\d:\d\d:\d\d \d\d:\d\d:\d\d:)/g;
         if (input !== undefined){
-          return input.replace(regex, '<b style="color: gray">$1</b>')
+          return input.replace(regex, '<time className="time">$1</time>')
         }
       };
       tabContent2 = (
@@ -369,8 +369,7 @@ export default class NewTask extends Component {
             {this.getPromptFieldsHtml()}
 
             <button className='icon run' onClick={this.onRun.bind(this, undefined)}>
-              <span className='svg icon' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
-              <span>Run</span>
+              <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
             </button>
 
             <h2>{this.props.task.slug}</h2>
@@ -382,7 +381,7 @@ export default class NewTask extends Component {
           <section className='body'>
             <nav className='tabs'>
               {/* < button className='icon fullscreen'>
-                <span className='svg icon'
+                <span className='svg'
                     dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 9.49263,13.0931L 10.9068,14.5073L 6.41421,19L 10,19L 10,21L 3,21L 3,14L 5,14L 5,17.5858L 9.49263,13.0931 Z M 10.9069,9.49266L 9.49265,10.9069L 5,6.41422L 5,10L 3,10L 3,3.00001L 10,3L 10,5L 6.41421,5L 10.9069,9.49266 Z M 14.5074,13.0931L 19,17.5858L 19,14L 21,14L 21,21L 14,21L 14,19L 17.5858,19L 13.0932,14.5073L 14.5074,13.0931 Z M 13.0931,9.49265L 17.5858,5L 14,5L 14,3L 21,3L 21,10L 19,10L 19,6.41421L 14.5073,10.9069L 13.0931,9.49265 Z '/></svg>"}}/-->
 
                 <span>Fullscreen</span>
@@ -400,4 +399,3 @@ export default class NewTask extends Component {
     );
   }
 };
-

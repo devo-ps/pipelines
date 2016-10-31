@@ -1,0 +1,32 @@
+body {
+  background: $light;
+}
+
+.wrapper {
+  @include clearfix;
+  margin: 0 auto;
+  max-width: $width;
+  width: 92%;
+}
+
+.controls {
+  float: right;
+}
+
+.icon {
+  background: transparent;
+  border: 0;
+  line-height: 1;
+  outline: none;
+  padding: 0;
+}
+
+.svg {
+  svg {
+    display: block;
+  }
+}
+
+.loading {
+  // @include loading;
+}

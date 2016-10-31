@@ -1,0 +1,172 @@
+#main {
+  .wrapper > .header {
+    display: none;
+  }
+  .item {
+    background: #FFF;
+    border-radius: $radius;
+    border: 1px solid $line;
+    margin-bottom: $space/2;
+    @import '_run';
+    .status {
+      &:before {
+        background: $green;
+        border-radius: $space;
+        display: inline-block;
+        content: '';
+        @include font-size($small);
+        height: $space/3;
+        width: $space/3;
+      }
+      &.error:before {
+        background: $red;
+      }
+    }
+    .header {
+      line-height: 1;
+      padding: $space/2;
+      h2 {
+        font-size: inherit;
+        margin: 0 0 $space/6;
+      }
+      .run {
+        margin-right: $space/4;
+        margin-top: -$space/6;
+      }
+      .status {
+        display: inline-block;
+        @include tooltip;
+        &:before {
+          margin: 0 $space/8 0 0;
+          opacity: 0.2;
+          @include transition-property(opacity, transform);
+          @include transition-duration($ease);
+        }
+        &:hover {
+          &:before {
+            opacity: 1;
+            @include transform(scale(1.3));
+          }
+        }
+        &:first-child {
+          &:before {
+            opacity: 1;
+          }
+        }
+      }
+      .prompt {
+        background: #FFF;
+        border-radius: $radius;
+        box-shadow: $hover;
+        box-sizing: border-box;
+        line-height: 160%;
+        opacity: 0;
+        margin-top: 2*$space;
+        padding: $space/2;
+        position: absolute;
+        @include transform(scale(0.9));
+        @include transition-property(opacity, transform);
+        @include transition-duration($ease);
+        width: 240px;
+        z-index: 9999;
+        input {
+          width: 100%;
+        }
+        &.active {
+          opacity: 1;
+          @include transform(scale(1));
+        }
+      }
+    }
+    .body {
+      border-top: 1px solid $line;
+      display: none;
+      .tabs {
+        border-bottom: 1px solid $light;
+        @include font-size($smaller);
+        a {
+          color: inherit;
+          display: inline-block;
+          margin: 0 $space/2;
+          padding: 1.5*$space/4 $space/2 (1.5*$space/4 - 3);
+          &:hover {
+            color: $primary;
+            text-decoration: none;
+          }
+          &.active {
+            border-bottom: 3px solid $blue;
+            color: $primary;
+          }
+        }
+      }
+      .toolbar {
+        @include clearfix;
+        @include font-size($smaller);
+        vertical-align: middle;
+        .menu > a,
+        .icon {
+          border-right: 1px solid $light;
+          color: inherit;
+          display: block;
+          padding: 1.5*$space/4 $space/2;
+          svg {
+            fill: $black;
+          }
+          &:hover {
+            color: $primary;
+            text-decoration: none;
+            svg {
+              fill: $primary;
+            }
+          }
+        }
+        .menu {
+          .status:before {
+            box-shadow: 0 0 0 1px #FFF;
+            margin-right: $space/4;
+          }
+          .options {
+            max-height: 200px;
+            overflow: auto;
+            svg {
+              float: right;
+              margin-left: $space/6;
+              width: $space/2;
+            }
+          }
+        }
+        > * {
+          float: left;
+          vertical-align: middle;
+        }
+        > .fullscreen {
+          float: right;
+        }
+        .icon {
+          @include tooltip;
+        }
+      }
+      .console {
+        background: $black;
+        border-radius: 0 0 $radius $radius;
+        color: #FFF;
+        font-family: $code;
+        @include font-size($small);
+        line-height: 160%;
+        max-height: 264px;
+        overflow: auto;
+        padding: $space/2 1.5*$space/2;
+        position: relative;
+        white-space: pre;
+        time {
+          opacity: 0.4;
+        }
+      }
+    }
+    &.active {
+      .body {
+        display: block;
+      }
+    }
+  }
+}

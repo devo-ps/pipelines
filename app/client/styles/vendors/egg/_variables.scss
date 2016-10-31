@@ -1,0 +1,64 @@
+/* Colors from http://clrs.cc/ */
+
+$aqua: #7FDBFF !default;
+$black: #111111 !default;
+$blue: #0074D9 !default;
+$fuchsia: #F012BE !default;
+$green: #2ECC40 !default;
+$grey: #AAAAAA !default;
+$lime: #01FF70 !default;
+$maroon: #85144b !default;
+$navy: #001f3f !default;
+$olive: #3D9970 !default;
+$orange: #FF851B !default;
+$purple: #B10DC9 !default;
+$red: #FF4136 !default;
+$silver: #DDDDDD !default;
+$teal: #39CCCC !default;
+$yellow: #FFDC00 !default;
+
+$primary: $blue !default;
+$secondary: $purple !default;
+
+$light: #EEE !default;
+$line: $silver !default;
+$background: #FFF !default;
+
+/* Sizes */
+
+$pico: 10 !default;
+$micro: 11 !default;
+$small: 12 !default;
+$smaller: 14 !default;
+$regular: 16 !default;
+$larger: 18 !default;
+$large: 24 !default;
+$huge: 32 !default;
+$gigantic: 48 !default;
+$humongous: 64 !default;
+
+/* Fonts */
+
+$body: -apple-system, 'Avenir next', Avenir, Roboto, Noto, 'Helvetica neue', Helvetica, Arial, Sans-serif !default;
+$headline: $body !default;
+$code: 'Lucida Sans Typewriter', 'Lucida Console', monaco, 'Bitstream Vera Sans Mono', monospace !default;
+
+/* Misc */
+
+$ease: 0.2s !default;
+$space: 24px !default;
+$radius: 2px !default;
+$shadow: rgba(0, 0, 0, 0.1) 0 1px 1px 0 !default;
+$hover: rgba(0, 0, 0, 0.2) 0 1px 10px 0 !default;
+
+/* Partials */
+
+$partials: (
+  base,
+  button,
+  form,
+  menu,
+  modal,
+  notification,
+  tooltip
+) !default;

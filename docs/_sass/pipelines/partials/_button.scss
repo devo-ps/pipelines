@@ -1,0 +1,20 @@
+.button {
+  border: 0;
+  @include button($light, true, false);
+  font-size: inherit;
+  font-weight: bold;
+  text-align: center;
+  &.primary {
+    @include button($primary, false, false);
+  }
+  &.secondary {
+    @include button($secondary, false, false);
+  }
+}
+
+.bundle .button {
+  @include bundle;
+  &.secondary {
+    @include bundle;
+  }
+}
