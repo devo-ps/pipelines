@@ -97,13 +97,13 @@
           color: inherit;
           display: inline-block;
           margin: 0 $space/2;
-          padding: 1.5*$space/4 $space/2 (1.5*$space/4 - 3);
+          padding: 1.5*$space/4 $space/2 (1.5*$space/4 - 2);
           &:hover {
             color: $primary;
             text-decoration: none;
           }
           &.active {
-            border-bottom: 3px solid $blue;
+            border-bottom: 2px solid $blue;
           }
         }
       }

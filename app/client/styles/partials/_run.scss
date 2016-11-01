@@ -1,4 +1,4 @@
-$loading_thickness: 3px;
+$loading_thickness: 2px;
 $loading_size: 42px;
 $img_size: 24px;
 &.running {
@@ -10,7 +10,7 @@ $img_size: 24px;
     }
     &:after {
       animation: spin 3*$ease linear infinite;
-      border: $loading_thickness solid $light;
+      border: $loading_thickness solid $line;
       border-top: $loading_thickness solid $primary;
     }
   }
@@ -60,7 +60,7 @@ $img_size: 24px;
   }
   &:after {
     background: rgba($primary, 0);
-    border: $loading_thickness solid $light;
+    border: $loading_thickness solid $line;
     border-radius: 50%;
     bottom: 0;
     content: '';
