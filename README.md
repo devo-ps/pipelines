@@ -5,7 +5,7 @@
 Pipelines is a simple tool with a web UI to manage running tasks. It supports triggering tasks manually throught a Web
 UI or using webhooks.
 
-Pipelines is composed of two three components:
+Pipelines is composed of three components:
  - __Web UI__: User interface that allows users to run tasks, inspect logs and show the task details. It also support
    username/password authentication.
  - __Pipelines API__: This is the backend for the Web UI and webh
