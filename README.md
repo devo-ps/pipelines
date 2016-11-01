@@ -31,8 +31,8 @@ The Pipeline definition file uses YAML syntax. Lets start with a simple example:
 ---
 ## Variables are exposed to all the tasks
 vars:
- slack_url: https://hooks.slack.com/services/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
  code_branch: dev
+ log_folder: "/var/log"
 
 ## Triggers define the automated ways to run the task
 triggers: []
