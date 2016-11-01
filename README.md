@@ -36,8 +36,6 @@ vars:
 
 ## Triggers define the automated ways to run the task
 triggers: []
-  # By default you can trigger the pipeline by hitting `http://example.com/wh/SECRET` (where `SECRET` is displayed in
-  # the Web UI). Maybe we can make overridable.
 
 ## Actions are the steps tbat are run for this pipeline
 actions:
