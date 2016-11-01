@@ -162,7 +162,7 @@
         overflow: auto;
         padding: $space/2;
         position: relative;
-        white-space: pre;
+        white-space: pre-wrap;
         time {
           opacity: 0.4;
         }
