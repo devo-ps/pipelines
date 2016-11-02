@@ -8,6 +8,17 @@
     border: 1px solid $line;
     margin-bottom: $space/2;
     @import '_run';
+    @import '_modal';
+    &.fullscreen {
+      border: 0;
+      border-radius: 0;
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 9999;
+    }
     &:hover {
       border-color: $grey;
     }
@@ -26,6 +37,7 @@
       }
     }
     .header {
+      cursor: pointer;
       line-height: 1;
       padding: $space/2;
       h2 {
@@ -57,41 +69,36 @@
           }
         }
       }
-      .prompt {
-        background: #FFF;
-        border-radius: $radius;
-        box-shadow: $hover;
-        box-sizing: border-box;
+      .modal {
         line-height: 160%;
-        opacity: 0;
-        margin-top: 2*$space;
-        padding: $space/2;
-        position: absolute;
-        @include transform(scale(0.9));
-        @include transition-property(opacity, transform);
-        @include transition-duration($ease);
-        visibility: hidden;
-        width: 240px;
-        z-index: 9999;
-        input {
-          width: 100%;
-        }
-        &.active {
-          opacity: 1;
-          @include transform(scale(1));
-          visibility: visible;
-        }
       }
     }
-    .body {
+    > .body {
       border-top: 1px solid $line;
       display: none;
       .status:before {
         box-shadow: 0 0 0 1px #FFF;
         margin-right: $space/4;
       }
+      .tabs,
+      .toolbar {
+        .fullscreen {
+          float: right;
+          padding: 1.5*$space/4 $space/2;
+          svg {
+            fill: $grey;
+          }
+          &:hover {
+            svg {
+              fill: $primary;
+            }
+          }
+        }
+        .icon {
+          @include tooltip;
+        }
+      }
       .tabs {
-        border-bottom: 1px solid $light;
         @include font-size($smaller);
         a {
           color: inherit;
@@ -104,16 +111,18 @@
           }
           &.active {
             border-bottom: 2px solid $blue;
+            color: $primary;
           }
         }
       }
       .toolbar {
+        border-top: 1px solid $light;
         @include clearfix;
         @include font-size($smaller);
         vertical-align: middle;
         .menu > a,
         .icon {
-          border-right: 1px solid $light;
+          // border-right: 1px solid $light;
           color: inherit;
           display: block;
           padding: 1.5*$space/4 $space/2;
@@ -132,6 +141,12 @@
           .options {
             max-height: 200px;
             overflow: auto;
+            a.active {
+              background: $light;
+              &:hover {
+                background: $blue;
+              }
+            }
             svg {
               float: right;
               margin-left: $space/6;
@@ -143,11 +158,12 @@
           float: left;
           vertical-align: middle;
         }
-        > .fullscreen {
-          float: right;
-        }
-        .icon {
-          @include tooltip;
+      }
+      .content {
+        border-top: 1px solid $light;
+        padding: $space/2;
+        input {
+          width: 100%;
         }
       }
       .console {

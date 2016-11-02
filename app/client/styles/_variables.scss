@@ -12,3 +12,16 @@ $primary: $blue;
 /* Misc */
 
 $width: 800px;
+$login: 288px;
+$modal: 400px;
+
+/* Partials */
+
+$partials: (
+  base,
+  button,
+  form,
+  menu,
+  notification,
+  tooltip
+);

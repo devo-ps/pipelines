@@ -1,0 +1,28 @@
+#login {
+  bottom: 0;
+  display: table;
+  height: auto;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: $login;
+  form {
+    background: #FFF;
+    border: 1px solid $line;
+    border-radius: $radius;
+    padding: 1.5*$space/2;
+    h1 {
+      border-bottom: 1px solid $line;
+      font-size: inherit;
+      margin: -1.5*$space/2;
+      margin-bottom: $space/2;
+      padding: 1.5*$space/2;
+    }
+    input,
+    .button {
+      width: 100%;
+    }
+  }
+}

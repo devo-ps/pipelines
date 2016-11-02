@@ -30,3 +30,17 @@ body {
 .loading {
   // @include loading;
 }
+
+.credit {
+  color: $grey;
+  display: block;
+  margin-top: $space/4;
+  text-align: center;
+  a {
+    color: $grey;
+    text-decoration: underline;
+    &:hover {
+      color: $primary;
+    }
+  }
+}

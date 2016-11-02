@@ -207,11 +207,7 @@ class GetTriggersHandler(PipelinesRequestHandler):
 class LoginHandler(PipelinesRequestHandler):
     def get(self):
         log.debug('Login page')
-        self.write('<html><body><form action="/login" method="post">'
-                   'Username: <input type="text" name="username"><br/>'
-                   'Password: <input type="text" name="password"><br/>'
-                   '<input type="submit" value="Sign in">'
-                   '</form></body></html>')
+        self.render('templates/login.html', error_msg=None)
 
     def post(self):
         if _authenticate_user(
@@ -223,7 +219,7 @@ class LoginHandler(PipelinesRequestHandler):
             print 'set secure cookie'
             self.redirect("/index.html")
         else:
-            self.redirect("/login")
+            self.render('templates/login.html', error_msg='Wrong username or password')
 
 
 class GetPipelinesHandler(PipelinesRequestHandler):

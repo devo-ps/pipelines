@@ -32,7 +32,9 @@ export default class NewTask extends Component {
         intervals: {},
         logs: {},
         promptHolder: prompt,
-        triggers: []
+        triggers: [],
+        activeRunId: undefined,
+        fullscreen: false
     };
   }
 
@@ -117,16 +119,22 @@ export default class NewTask extends Component {
         var runs = this.state.task.runs;
         runs.unshift(this_run)
         var that = this;
+        var logs  = this.state.logs;
+        logs['0'] = 'Loading...'
         this.setState({
           open: true,
           task: task,
+          logs: logs,
           status: 'running',
           activeRunId: '0'
+
         })
+
 
         API.runPipeline(task.slug, params)
           .then((data) => {
             log('Pipeline run, new task id: ', data.task_id, task.slug)
+
             this_run.id = data.task_id;
             runs.unshift(this_run)
             that.setState({
@@ -149,12 +157,22 @@ export default class NewTask extends Component {
     this.setState({ open: !this.state.open })
   }
 
+  toggleFullscreen (item) {
+    log('Toggle fullscreen', this.state.fullscreen)
+    this.setState({ fullscreen: !this.state.fullscreen })
+  }
+
   selectLogsTab () {
     this.setState({ tab: 'logs' })
   }
 
   selectConfigTab () {
     this.setState({ tab: 'configuration' })
+  }
+
+  selectWebhookTab () {
+    console.log('wb')
+    this.setState({ tab: 'webhook' })
   }
 
   pollPipeline(){
@@ -238,7 +256,7 @@ export default class NewTask extends Component {
               <a
                 key={'runs'+index}
                 onClick={this.selectRun.bind(this, item.id)}
-                className={ `status ${statusClass} active`}>
+                className={ `status ${statusClass} ${item.id == that.state.activeRunId ? 'active': ''}`}>
                   {item.status}	&middot; { that.relativeTime(item.start_time) }
                 </a>
             )
@@ -261,6 +279,7 @@ export default class NewTask extends Component {
            </div>
            <a className={`status ${statusClass}`}>{activeRunObj.status}	&middot; {activeRunObj && this.relativeTime(activeRunObj.start_time)}</a>
          </span>
+         {/*
          <button className='icon previous'>
            <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/></svg>"}}/>
            <span>Previous</span>
@@ -270,6 +289,7 @@ export default class NewTask extends Component {
                  dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/></svg>"}}/>
            <span>Next</span>
          </button>
+         */}
        </header>
      )
 
@@ -307,7 +327,7 @@ export default class NewTask extends Component {
   getPromptFieldsHtml() {
     if (this.state.task.definition.prompt){
       var that = this;
-      var fields =  Object.keys(this.state.promptHolder).map(function(key){
+      var fieldsHtml =  Object.keys(this.state.promptHolder).map(function(key){
         return (
           <div className="field" key={key}>
             <label>{key}</label>
@@ -318,11 +338,20 @@ export default class NewTask extends Component {
 
 
       return (
-        <div className={`prompt ${this.state.showPrompt ? 'active' : 'inactive'}`}>
-          <p>Please input fields:</p>
-          <span>{fields}</span>
-          <button className="button" onClick={::this.hidePrompt} >Cancel</button>
-          <button className="button primary" onClick={this.onRun.bind(this, this.state.promptHolder)} >Run</button>
+        <div className={`overlay ${this.state.showPrompt ? 'active' : 'inactive'}`} onClick={ function(ev){ ev.stopPropagation();} }>
+          <div className="modal">
+            <header className="header">
+              <a className="close" onClick={::this.hidePrompt}>Close</a>
+              <h2>Fill in these values</h2>
+            </header>
+            <section className="body">
+              <span>{ fieldsHtml }</span>
+              <footer className="actions">
+                <button className="button" onClick={::this.hidePrompt} >Cancel</button>
+                <button className="button primary" onClick={this.onRun.bind(this, this.state.promptHolder)} >Run</button>
+              </footer>
+            </section>
+          </div>
         </div>
       )
     }
@@ -355,20 +384,44 @@ export default class NewTask extends Component {
         <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id])} } >
         </div>
       );
-    } else {
-       tabContent =(
-           <header className='toolbar'>
-               <span className='status'>
-                 webhooks: {this.state.triggers.map(function(item){ return <span>{item.webhook_id}</span>})}
-               </span>
-           </header>
-         )
+    } else if (this.state.tab == 'webhook'){
+      var webhookTabHtml;
+      if (this.state.triggers[0] && this.state.triggers[0].webhook_id){
+        webhookTabHtml = (
+          <div className='content'>
+            <p>Use this url to configure webhooks. For example, you can automate the deployment of your code by
+            <a href='https://help.github.com/articles/about-webhooks/' target='_blank'>setting up your GitHub repo</a> to hit this URL whenever a new commit is pushed.</p>
+            <div className='field'>
+              <label>Webhook URL</label>
+              <input type='text' readonly value="http://localhost:8888/webhook/{ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }" />
+            </div>
+          </div>
+        )
+      } else {
+        webhookTabHtml = (
+          <div className='content'>
+            <p className='empty'>This task has no webhook trigger. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>Read about how to add a webhook trigger</a>.</p>
+          </div>
+        )
+      }
+      tabContent2 = webhookTabHtml;
+    }
+     else {
        tabContent2 = (<div className='console' >{this.state.task.raw }</div>);
+    }
+
+    var fullscreenSvg;
+    var fullscreenClass;
+    if (this.state.fullscreen){
+      fullscreenSvg = '<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>'
+      fullscreenClass = 'fullscreen'
+    } else {
+      fullscreenSvg = '<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>';
     }
 
     return (
         <article
-          className={`item pipeline ${activeRunObj.status} ${activ}`}
+          className={`item pipeline ${activeRunObj.status} ${activ} ${this.state.fullscreen?'fullscreen':''}`}
           onclick2='toggleItem(this)'
         >
           <header className='header' onClick={::this.toggleItem}>
@@ -386,16 +439,15 @@ export default class NewTask extends Component {
 
           <section className='body'>
             <nav className='tabs'>
-              {/* < button className='icon fullscreen'>
-                <span className='svg'
-                    dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 9.49263,13.0931L 10.9068,14.5073L 6.41421,19L 10,19L 10,21L 3,21L 3,14L 5,14L 5,17.5858L 9.49263,13.0931 Z M 10.9069,9.49266L 9.49265,10.9069L 5,6.41422L 5,10L 3,10L 3,3.00001L 10,3L 10,5L 6.41421,5L 10.9069,9.49266 Z M 14.5074,13.0931L 19,17.5858L 19,14L 21,14L 21,21L 14,21L 14,19L 17.5858,19L 13.0932,14.5073L 14.5074,13.0931 Z M 13.0931,9.49265L 17.5858,5L 14,5L 14,3L 21,3L 21,10L 19,10L 19,6.41421L 14.5073,10.9069L 13.0931,9.49265 Z '/></svg>"}}/-->
-
+              <button className='icon fullscreen' onClick={::this.toggleFullscreen}>
+                <div className='svg'
+                    dangerouslySetInnerHTML={{__html:fullscreenSvg}}/>
                 <span>Fullscreen</span>
               </button>
-              */}
 
               <a className={`logs ${this.state.tab=='logs' ? 'active' : ''}`} onClick={::this.selectLogsTab}>Logs</a>
               <a className={`configuration ${this.state.tab=='configuration' ? 'active' : ''}`} onClick={::this.selectConfigTab}>Configuration</a>
+              <a className={`webhook ${this.state.tab=='webhook' ? 'active' : ''}`} onClick={::this.selectWebhookTab}>Webhook</a>
             </nav>
 
             { tabContent }

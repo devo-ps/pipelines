@@ -41,7 +41,7 @@ export default class Index extends Component {
 */}
             </nav>
 
-            <h1><a>Pipelines</a></h1>
+            <h1>Pipelines</h1>
           </div>
         </header>
         <div id='main'>
@@ -66,6 +66,7 @@ export default class Index extends Component {
                )
              }
             </section>
+            <small className="credit">Powered by <a href="http://github.com/Wiredcraft/pipelines/wiki" target="_blank">Pipelines</a></small>
           </div>
         </div>
       </section>

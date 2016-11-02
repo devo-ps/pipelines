@@ -22,7 +22,7 @@ setup(
         'pipelines': 'pipelines',
     },
     package_data={
-        'pipelines.api': ['app_dist/*.html', 'app_dist/client/dist/*']
+        'pipelines.api': ['app_dist/*.html', 'app_dist/client/dist/*', 'templates/*.html']
     },
     packages=[
         'pipelines',
