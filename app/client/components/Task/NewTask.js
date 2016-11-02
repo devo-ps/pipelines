@@ -41,29 +41,13 @@ export default class NewTask extends Component {
   componentDidMount () {
     log('Component mounted', this.props)
     const {task} = this.props
-
+    this.fetchTriggers(task.slug)
     if (task.run_ids && task.run_ids.length > 0) {
-      let temp = task.run_ids
-
-//      Promise.all(temp.map((id, idx) => {
-//        return API.getPipelineStatus(task.slug, id)
-//          .then((result) => {
-//            return {status: result.status, id: id}
-//          })
-//      }))
-//      .then((result) => {
-//        this.setState({
-//          runs: result
-//        })
-//      })
-
-
-
       if (task.runs){
         var activeRunId = task.runs[0].id
         this.setState({activeRunId: activeRunId})
         this.refreshLogs(activeRunId)
-        this.fetchTriggers(task.slug)
+
       } else {
         log('No runs', task)
       }
@@ -83,6 +67,7 @@ export default class NewTask extends Component {
   }
 
   fetchTriggers(slug){
+    log('Fetch Triggers', slug)
     return API.getTriggers(slug)
       .then((result) => {
         log('Fetched triggers for', slug)
@@ -230,6 +215,9 @@ export default class NewTask extends Component {
   }
 
   relativeTime(timestamp){
+    if (!timestamp) {
+      return 'No runs'
+    }
     if (timestamp == 'now') {
       return 'Now'
     }
@@ -238,6 +226,9 @@ export default class NewTask extends Component {
 
   getRunHistoryPointers(runs){
     var that = this;
+    if (!runs || runs.length == 0){
+      return <div className='status inactive' key='0'></div>
+    }
     return runs.slice(0,6).map(function(run){
       var status = run.status == 'success'? 'ok' : 'error';
       return <div className={`status ${status}`} key={run.id}><span>{run.status} &middot; { that.relativeTime(run.start_time)}</span></div>
@@ -267,8 +258,6 @@ export default class NewTask extends Component {
   getLogsToolbar(runsHtml) {
 
       var activeRunObj = this.getRunWithId(this.state.activeRunId) || {};
-      log('aacc', activeRunObj)
-
       var statusClass = activeRunObj.status == 'success'? 'ok' : 'error';
 
      return (
@@ -381,7 +370,7 @@ export default class NewTask extends Component {
         }
       };
       tabContent2 = (
-        <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id])} } >
+        <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id] || 'No runs')} } >
         </div>
       );
     } else if (this.state.tab == 'webhook'){
@@ -389,11 +378,10 @@ export default class NewTask extends Component {
       if (this.state.triggers[0] && this.state.triggers[0].webhook_id){
         webhookTabHtml = (
           <div className='content'>
-            <p>Use this url to configure webhooks. For example, you can automate the deployment of your code by
-            <a href='https://help.github.com/articles/about-webhooks/' target='_blank'>setting up your GitHub repo</a> to hit this URL whenever a new commit is pushed.</p>
+            <p>Use this url to configure webhooks. For example, you can automate the deployment of your code by <a href='https://help.github.com/articles/about-webhooks/' target='_blank'> setting up your GitHub repo</a> to hit this URL whenever a new commit is pushed.</p>
             <div className='field'>
               <label>Webhook URL</label>
-              <input type='text' readonly value="http://localhost:8888/webhook/{ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }" />
+              <input type='text' readonly value={`${window.location.protocol}://${window.location.host}/webhook/${ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }`} />
             </div>
           </div>
         )

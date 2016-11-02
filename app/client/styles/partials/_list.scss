@@ -33,7 +33,10 @@
         width: $space/3;
       }
       &.error:before {
-        background: $red;
+        background: $blue;
+      }
+      &.inactive:before {
+        background: $white;
       }
     }
     .header {
