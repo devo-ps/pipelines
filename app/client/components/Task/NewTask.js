@@ -38,6 +38,7 @@ export default class NewTask extends Component {
     };
   }
 
+
   componentDidMount () {
     log('Component mounted', this.props)
     const {task} = this.props
@@ -227,7 +228,7 @@ export default class NewTask extends Component {
   getRunHistoryPointers(runs){
     var that = this;
     if (!runs || runs.length == 0){
-      return <div className='status inactive' key='0'></div>
+      return <div className='empty'>No runs yet</div>
     }
     return runs.slice(0,6).map(function(run){
       var status = run.status == 'success'? 'ok' : 'error';
@@ -362,17 +363,30 @@ export default class NewTask extends Component {
 
     if (this.state.tab == 'logs'){
 
-      tabContent = this.getLogsToolbar()
       function highlight(input){
         var regex = /(\d\d\d\d:\d\d:\d\d \d\d:\d\d:\d\d:)/g;
         if (input !== undefined){
           return input.replace(regex, '<time className="time">$1</time>')
         }
       };
-      tabContent2 = (
+      console.log(this.state)
+      if (this.state.task.runs && this.state.task.runs.length){
+        console.log('Has runs', this.state)
+        tabContent = this.getLogsToolbar()
+
+        tabContent2 = (
+
         <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id] || 'No runs')} } >
         </div>
-      );
+        );
+      } else {
+        tabContent2 = (
+          <div className='content'>
+            <div className='notification info'>You haven't run this pipeline yet. Click the "Run" button at the top or <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>see how to trigger pipelines</a></div>
+         </div>
+         )
+      }
+
     } else if (this.state.tab == 'webhook'){
       var webhookTabHtml;
       if (this.state.triggers[0] && this.state.triggers[0].webhook_id){
@@ -381,7 +395,7 @@ export default class NewTask extends Component {
             <p>Use this url to configure webhooks. For example, you can automate the deployment of your code by <a href='https://help.github.com/articles/about-webhooks/' target='_blank'> setting up your GitHub repo</a> to hit this URL whenever a new commit is pushed.</p>
             <div className='field'>
               <label>Webhook URL</label>
-              <input type='text' readonly value={`${window.location.protocol}://${window.location.host}/webhook/${ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }`} />
+              <input type='text' readOnly value={`${window.location.protocol}://${window.location.host}/webhook/${ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }`} />
             </div>
           </div>
         )

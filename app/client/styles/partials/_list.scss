@@ -14,10 +14,14 @@
       border-radius: 0;
       bottom: 0;
       left: 0;
+      margin: 0;
       position: absolute;
       right: 0;
       top: 0;
       z-index: 9999;
+      > .body .console {
+        height: auto;
+      }
     }
     &:hover {
       border-color: $grey;
@@ -33,7 +37,7 @@
         width: $space/3;
       }
       &.error:before {
-        background: $blue;
+        background: $red;
       }
       &.inactive:before {
         background: $white;
@@ -50,6 +54,10 @@
       .run {
         margin-right: $space/4;
         margin-top: -$space/6;
+      }
+      .empty {
+        color: $grey;
+        @include font-size($smaller);
       }
       .status {
         display: inline-block;
@@ -124,7 +132,8 @@
         @include font-size($smaller);
         vertical-align: middle;
         .menu > a,
-        .icon {
+        .icon,
+        .empty {
           // border-right: 1px solid $light;
           color: inherit;
           display: block;
@@ -139,6 +148,9 @@
               fill: $primary;
             }
           }
+        }
+        .empty {
+          color: $grey;
         }
         .menu {
           .options {

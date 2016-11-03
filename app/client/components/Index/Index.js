@@ -15,7 +15,6 @@ export default class Index extends Component {
     .then((data) => {
       console.log(data)
       this.setState({pipelines: data})
-      console.log('pp', this.state.pipelines)
     })
 
   }
@@ -55,16 +54,13 @@ export default class Index extends Component {
             </header>
             <section className='body'>
             {
-
-               this.state.pipelines.map(
-                 (item, index) => {
-
-                   return (
-                      <NewTask key={index} task={item}/>
-                   );
-                 }
-               )
-             }
+              this.state.pipelines && this.state.pipelines.length ?
+              this.state.pipelines.map((item, index) => {
+                return <NewTask key={index} task={item}/>;
+              })
+              :
+                (<div className='notification info'>No pipelines yet. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>See how to add a pipeline</a></div>)
+            }
             </section>
             <small className="credit">Powered by <a href="http://github.com/Wiredcraft/pipelines/wiki" target="_blank">Pipelines</a></small>
           </div>
