@@ -7,21 +7,21 @@ export default class Index extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {pipelines: []};
+    this.state = {pipelines: [], loaded: false};
   }
 
   componentWillMount () {
     getAllPipelines()
     .then((data) => {
+
       console.log(data)
-      this.setState({pipelines: data})
+      this.setState({pipelines: data, loaded: true})
     })
 
   }
 
   render() {
-    console.log('rend', this.state.pipelines)
-    if (this.state.pipelines.length === 0) {
+    if (!this.state.loaded) {
       return (
         <p ref="empty loading">Loading...</p>
       );
