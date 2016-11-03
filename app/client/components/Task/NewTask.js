@@ -163,14 +163,14 @@ export default class NewTask extends Component {
 
   pollPipeline(){
     if (this.pipelineInterval){
-      log('Already polling')
+      log('pollPipeline: Already polling')
     } else {
         function refreshPipelineInner () {
             const {task} = this.props
             var that = this;
             return API.getPipeline(task.slug)
               .then((result) => {
-                console.log('Refreshed pipeline', task.slug, result)
+                log('Refreshed pipeline', task.slug, result)
                 if (result){
                     this.setState({task: result})
 
@@ -199,7 +199,7 @@ export default class NewTask extends Component {
 
   pollingLog (runId) {
     if (this.state.intervals[runId] != undefined){
-      log('Already polling for logs for task.')
+      log('pollingLog: Already polling for logs for task.')
       return
     }
     function getLog(){
@@ -369,9 +369,7 @@ export default class NewTask extends Component {
           return input.replace(regex, '<time className="time">$1</time>')
         }
       };
-      console.log(this.state)
       if (this.state.task.runs && this.state.task.runs.length){
-        console.log('Has runs', this.state)
         tabContent = this.getLogsToolbar()
 
         tabContent2 = (

@@ -27,6 +27,9 @@
       border-color: $grey;
     }
     .status {
+      span {
+        text-transform:capitalize;
+      }
       &:before {
         background: $green;
         border-radius: $space;
@@ -39,9 +42,7 @@
       &.error:before {
         background: $red;
       }
-      &.inactive:before {
-        background: $white;
-      }
+
     }
     .header {
       cursor: pointer;
