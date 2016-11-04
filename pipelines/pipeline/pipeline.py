@@ -148,16 +148,17 @@ class Pipeline(object):
 
 
     def run(self, params={}):
-        self.plugin_mgr.trigger('on_pipeline_start')
-
+        log.debug('Run pipeline. params: {}, {}'.format(params, self.context))
         pipeline_context ={
             'results': [],
-            'vars': self.context.get('vars'),
+            'vars': deepmerge(self.context.get('vars'), params),
             'status': PIPELINE_STATUS_OK,
-            'prev_result': None
+            'prev_result': None,
+            'params': params
         }
-        pipeline_context = DotMap(deepmerge(pipeline_context, params))
+        pipeline_context = DotMap(pipeline_context)
 
+        self.plugin_mgr.trigger('on_pipeline_start', pipeline_context)
         log.debug('Pipeline starting. context: %s' % pipeline_context)
         for task in self.tasks:
             if self._should_run(task, pipeline_context):

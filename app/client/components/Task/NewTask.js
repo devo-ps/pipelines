@@ -23,10 +23,9 @@ export default class NewTask extends Component {
   constructor(props) {
     super(props);
     var prompt = props.task.definition.prompt || {}
+
     this.state = {
         open: false,
-        runTasks: [],
-        runs: [],
         task: props.task,
         tab: 'logs',
         intervals: {},
@@ -140,7 +139,9 @@ export default class NewTask extends Component {
   }
 
   toggleItem (item) {
-    this.setState({ open: !this.state.open })
+    if (!this.state.fullscreen){
+      this.setState({ open: !this.state.open })
+    }
   }
 
   toggleFullscreen (item) {
@@ -239,11 +240,16 @@ export default class NewTask extends Component {
     var that = this;
     var runsHtml = '';
 
-    if (this.state.task.runs && this.state.task.runs.length > 0){
+    if (runs && runs.length > 0){
 
           var runsHtml = runs.map((item, index) => {
+            if (!item){
+              console.log('Undefined run', runs)
+              return
+            }
 
             var statusClass = item.status == 'success'? 'ok' : 'error';
+
             return (
               <a
                 key={'runs'+index}
@@ -286,8 +292,8 @@ export default class NewTask extends Component {
 
   }
 
-  getPastRunHtml (runTasks, runs) {
-    return runTasks.concat(runs).map((item, index) => {
+  getPastRunHtml (runs) {
+    return runs.map((item, index) => {
       return (
         <li key={'runs'+index}
           onClick={this.refreshLogs.bind(this, item.id)}
@@ -352,9 +358,8 @@ export default class NewTask extends Component {
   }
   render () {
     const {task} = this.props
-    const {runTasks, runs} = this.state
 
-    let pastJobs = this.getPastRunHtml(runTasks, runs)
+    let pastJobs = this.getPastRunHtml(this.state.task.runs)
     var activ = this.state.open ? 'active' : ''
 
     var tabContent = ''
@@ -364,17 +369,42 @@ export default class NewTask extends Component {
     if (this.state.tab == 'logs'){
 
       function highlight(input){
-        var regex = /(\d\d\d\d:\d\d:\d\d \d\d:\d\d:\d\d:)/g;
+        var timestampRegex = /(\d\d\d\d:\d\d:\d\d) (\d\d:\d\d:\d\d):/g;
+        var failRegex = /([^0] failed|failed|fail|error|err|status: 1)/g;
+        var bashColors = [
+        [/\[0;30m(.*)\[0m/g, '<span class="black">$1</span>'],
+        [/\[0;31m(.*)\[0m/g, '<span class="red">$1</span>'],
+        [/\[0;32m(.*)\[0m/g, '<span class="green">$1</span>'],
+        [/\[0;33m(.*)\[0m/g, '<span class="brown">$1</span>'],
+        [/\[0;34m(.*)\[0m/g, '<span class="blue">$1</span>'],
+        [/\[0;35m(.*)\[0m/g, '<span class="purple">$1</span>'],
+        [/\[0;36m(.*)\[0m/g, '<span class="cyan">$1</span>'],
+        [/\[0;37m(.*)\[0m/g, '<span class="light-gray">$1</span>'],
+        [/\[1;30m(.*)\[0m/g, '<span class="dark-gray">$1</span>'],
+        [/\[1;31m(.*)\[0m/g, '<span class="light-red">$1</span>'],
+        [/\[1;32m(.*)\[0m/g, '<span class="light-green">$1</span>'],
+        [/\[1;33m(.*)\[0m/g, '<span class="yellow">$1</span>'],
+        [/\[1;34m(.*)\[0m/g, '<span class="light-blue">$1</span>'],
+        [/\[1;35m(.*)\[0m/g, '<span class="light-purple">$1</span>'],
+        [/\[1;36m(.*)\[0m/g, '<san class="light-cyan">$1</span>'],
+        [/\[1;37m(.*)\[0m/g, '<span class="white">$1</span>'],
+        ]
+        bashColors.map(function(code){
+          input = input.replace(code[0], code[1])
+        })
+
         if (input !== undefined){
-          return input.replace(regex, '<time className="time">$1</time>')
+          input =  input.replace(timestampRegex, '<time className="time">$2</time>')
+          input = input.replace(failRegex, '<span style="color: red;">$1</span>')
         }
+        return input;
+
       };
       if (this.state.task.runs && this.state.task.runs.length){
         tabContent = this.getLogsToolbar()
 
         tabContent2 = (
-
-        <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id] || 'No runs')} } >
+        <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id] || 'No logs yet')} } >
         </div>
         );
       } else {
@@ -393,7 +423,7 @@ export default class NewTask extends Component {
             <p>Use this url to configure webhooks. For example, you can automate the deployment of your code by <a href='https://help.github.com/articles/about-webhooks/' target='_blank'> setting up your GitHub repo</a> to hit this URL whenever a new commit is pushed.</p>
             <div className='field'>
               <label>Webhook URL</label>
-              <input type='text' readOnly value={`${window.location.protocol}://${window.location.host}/webhook/${ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }`} />
+              <input type='text' readOnly value={`${window.location.protocol}//${window.location.host}/webhook/${ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }`} />
             </div>
           </div>
         )
@@ -431,9 +461,9 @@ export default class NewTask extends Component {
               <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
             </button>
 
-            <h2>{this.props.task.slug}</h2>
+            <h2>{this.state.task.slug}</h2>
             <span className='history'>
-              { this.getRunHistoryPointers(this.props.task.runs) }
+              { this.getRunHistoryPointers(this.state.task.runs) }
             </span>
           </header>
 

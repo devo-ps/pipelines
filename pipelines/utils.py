@@ -18,6 +18,7 @@ def conf_logging():
 def deepmerge(base, update):
     for k, v in base.items():
         if k in update:
-            update[k] = deepmerge(v, update[k])
+            if isinstance(update[k], dict):
+                update[k] = deepmerge(v, update[k])
     base.update(update)
     return base

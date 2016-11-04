@@ -195,8 +195,6 @@ class GetTriggersHandler(PipelinesRequestHandler):
                         id = _get_webhook_id(wh_identifier, wh_config)
                         trigger['webhook_id'] = id
                         mapping[id] = wh_identifier
-                print 'mappings'
-                print mapping
                 print pipeline_def
                 with open(config_path, 'w') as wh_file:
                     json.dump(mapping, wh_file, indent=2)

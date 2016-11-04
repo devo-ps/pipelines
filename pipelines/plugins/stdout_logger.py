@@ -1,3 +1,4 @@
+import json
 import logging
 from datetime import datetime
 
@@ -45,11 +46,11 @@ class StdoutLogger(BasePlugin):
             log.debug('No Log File for stdout logger')
         return cls(conf_dict.get('log_file'))
 
-    def on_pipeline_start(self, *args):
+    def on_pipeline_start(self, pipeline_context, *args):
         self._add_pipeline_start_stats()
 
         if 'on_pipeline_start' in self.write_on:
-            self.write('Pipeline started')
+            self.write('Pipeline started. vars: %s' % json.dumps(pipeline_context.toDict().get('vars', 'None')))
 
     def on_pipeline_finish(self, *args):
         self._add_pipeline_finish_stats()
