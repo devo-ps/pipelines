@@ -234,13 +234,21 @@ class GetPipelinesHandler(PipelinesRequestHandler):
             pipeline_def = yaml.load(yaml_string)
             slug = _slugify_file(path)
             full_path = os.path.join(workspace, slug)
+            run_dict = {
+                'slug': slug,
+                'run_ids': [],
+                'definition': pipeline_def,
+                'raw': yaml_string
+            }
             if os.path.isdir(full_path):
                 # expect to have runs
                 ids = list(_run_id_iterator(full_path))
                 runs = _fetch_runs(full_path, ids)
-                pipelines.append({'slug': slug, 'run_ids': ids, 'runs': runs, 'definition': pipeline_def, 'raw': yaml_string })
-            else:
-                pipelines.append({'slug': slug, 'run_ids': [], 'definition': pipeline_def, 'raw': yaml_string})
+                run_dict['run_ids'] = ids
+                run_dict['runs'] = runs
+
+            pipelines.append(run_dict)
+
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
@@ -407,8 +415,8 @@ def main(config):
     conf_logging()
     app = make_app(config.get('workspace', 'fixtures/workspace'), config.get('auth'))
     app.listen(
-            int(config.get('port', 8888)),
-            address=config.get('host', '127.0.0.1'),
+        int(config.get('port', 8888)),
+        address=config.get('host', '127.0.0.1'),
     )
 
     log.info('Starting ioloop: {}'.format(config))
