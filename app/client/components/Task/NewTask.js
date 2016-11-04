@@ -47,7 +47,6 @@ export default class NewTask extends Component {
         var activeRunId = task.runs[0].id
         this.setState({activeRunId: activeRunId})
         this.refreshLogs(activeRunId)
-
       } else {
         log('No runs', task)
       }
@@ -126,6 +125,7 @@ export default class NewTask extends Component {
               task: task,
               activeRunId: data.task_id
             })
+            that.refreshLogs(data.task_id)
             that.pollingLog(data.task_id)
             that.pollPipeline()
           })
@@ -166,6 +166,7 @@ export default class NewTask extends Component {
     if (this.pipelineInterval){
       log('pollPipeline: Already polling')
     } else {
+        var pipelineInterval;
         function refreshPipelineInner () {
             const {task} = this.props
             var that = this;
@@ -180,13 +181,15 @@ export default class NewTask extends Component {
                       if (that.state.intervals[runObj.id] != undefined && runObj.status != 'running'){
                         // Run finished, clear the timeout
                         clearTimeout(that.state.intervals[runObj.id])
+                        clearTimeout(pipelineInterval)
+                        that.refreshLogs(runObj.id) // Fetch one last time
                         delete that.state.intervals[runObj.id]
                       }
                       if (runObj.status == 'running'){
                         pipelineStatus = 'running'
                       }
                     })
-                    this.setState({
+                    that.setState({
                       status: pipelineStatus,
                       task: result
                     })
@@ -194,7 +197,7 @@ export default class NewTask extends Component {
               })
           }
 
-      this.pipelineInterval = setInterval(refreshPipelineInner.bind(this), 4000)
+      pipelineInterval = setInterval(refreshPipelineInner.bind(this), 1500)
     }
   }
 
