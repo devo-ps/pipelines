@@ -21,23 +21,12 @@ export default class Index extends Component {
   }
 
   render() {
-    if (!this.state.loaded) {
-      return (
-        <p ref="empty loading">Loading...</p>
-      );
-    }
-
     return (
-      <section>
+      <section className={!this.state.loaded?'loading':''} id='app'>
         <header id='header'>
           <div className='wrapper'>
             <nav className='links'>
               <a hred='http://github.com/Wiredcraft/pipelines/wiki' target='_blank'>Help</a>
-{/*}              <a onclick='showModal()' className='user'>
-                <img src='assets/user.jpg' alt='hunvreus'/>
-                Ronan
-              </a>
-*/}
             </nav>
 
             <h1>Pipelines</h1>

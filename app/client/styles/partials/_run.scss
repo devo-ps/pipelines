@@ -1,6 +1,6 @@
-$loading_thickness: 2px;
+$loading_thickness: $thickness;
 $loading_size: 42px;
-$img_size: 24px;
+$img_size: $space;
 &.running {
   .run,
   .run:hover {
@@ -73,9 +73,4 @@ $img_size: 24px;
     width: $loading_size;
     z-index: 998;
   }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
