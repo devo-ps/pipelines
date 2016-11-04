@@ -132,9 +132,10 @@ class WebhookHandler(RequestHandler):
         with open(conf_path) as f:
             try:
                 pipeline_state = json.load(f)
-                if webhook_id not in pipeline_state:
+                wh_conf = pipeline_state.get('webhooks', {})
+                if webhook_id not in wh_conf:
                     raise HTTPError(404, 'Not found')
-                webhook_context = pipeline_state[webhook_id]
+                webhook_context = wh_conf[webhook_id]
 
                 log.debug('wh context %s', webhook_context)
                 return webhook_context
@@ -186,6 +187,8 @@ class GetTriggersHandler(PipelinesRequestHandler):
                 if os.path.isfile(config_path):
                     with open(config_path) as wh_file:
                         pipeline_config = json.load(wh_file)
+                        if 'webhooks' not in pipeline_config:
+                            pipeline_config['webhooks'] = {}
 
                 for index, trigger in enumerate(pipeline_def['triggers']):
                     if trigger.get('type') == 'webhook':
