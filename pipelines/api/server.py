@@ -131,8 +131,11 @@ class WebhookHandler(RequestHandler):
 
         with open(conf_path) as f:
             try:
-                json_data = json.load(f)
-                webhook_context = json_data[webhook_id]
+                pipeline_state = json.load(f)
+                if webhook_id not in pipeline_state:
+                    raise HTTPError(404, 'Not found')
+                webhook_context = pipeline_state[webhook_id]
+
                 log.debug('wh context %s', webhook_context)
                 return webhook_context
             except KeyError as ke:
@@ -162,11 +165,11 @@ class GetTriggersHandler(PipelinesRequestHandler):
     @authenticated
     def get(self, pipeline_slug):
         workspace = self.settings['workspace_path']
-        log.debug('get triggers')
+        log.debug('Get triggers %s' % pipeline_slug)
         yaml_filepath = _get_pipeline_filepath(workspace, pipeline_slug)
 
         if not os.path.exists(yaml_filepath):
-            print('not found %s' % yaml_filepath)
+            print('Not found %s' % yaml_filepath)
             raise HTTPError(404, 'Pipeline not found')
 
         with open(yaml_filepath) as f:
@@ -176,14 +179,13 @@ class GetTriggersHandler(PipelinesRequestHandler):
             except yaml.YAMLError as e:
                 log.exception(e)
                 raise HTTPError(500, 'Invalid yaml config')
-            mapping = {}
 
             with filelock.FileLock(os.path.join(workspace, '.pipelinelock')):
+                pipeline_config = {'webhooks': {}}
                 config_path = os.path.join(workspace, WEB_HOOK_CONFIG)
-                wh_config = {}
                 if os.path.isfile(config_path):
                     with open(config_path) as wh_file:
-                        wh_config = json.load(wh_file)
+                        pipeline_config = json.load(wh_file)
 
                 for index, trigger in enumerate(pipeline_def['triggers']):
                     if trigger.get('type') == 'webhook':
@@ -192,12 +194,12 @@ class GetTriggersHandler(PipelinesRequestHandler):
                             'index': index,
                             'type': trigger.get('type')
                         }
-                        id = _get_webhook_id(wh_identifier, wh_config)
-                        trigger['webhook_id'] = id
-                        mapping[id] = wh_identifier
-                print pipeline_def
+                        wh_id = _get_webhook_id(wh_identifier, pipeline_config['webhooks'])
+                        trigger['webhook_id'] = wh_id
+                        pipeline_config['webhooks'][wh_id] = wh_identifier
+
                 with open(config_path, 'w') as wh_file:
-                    json.dump(mapping, wh_file, indent=2)
+                    json.dump(pipeline_config, wh_file, indent=2)
 
             self.write(json.dumps({'triggers': pipeline_def['triggers']}, indent=2))
             self.finish()
