@@ -400,7 +400,7 @@ export default class NewTask extends Component {
       } else {
         webhookTabHtml = (
           <div className='content'>
-            <p className='empty'>This task has no webhook trigger. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>Read about how to add a webhook trigger</a>.</p>
+            <div className='notification info'>This task has no webhook trigger. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>Read about how to add a webhook trigger</a>.</div>
           </div>
         )
       }
