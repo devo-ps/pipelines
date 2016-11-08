@@ -1,6 +1,4 @@
 import React, { Component, PropTypes } from 'react'
-import {Collapse} from 'react-bootstrap';
-import LoadingIcon from '../LoadingIcon'
 import * as API from '../../api'
 import moment from 'moment';
 // var Highlight = require('react-syntax-highlight');
@@ -14,7 +12,7 @@ var log = function(){
   }
 }
 
-export default class NewTask extends Component {
+export default class Task extends Component {
 
   static propTypes = {
     task: PropTypes.object
@@ -397,8 +395,8 @@ export default class NewTask extends Component {
         })
 
         if (input !== undefined){
-          input =  input.replace(timestampRegex, '<time className="time">$2</time>')
-          input = input.replace(failRegex, '<span style="color: red;">$1</span>')
+          input =  input.replace(timestampRegex, '<time class="time">$2</time>')
+          input = input.replace(failRegex, '<span class="red">$1</span>')
         }
         return input;
 
@@ -426,7 +424,7 @@ export default class NewTask extends Component {
             <p>Use this url to configure webhooks. For example, you can automate the deployment of your code by <a href='https://help.github.com/articles/about-webhooks/' target='_blank'> setting up your GitHub repo</a> to hit this URL whenever a new commit is pushed.</p>
             <div className='field'>
               <label>Webhook URL</label>
-              <input type='text' readOnly value={`${window.location.protocol}//${window.location.host}/webhook/${ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }`} />
+              <input type='text' readOnly value={`${window.location.protocol}//${window.location.host}/api/webhook/${ this.state.triggers[0] && this.state.triggers[0].webhook_id ? this.state.triggers[0].webhook_id : '' }`} />
             </div>
           </div>
         )
@@ -464,7 +462,7 @@ export default class NewTask extends Component {
               <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
             </button>
 
-            <h2>{this.state.task.slug}</h2>
+            <h2>{this.state.task.definition.name ? this.state.task.definition.name : this.state.task.slug}</h2>
             <span className='history'>
               { this.getRunHistoryPointers(this.state.task.runs) }
             </span>

@@ -105,6 +105,7 @@
       }
       .tabs {
         @include font-size($smaller);
+        font-weight: bold;
         a {
           color: inherit;
           display: inline-block;
@@ -117,6 +118,11 @@
           &.active {
             border-bottom: 2px solid $blue;
             color: $primary;
+          }
+        }
+        @include breakpoint(mobile) {
+          a {
+            padding: 1.5*$space/4 $space/4 (1.5*$space/4 - 2);
           }
         }
       }

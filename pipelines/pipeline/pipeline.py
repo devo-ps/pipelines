@@ -47,9 +47,10 @@ DEFAULTS = {
 }
 
 PIPELINES_SCHEMA = Schema({
-    'vars': {
+    Optional('vars'): {
         basestring: basestring
     },
+    Optional('name'): basestring,
     'actions': [
         Or(
             basestring,
@@ -108,6 +109,8 @@ class Pipeline(object):
 
         if 'vars' not in pipeline_def:
             pipeline_def['vars'] = {}
+        if 'triggers' not in pipeline_def:
+            pipeline_def['triggers'] = {}
 
         # Merge parameters to variables dict
         pipeline_def['vars'].update(params)

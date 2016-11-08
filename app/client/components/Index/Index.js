@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import NewTask from '../Task/NewTask';
+import Task from '../Task/Task';
 import {getAllPipelines} from '../../api';
 import 'styles/main'
 
@@ -45,7 +45,7 @@ export default class Index extends Component {
             {
               this.state.pipelines && this.state.pipelines.length ?
               this.state.pipelines.map((item, index) => {
-                return <NewTask key={index} task={item}/>;
+                return <Task key={index} task={item}/>;
               })
               :
                 (<div className='notification info'>No pipelines yet. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>See how to add a pipeline</a></div>)

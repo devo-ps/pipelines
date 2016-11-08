@@ -41,7 +41,7 @@ body {
 .credit {
   color: $grey;
   display: block;
-  margin-top: $space/4;
+  padding: $space/4 0;
   text-align: center;
   a {
     color: $grey;
@@ -57,56 +57,24 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-.black {
-  color: black;
-}
-.red {
-  color: red;
-}
+.black { color: $black; }
+.blue { color: $blue; }
+.brown { color: $yellow; }
+.cyan { color: $cyan; }
+.green { color: $green; }
+.purple { color: $purple; }
+.red { color: $red; }
+.yellow { color: $yellow; }
+.white { color: #FFF; }
 
-.green {
-  color: green;
-}
-.brown {
-  color: yellow;
-}
+.light-blue { color: $light-blue; }
+.light-cyan { color: $light-cyan; }
+.light-gray { color: $light-gray; }
+.light-green { color: $light-green; }
+.light-purple { color: $light-purple; }
+.light-red { color: $light-red; }
 
-.blue {
-  color: blue;
-}
-.cyan {
-  color: cyan;
-}
-.purple {
-  color: purple;
-}
-.light-gray {
-  color: gray;
-}
-.dark-gray {
-  color: gray;
-}
-.light-red {
-  color: red;
-}
-.light-green {
-  color: green;
-}
-.yellow {
-  color: yellow;
-}
-.light-blue {
-  color: blue;
-}
-.dark-gray {
-  color: gray;
-}
-.white {
-  color: white;
-}
-.light-purple {
-  color: purple;
-}
-.light-cyan {
-  color: cyan;
-}
+.dark-gray { color: $gray; }
+
+
+
