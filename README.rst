@@ -270,7 +270,8 @@ If you want to run your pipeline by triggering it through a webhook you can enab
 
 
 If you open the web-UI you can see the webhook URL that was generated for this pipeline in the "Webhook" tab. You can
-for example configure GitHub repository to call this url after every commit.
+for example `configure GitHub repository <https://developer.github.com/webhooks/creating/>`_ to call this url after every commit.
+
 
 ``Note``:
 
