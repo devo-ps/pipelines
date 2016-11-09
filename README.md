@@ -18,7 +18,7 @@ Pipelines is composed of three components:
 ## Getting started
 
 In order to run the pipelines on your own server you need to do the following:
- - Ensure you have python and pip (you probably do)
+ - Ensure you have python (2.7) and pip (you probably do)
  - Run: `pip install git+git://github.com/Wiredcraft/pipelines@dev`
  - Create a workspace anywhere in the filesystem (you'll have your task definitions, logs and temporary data here)
  - Run the backend. This is up to you but you can run it manually (for quick testing), inside a screen (bit better) or
@@ -30,27 +30,40 @@ In order to run the pipelines on your own server you need to do the following:
 
 The Pipeline definition file uses YAML syntax. Lets start with a simple example:
 
+`example-pipeline.yaml`:
 ```yaml
 ---
-## Variables are exposed to all the tasks
+# Pipeline definitions are standard yaml and you can include comments inside
+
+# Variables are exposed to all actions through {{ varname }} syntax.
 vars:
  code_branch: dev
  log_folder: "/var/log"
 
-## Triggers define the automated ways to run the task
-triggers: []
+# Triggers define the automated ways to run the task. Only webhook is supported for now.
+triggers:
+ - webhook
 
-## Actions are the steps tbat are run for this pipeline
+# Actions are the steps that are run for this pipeline. The default action plugin is bash, but you can use others by
+# defining the "type" field.
 actions:
- - 'echo "Pre sleep task for {{ code_branch }}"'
- - "echo 'from time import sleep\nfor a in range(20):\n  print \"test\"\n  sleep(2)' | python"
- - 'echo "Post sleep task"'
+ - 'echo "Starting task for {{ code_branch }}"'
+ - type: bash
+   cmd: "echo 'less compact way to define actions'"
+ - 'ls -la /tmp'
  ```
 
 __More complex actions__
 
 The default mode for an action is a bash command. We also support more verbose style of defining actions where you can
-set more options. Here is an example of an action that send a message to slack channel:
+set more options.
+
+Currently supported action types:
+ - bash: run bash command
+ - slack: send message to slack through webhook
+ - python: write inline script or run python script inside a virtualenv
+
+Here is an example of an action that send a message to slack channel:
  ```
 - type: slack
   message: 'Deployment finished with status {{ status }} for jekyllplus (api+client).'
@@ -62,6 +75,25 @@ Explanation of fields:
  - `always_run` overrides the default behavior where if action fails the following tasks are not ran.
  - `message` is a slack specific field that defines the message that is posted to the slack channel.
 
+
+Example python action:
+```
+ - type: python
+   script: |
+     import json
+     a = {'test': 'value', 'array': [1,2,3]}
+     print json.dumps(a, indent=2)
+ - type: python
+   virtualenv:  test/files/test_venv
+   file: 'test/files/test_dopy_import.py'
+```
+
+Explanation of the fields:
+ - `script`: raw python code to be run directly
+ - `virtualenv`: run the python code inside a virtualenv
+ - `file`: run a python file (can not be used together with "script" field).
+
+
 __Webhooks__
 
 If you want to run your pipeline by triggering it through a webhook you can enable it in the triggers section. For
@@ -71,13 +103,15 @@ triggers:
   - type: webhook
 ```
 
-If you open the web-UI you can see the webhook URL that was generated for this pipeline. You can for example configure
-GitHub repository to trigger this task on every commit.
+If you open the web-UI you can see the webhook URL that was generated for this pipeline in the "Webhook" tab. You can
+for example configure GitHub repository to call this url after every commit.
 
 __Field prompts__
 
 You can prompt users to manually input fields when they run the pipeine through the web-UI. To do this add a `prompt`
-section to your pipeline definition, for example:
+section to your pipeline definition. The prompt fields will override the variables from the "vars" section.
+
+For example:
 ```
 prompt:
  code_branch: dev
@@ -86,7 +120,7 @@ prompt:
 This example would ask the user to fill in a code_branch field when they try to run the pipeline with `dev` as default
 value. The prompted value will override any values defines in the `vars` section.
 
-__Simple step by step install__
+__Simple step by step install for Ubuntu server__
 
 **TODO**: replace by ansible playbook...
 

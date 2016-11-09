@@ -206,7 +206,7 @@ class GetTriggersHandler(PipelinesRequestHandler):
                 with open(config_path, 'w') as wh_file:
                     json.dump(pipeline_config, wh_file, indent=2)
 
-            self.write(json.dumps({'triggers': pipeline_def['triggers']}, indent=2))
+            self.write(json.dumps({'triggers': pipeline_def.get('triggers', [])}, indent=2))
             self.finish()
 
 class LoginHandler(PipelinesRequestHandler):
