@@ -31,6 +31,5 @@ class FileLogger(StdoutLogger):
     def write(self, msg):
         with open(self.file_path) as f:
             f.write(json.dump({
-                            'status': 'success'
-                        }, indent=2))
-
+                'status': 'success'
+            }, indent=2))
