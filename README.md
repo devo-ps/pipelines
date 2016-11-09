@@ -82,3 +82,17 @@ prompt:
 
 This example would ask the user to fill in a code_branch field when they try to run the pipeline with `dev` as default
 value. The prompted value will override any values defines in the `vars` section.
+
+__Simple step by step install__
+
+**TODO**: replace by ansible playbook...
+
+- `apt-get update`
+- `apt-get upgrade`
+- `apt-get install python-pip git`
+- `pip install virtualenv`
+- `mkdir /opt/virtualenvs && cd /opt/virtualenvs`
+- `virtualenv pipelines`
+- `source pipelines/bin/activate`
+- `pip install git+git://github.com/Wiredcraft/pipelines@dev`
+
