@@ -1,8 +1,5 @@
 import logging
 
-import errno
-from time import sleep
-
 from pipelines.plugins.base_executor import BaseExecutorPlugin
 from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
 from pipelines.plugin.exceptions import PluginError
@@ -41,11 +38,12 @@ class BashExecutor(BaseExecutorPlugin):
             return TaskResult(EXECUTION_SUCCESSFUL)
 
         try:
-            stdout = self._run_bash(cmd)
+            # stdout = self._run_bash(cmd)
+            self._run_bash(cmd)
             status = EXECUTION_SUCCESSFUL
-        except BashExecuteError as e:
+        except BashExecuteError:
             status = EXECUTION_FAILED
-            stdout = e.stderr
+            # stdout = e.stderr
 
         return TaskResult(status, 'Bash task finished')
 

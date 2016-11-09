@@ -1,7 +1,6 @@
 from time import sleep
 
 import unittest
-import requests
 import json
 import os.path
 
@@ -100,7 +99,6 @@ class TestAPIs(AsyncHTTPTestCase):
         # Fetch the pipelines' list and extract one of the pipeline's ID
         resp_list = self.fetch(url_list)
         self.assertTrue(resp_list.code, 200)
-        json_list = json.loads(resp_list.body)
         pipeline_id = 'sample-deploy' # json_list[0]['slug']
 
         # Run the pipeline, and extract the task id

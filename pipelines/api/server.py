@@ -141,7 +141,7 @@ class WebhookHandler(RequestHandler):
 
                 log.debug('wh context %s', webhook_context)
                 return webhook_context
-            except KeyError as ke:
+            except KeyError:
                 raise HTTPError(500, 'Invalid webhook config')
         return None
 

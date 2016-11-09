@@ -1,16 +1,9 @@
 import importlib
-import json
 import logging
 import os
 import sys
 
-import importlib
-import logging
-from copy import deepcopy
-
 import yaml
-
-# import pipelines.plugins
 
 from dotmap import DotMap
 
@@ -116,7 +109,7 @@ class Pipeline(object):
         pipeline_def['vars'].update(params)
 
         # Substitute {{ }} variables in tasks
-        vars = pipeline_def.get('vars', {})
+        # vars = pipeline_def.get('vars', {})
         # pipeline_def = substitute_variables(vars, pipeline_def)
 
         return Pipeline.form_dict(pipeline_def)

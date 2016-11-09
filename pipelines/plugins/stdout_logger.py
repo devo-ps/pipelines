@@ -3,7 +3,6 @@ import logging
 from datetime import datetime
 
 from pipelines.plugin.base_plugin import BasePlugin
-from pipelines.plugin.utils import datetime_serializer
 
 log = logging.getLogger('pipelines')
 
@@ -128,9 +127,6 @@ class StdoutLogger(BasePlugin):
 
 
     def _generate_report(self, msg_format):
-        # import json
-        # print json.dumps(self.stats['tasks'], default=datetime_serializer)
-
         fail_count = len(filter(lambda task: not task['result'].is_successful(),
                                 self.stats['tasks']))
 

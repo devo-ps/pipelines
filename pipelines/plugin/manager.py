@@ -21,7 +21,7 @@ class PluginManager():
             try:
                 ret = cb(*args)
                 results.append(ret)
-            except Exception as e:
+            except Exception:
                 log.error('Unknown error running callback {} hook {}, aborting.'.format(
                     cb.__name__, event_name)
                 )

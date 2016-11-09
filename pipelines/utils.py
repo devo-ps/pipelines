@@ -1,5 +1,4 @@
 import logging
-from copy import deepcopy
 
 log = logging.getLogger('pipelines')
 

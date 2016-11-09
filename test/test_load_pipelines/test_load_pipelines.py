@@ -1,8 +1,5 @@
-from time import sleep
 
 import unittest
-import requests
-import json
 
 import pipelines.api.server as server
 

@@ -75,7 +75,6 @@ def _get_password(args):
         return args['--password']
     if args['--ask-password']:
         return getpass()
-        password = sys.stdin
     if 'PASSWORD' in os.environ:
         return os.environ['PASSWORD']
     return None
