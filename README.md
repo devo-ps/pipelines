@@ -1,5 +1,7 @@
 # Pipelines
 
+![image](https://cloud.githubusercontent.com/assets/919180/20129201/179e6c20-a689-11e6-8d6c-39987804e462.png)
+
 ## What is Pipelines
 
 Pipelines is a simple tool with a web UI to manage running tasks. It supports triggering tasks manually throught a Web
