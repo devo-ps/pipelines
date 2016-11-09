@@ -21,8 +21,9 @@ In order to run the pipelines on your own server you need to do the following:
  - Create a workspace anywhere in the filesystem (you'll have your task definitions, logs and temporary data here)
  - Run the backend. This is up to you but you can run it manually (for quick testing), inside a screen (bit better) or
    set up supervisord to run it (our recommendation). You can run it with: `pipelines api --workspace=(your-workspace) --username=(your-username) --password=(your-password)`
+ - Add some pipeline definition files to the workspace (see the section below)
 
-## Writing task defititions
+## Writing task definitions
 
 
 The Pipeline definition file uses YAML syntax. Lets start with a simple example:
