@@ -1,11 +1,14 @@
 import os
 import re
 import json
+from copy import copy
+
 import yaml
 import logging
 import tornado
 import filelock
 from uuid import uuid4
+from yaml import YAMLError
 from concurrent.futures import ThreadPoolExecutor
 from tornado import gen
 from tornado.ioloop import IOLoop
@@ -32,7 +35,6 @@ class PipelinesRequestHandler(RequestHandler):
         if not self.settings.get('auth'):
             # No authentication required
             return 'guest'
-        print 'Auth required %s' % self.settings.get('auth')
         user_cookie = self.get_secure_cookie("user")
         if user_cookie:
             return json.loads(user_cookie)
@@ -190,7 +192,7 @@ class GetTriggersHandler(PipelinesRequestHandler):
                         if 'webhooks' not in pipeline_config:
                             pipeline_config['webhooks'] = {}
 
-                for index, trigger in enumerate(pipeline_def['triggers']):
+                for index, trigger in enumerate(pipeline_def.get('triggers', [])):
                     if trigger.get('type') == 'webhook':
                         wh_identifier = {
                             'slug': pipeline_slug,
@@ -236,7 +238,13 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
             with open(os.path.join(workspace, path)) as f:
                 yaml_string = f.read()
-            pipeline_def = yaml.load(yaml_string)
+
+            try:
+                pipeline_def = yaml.load(yaml_string)
+            except YAMLError:
+                log.error('Skipping pipeline. Could not load yaml for: {}'.format(path))
+
+                continue
             slug = _slugify_file(path)
             full_path = os.path.join(workspace, slug)
             run_dict = {
@@ -416,6 +424,14 @@ def _get_static_path(subpath):
     log.debug('Serving %s' % ret)
     return ret
 
+
+def _hide_pw(conf_dict):
+    out = copy(conf_dict)
+    if 'auth' in out and len(out['auth']) == 2:
+        out['auth'] = (out['auth'][0], '*******')
+    return out
+
+
 def main(config):
     conf_logging()
     app = make_app(config.get('workspace', 'fixtures/workspace'), config.get('auth'))
@@ -424,7 +440,7 @@ def main(config):
         address=config.get('host', '127.0.0.1'),
     )
 
-    log.info('Starting ioloop: {}'.format(config))
+    log.info('Starting server: {}'.format(_hide_pw(config)))
     io_loop = IOLoop.current()
     io_loop.start()
 
