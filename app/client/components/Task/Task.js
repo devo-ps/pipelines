@@ -413,7 +413,7 @@ export default class Task extends Component {
       } else {
         tabContent2 = (
           <div className='content'>
-            <div className='notification info'>You haven't run this pipeline yet. Click the "Run" button at the top or <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>see how to trigger pipelines</a></div>
+            <div className='notification info'>You haven't run this pipeline yet. Click the "Run" button at the top or <a href='https://github.com/Wiredcraft/pipelines' target='_blank'>see how to trigger pipelines</a></div>
          </div>
          )
       }
