@@ -23,8 +23,8 @@ Installation
 
 Requirements:
 
-- `python 2.7` (other versions not tested)
-- `pip`
+- **python 2.7** (other versions not tested)
+- **pip**
 
 Base install
 ------------
@@ -40,10 +40,10 @@ Or get the latest dev version from `Github <https://github.com/Wiredcraft/pipeli
 Configuration
 -------------
 
-``Pipelines`` runs solely on files. No database is currently required.
-All the pipelines, the logs of each run and various temporary files are stored in the `workspace`. 
+**Pipelines** runs solely on files. No database is currently required.
+All the pipelines, the logs of each run and various temporary files are stored in the ``workspace``. 
 
-The workspace is a folder that needs to be specified when running ``pipelines``
+The workspace is a folder that needs to be specified when running ``pipelines``.
 
 .. code-block:: bash
 
@@ -92,7 +92,7 @@ You may want to rely on supervisord to run the API.
     yum install supervisord
 
 
-Copy and adapt de config file from `etc/supervisor/pipelines.conf` to `/etc/supervisor`
+Copy and adapt de config file from ``etc/supervisor/pipelines.conf`` to ``/etc/supervisor``.
 
 .. code-block:: bash
 
@@ -103,7 +103,7 @@ Copy and adapt de config file from `etc/supervisor/pipelines.conf` to `/etc/supe
 
 Access the web interface at http://localhost:8888/web
 
-Additionaly you may want to use nginx as reverse proxy as well. See sample config from `etc/nginx`.
+Additionaly you may want to use nginx as reverse proxy as well. See sample config from ``etc/nginx``.
 
 
 Pipelines file format
@@ -115,7 +115,7 @@ Pipelines files are meant to be put at the root of your workspace.
 Simple example
 --------------
 
-This is a very basic pipeline definition. Save it in your workspace within a `.yaml` file (e.g. `WORKSPACE/example-pipeline.yaml`). It does ... nothing really useful TBH.
+This is a very basic pipeline definition. Save it in your workspace within a ``.yaml`` file (e.g. ``WORKSPACE/example-pipeline.yaml``). It does ... nothing really useful TBH.
 
 .. code-block:: yaml
 
@@ -143,7 +143,7 @@ This is a very basic pipeline definition. Save it in your workspace within a `.y
 Vars
 ----
 
-The `vars` section of the pipeline definition defines variables that will then be available in any of the actions.
+The ``vars`` section of the pipeline definition defines variables that will then be available in any of the actions.
 
 .. code-block:: yaml
 
@@ -163,8 +163,8 @@ You can then use the variables as seen above.
 Prompts
 -------
 
-You can prompt users to manually input fields when they run the pipeine through the web-UI. To do this add a `prompt`
-section to your pipeline definition. The prompt fields will override the variables from the "vars" section.
+You can prompt users to manually input fields when they run the pipeine through the web-UI. To do this add a ``prompt``
+section to your pipeline definition. The ``prompt`` fields will **override** the variables from the ``vars`` section.
 
 .. code-block:: yaml
 
@@ -187,13 +187,13 @@ section to your pipeline definition. The prompt fields will override the variabl
 Actions
 -------
 
-Default actions use the `bash` plugin and will execute command as if they were shell commands.
+Default actions use the ``bash`` plugin and will execute command as if they were shell commands.
 
-Other actions can be used by specifying another `type`. Supported types currently are:
+Other actions can be used by specifying another ``type``. Supported types currently are:
 
-- bash: run bash command
-- python: write inline script or run python script inside a virtualenv
-- slack: send message to slack
+- ``bash``: run bash command.
+- ``python``: write inline script or run python script inside a virtualenv.
+- ``slack``: send message to Slack.
 
 bash
 ````
@@ -203,7 +203,7 @@ See example above.
 python
 ``````
 
-The `python` plugin allows to run python scripts or inline python code.
+The ``python`` plugin allows to run python scripts or inline python code.
 
 .. code-block:: yaml
 
@@ -220,19 +220,19 @@ The `python` plugin allows to run python scripts or inline python code.
 
 Explanation of the fields:
 
-- `script`: inline python code to be run against the python interpreter.
-- `file`: run a python script.
-- `virtualenv`: run the python code (inline or file) inside a virtualenv.
+- **script**: inline python code to be run against the python interpreter.
+- **file**: run a python script.
+- **virtualenv**: run the python code (inline or file) inside a virtualenv.
 
 **Note**:
 
-- The path of either `virtualenv` folder or `file` need to exist and be on the server. It is currently set relatively to the CWD where the **Pipelines** api / UI is running from.
+- The path of either ``virtualenv`` folder or ``file`` need to exist and be on the server. It is currently set relatively to the CWD where the **Pipelines** api / UI is running from.
 
 
 slack
 `````
 
-The Slack plugin allows sending messages over to slack (e.g. pipelines execution status)
+The ``slack`` plugin allows sending messages over to `Slack <https://slack.com>`_ (e.g. pipelines execution status).
 
 .. code-block:: yaml
 
@@ -248,13 +248,13 @@ The Slack plugin allows sending messages over to slack (e.g. pipelines execution
 
 Explanation of fields:
 
-- `type`: tells ``Pipelines`` to execute the action through the `slack` plugin.
-- `always_run`: ensure the action is run all the time - even if a former action failed.
-- `message`: is the message to send to Slack.
+- **type**: tells **Pipelines** to execute the action through the ``slack`` plugin.
+- **always_run**: ensure the action is run all the time - even if a former action failed.
+- **message**: is the message to send to Slack.
 
 **Note**:
 
-- The `slack` plugin ``require`` a `slack_webhook` vars defined in the `vars` section of the pipeline.
+- The ``slack`` plugin **require** a ``slack_webhook`` vars defined in the ``vars`` section of the pipeline.
 
 Slack Hooks URL are defined via the `Incoming WebHooks <https://slack.com/apps/A0F7XDUAZ-incoming-webhooks>`_ app (`Slack API details here <https://api.slack.com/incoming-webhooks>`_).
 
