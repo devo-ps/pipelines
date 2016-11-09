@@ -72,7 +72,7 @@ class PythonExecutor(BashExecutor):
             stdout = e.stderr
         print 'Finished, stdout: %s' % (stdout)
 
-        return TaskResult(status, stdout)
+        return TaskResult(status, 'Execution finished')
 
 
 

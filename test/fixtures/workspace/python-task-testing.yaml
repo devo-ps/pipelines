@@ -1,18 +1,8 @@
----
-# This is a sample of a pipeline that deploys code from GitHub to a Digital Ocean server
-# and send a notification on Slack upon success
-# The `id` of the pipeline is defined by the filename; `sample-deploy`
-
-vars:
- slack_url: https://hooks.slack.com/services/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
- code_branch: dev
-
-
-triggers: []
-  # By default you can trigger the pipeline by hitting `http://example.com/wh/SECRET` (where `SECRET` is displayed in
-  # the Web UI). Maybe we can make overridable.
-
 actions:
- - 'echo "Pre sleep task"'
  - type: python
    script: 'print "test"'
+ - type: python
+   script: |
+     import json
+     a = {'test': 'value', 'array': [1,2,3]}
+     print json.dumps(a, indent=2)

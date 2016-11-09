@@ -372,6 +372,7 @@ export default class Task extends Component {
       function highlight(input){
         var timestampRegex = /(\d\d\d\d:\d\d:\d\d) (\d\d:\d\d:\d\d):/g;
         var failRegex = /([^0] failed|failed|fail|error|err|status: 1)/g;
+        var succRegex = /(0 failed|status: 0)/g;
         var bashColors = [
         [/\[(0;)?30m(.*?)\[(0)?m/g, '<span class="black">$2</span>'],
         [/\[(0;)?31m(.*?)\[(0)?m/g, '<span class="red">$2</span>'],
@@ -397,6 +398,7 @@ export default class Task extends Component {
         if (input !== undefined){
           input =  input.replace(timestampRegex, '<time class="time">$2</time>')
           input = input.replace(failRegex, '<span class="red">$1</span>')
+          input = input.replace(succRegex, '<span class="green">$1</span>')
         }
         return input;
 
