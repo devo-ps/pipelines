@@ -83,12 +83,3 @@ class BashExecutor(BaseExecutorPlugin):
     def from_dict(cls, conf_dict, event_mgr=None):
         return cls(conf_dict.get('bash_log_file'), event_mgr)
 
-
-if __name__ == '__main__':
-    from plugin.utils import setup_logging
-    setup_logging(logging.WARNING)
-    b = BashExecutor()
-    r = b.execute({'cmd': 'echo "test" && echo "test2"'})
-
-    print r.status
-    print r.message
