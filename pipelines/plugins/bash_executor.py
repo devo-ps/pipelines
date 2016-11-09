@@ -1,9 +1,13 @@
 import logging
 
+import errno
+from time import sleep
+
 from pipelines.plugins.base_executor import BaseExecutorPlugin
 from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
 from pipelines.plugin.exceptions import PluginError
 from sh import ErrorReturnCode
+from sh import bash
 
 log = logging.getLogger('pipelines')
 
@@ -48,17 +52,16 @@ class BashExecutor(BaseExecutorPlugin):
 
     def _run_bash(self, bash_input):
         log.debug('Running bash command: "{}"'.format(bash_input))
-
-        from sh import bash
-        stdout = ''
         f = None
         if self.log_file:
             f = open(self.log_file, 'a+')
 
+        output = {'stdout': ''}
         try:
-            for line in bash(_in=bash_input, _iter=True):
+            def process_line(line):
+                log.debug('Got line: %s' % line)
+                output['stdout'] += line
                 log.debug('BashExec stdout: {}'.format(line))
-                stdout += line
                 if f:
                     f.write(line)
 
@@ -66,10 +69,15 @@ class BashExecutor(BaseExecutorPlugin):
                     if len(line)>0 and line[-1] == '\n':
                         line = line[:-1]
                     self.event_mgr.trigger('on_task_event', {'output': line})
+
+            proc = bash(_in=bash_input, _out=process_line, _err=process_line)
+            proc.wait()
+            log.debug('Finished: %s, %s, %s' % (proc.exit_code, proc.stdout, proc.stderr))
+
         except ErrorReturnCode as e:
             log.debug('BashExec failed')
             raise BashExecuteError(e.stderr, e.exit_code)
-        return stdout
+        return output['stdout']
 
     @classmethod
     def from_dict(cls, conf_dict, event_mgr=None):
