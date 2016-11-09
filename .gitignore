@@ -11,4 +11,5 @@ assets.json
 .DS_Store
 
 venv
+dist
 !bundle*
