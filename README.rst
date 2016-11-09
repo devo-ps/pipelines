@@ -10,11 +10,9 @@ UI or automatically via webhooks.
 
 **Pipelines** is composed of three components:
  
-- **Web UI**: User interface that allows users to run tasks, inspect logs and show the task details. It also support
-   username/password authentication.
-- **Pipelines API**: This is the backend for the Web UI and webh
-- **Pipelines library**: This component includes core logic for running pipelies such as reading task definitions,
-   handling logging and running the pipelines.
+- **Web UI** : User interface that allows users to run tasks, inspect logs and show the task details. It also support username/password authentication.
+- **Pipelines API** : This is the backend for the Web UI and webh
+- **Pipelines library** : This component includes core logic for running pipelies such as reading task definitions, handling logging and running the pipelines.
 
 **Pipelines** is primarily developed to run on Linux / MacOS. Windows support is not available at the moment.
 
@@ -287,15 +285,15 @@ Dirty line by line setup
 
 **TODO**: Make a real setup script / one-liner script ... and not Debian only ...
 
-- `apt-get update`
-- `apt-get upgrade`
-- `apt-get install python-pip git`
-- `pip install virtualenv`
-- `virtualenv pipelines`
-- `source pipelines/bin/activate`
-- `pip install pipelines`
-- `mkdir ~/pipelines_workspace`
-- `pipelines server --workspace ~/pipelines_workspace --username admin --password admin`
+- ``apt-get update``
+- ``apt-get upgrade``
+- ``apt-get install python-pip git``
+- ``pip install virtualenv``
+- ``virtualenv pipelines``
+- ``source pipelines/bin/activate``
+- ``pip install pipelines``
+- ``mkdir ~/pipelines_workspace``
+- ``pipelines server --workspace ~/pipelines_workspace --username admin --password admin``
 
 
 Roadmap
