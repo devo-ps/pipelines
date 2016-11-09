@@ -5,18 +5,18 @@ Pipelines
     :align: center
     :alt: Pipeline UI screenshot
 
-``Pipelines`` is a simple tool with a web UI to manage running tasks. It supports running tasks manually through a Web
+**Pipelines** is a simple tool with a web UI to manage running tasks. It supports running tasks manually through a Web
 UI or automatically via webhooks.
 
-``Pipelines`` is composed of three components:
+**Pipelines** is composed of three components:
  
-- ``Web UI``: User interface that allows users to run tasks, inspect logs and show the task details. It also support
+- **Web UI**: User interface that allows users to run tasks, inspect logs and show the task details. It also support
    username/password authentication.
-- ``Pipelines API``: This is the backend for the Web UI and webh
-- ``Pipelines library``: This component includes core logic for running pipelies such as reading task definitions,
+- **Pipelines API**: This is the backend for the Web UI and webh
+- **Pipelines library**: This component includes core logic for running pipelies such as reading task definitions,
    handling logging and running the pipelines.
 
-``Pipelines`` is primarily developed to run on Linux / MacOS. Windows support is not available at the moment.
+**Pipelines** is primarily developed to run on Linux / MacOS. Windows support is not available at the moment.
 
 Installation
 ============
@@ -34,7 +34,7 @@ Base install
     pip install pipelines
 
 
-Or get the latest dev version from `Github <https://github.com/Wiredcraft/pipelines>`_ and run `pip install .` from within the cloned repo. Or run pip directly from git `pip install git+git://github.com/Wiredcraft/pipelines@dev`
+Or get the latest dev version from `Github <https://github.com/Wiredcraft/pipelines>`_ and run `pip install .` from within the cloned repo. Or run pip directly from git `pip install git+git://github.com/Wiredcraft/pipelines@dev`.
 
 
 Configuration
@@ -155,7 +155,7 @@ The `vars` section of the pipeline definition defines variables that will then b
 
 You can then use the variables as seen above. 
 
-``Note``:
+**Note**:
 
 - You may have to quote `"` your vars to respect the YAML format.
 
@@ -195,11 +195,13 @@ Other actions can be used by specifying another `type`. Supported types currentl
 - python: write inline script or run python script inside a virtualenv
 - slack: send message to slack
 
-``bash``
+bash
+````
 
 See example above.
 
-``python``
+python
+``````
 
 The `python` plugin allows to run python scripts or inline python code.
 
@@ -222,12 +224,13 @@ Explanation of the fields:
 - `file`: run a python script.
 - `virtualenv`: run the python code (inline or file) inside a virtualenv.
 
-``Note``:
+**Note**:
 
-- The path of either `virtualenv` folder or `file` need to exist and be on the server. It is currently set relatively to the CWD where the ``Pipelines`` api / UI is running from.
+- The path of either `virtualenv` folder or `file` need to exist and be on the server. It is currently set relatively to the CWD where the **Pipelines** api / UI is running from.
 
 
-``slack``
+slack
+`````
 
 The Slack plugin allows sending messages over to slack (e.g. pipelines execution status)
 
@@ -249,7 +252,7 @@ Explanation of fields:
 - `always_run`: ensure the action is run all the time - even if a former action failed.
 - `message`: is the message to send to Slack.
 
-``Note``:
+**Note**:
 
 - The `slack` plugin ``require`` a `slack_webhook` vars defined in the `vars` section of the pipeline.
 
@@ -259,7 +262,8 @@ Slack Hooks URL are defined via the `Incoming WebHooks <https://slack.com/apps/A
 Triggers
 --------
 
-``Webhooks``
+Webhooks
+````````
 
 If you want to run your pipeline by triggering it through a webhook you can enable it in the triggers section. 
 
@@ -273,7 +277,7 @@ If you open the web-UI you can see the webhook URL that was generated for this p
 for example `configure GitHub repository <https://developer.github.com/webhooks/creating/>`_ to call this url after every commit.
 
 
-``Note``:
+**Note**:
 
 - documentation is coming to explain how to use the content of the data sent through the hook.
 
@@ -301,10 +305,10 @@ No definitive roadmap for the moment, mainly focusing on having a lean code base
 
 Among the possible features:
 
-- [ ] Improved web UI & features
-- [ ] Better webhook management
-- [ ] Better management of the tasks
-- [ ] CLI 
-- [ ] Toolbar 
-- [ ] Improved Auth
+- Improved web UI & features
+- Better webhook management
+- Better management of the tasks
+- CLI 
+- Toolbar 
+- Improved Auth
 - etc.
