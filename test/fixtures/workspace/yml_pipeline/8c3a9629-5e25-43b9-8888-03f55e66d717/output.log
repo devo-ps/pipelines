@@ -1,9 +1,0 @@
-2016:10:31 16:44:17: Pipeline started
-2016:10:31 16:44:17: Task started: Task-1
-Test pipeline: yml_pipeline
-2016:10:31 16:44:17: Task finished, name: Task-1, status: 0, msg: Test pipeline: yml_pipeline
-
-2016:10:31 16:44:17: Task started: Task-2
-2016:10:31 16:44:17: Task finished, name: Task-2, status: 1, msg: /bin/bash: line 1: non-existing-command: command not found
-
-2016:10:31 16:44:17: Pipeline finished. Duration: 0.08s, 1 failed tasks

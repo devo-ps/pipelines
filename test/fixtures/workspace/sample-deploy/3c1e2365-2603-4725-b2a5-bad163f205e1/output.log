@@ -1,0 +1,44 @@
+2016:11:09 14:25:31: Pipeline started. vars: {"status_file": "test/fixtures/workspace/sample-deploy/3c1e2365-2603-4725-b2a5-bad163f205e1/status.json", "code_branch": "dev", "log_file": "test/fixtures/workspace/sample-deploy/3c1e2365-2603-4725-b2a5-bad163f205e1/output.log"}
+2016:11:09 14:25:31: Task started: Task-1
+2016:11:09 14:25:31: total 112
+2016:11:09 14:25:31: drwxr-xr-x  30 juha  staff  1020 Nov  9 13:52 .
+2016:11:09 14:25:31: drwxr-xr-x  44 juha  staff  1496 Nov  4 17:13 ..
+2016:11:09 14:25:31: -rw-r--r--@  1 juha  staff  6148 May  7  2016 .DS_Store
+2016:11:09 14:25:31: drwxr-xr-x  15 juha  staff   510 Nov  9 14:24 .git
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff   100 Nov  9 13:06 .gitignore
+2016:11:09 14:25:31: drwxr-xr-x   9 juha  staff   306 Nov  9 14:24 .idea
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff     2 Oct 27 14:01 .pipeline-store.json
+2016:11:09 14:25:31: drwxr-xr-x  10 juha  staff   340 Oct 27 14:06 .venv
+2016:11:09 14:25:31: drwxr-xr-x   2 juha  staff    68 Aug 11 12:57 2
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff   343 Oct 27 12:49 For-Developers.md
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff    86 Nov  2 13:24 MANIFEST.in
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff   854 Nov  9 13:06 Makefile
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff  3772 Nov  9 13:16 README.md
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff   221 Aug 23 16:17 README.md2
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff  2874 Jun 24 18:14 README.rst
+2016:11:09 14:25:31: drwxr-xr-x  23 juha  staff   782 Nov  4 17:20 app
+2016:11:09 14:25:31: drwxr-xr-x   3 juha  staff   102 Nov  9 13:06 bin
+2016:11:09 14:25:31: drwxr-xr-x  10 juha  staff   340 Nov  2 10:56 docs
+2016:11:09 14:25:31: drwxr-xr-x   6 juha  staff   204 Jun  6 18:54 etc
+2016:11:09 14:25:31: drwxr-xr-x   6 juha  staff   204 Aug 23 16:17 extension
+2016:11:09 14:25:31: drwxr-xr-x   3 juha  staff   102 Jun  6 18:54 fixtures
+2016:11:09 14:25:31: drwxr-xr-x   5 juha  staff   170 May  6  2016 lib
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff   912 Nov  3 18:21 npm-debug.log
+2016:11:09 14:25:31: drwxr-xr-x  12 juha  staff   408 Nov  4 17:40 pipelines
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff   180 Oct 28 12:07 requirements.txt
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff  1064 Nov  2 13:24 setup.py
+2016:11:09 14:25:31: -rw-r--r--   1 juha  staff    94 Jun 24 10:51 somelogfile.log
+2016:11:09 14:25:31: drwxr-xr-x   5 juha  staff   170 Jun  6 18:54 tasker
+2016:11:09 14:25:31: drwxr-xr-x   8 juha  staff   272 Nov  9 13:06 test
+2016:11:09 14:25:31: drwxr-xr-x   9 juha  staff   306 Oct 28 12:04 ui
+2016:11:09 14:25:31: Task finished, name: Task-1, status: 0, msg: Bash task finished
+2016:11:09 14:25:31: Task started: Task-2
+2016:11:09 14:25:32: Atom Crashes			mysql.sock
+2016:11:09 14:25:32: Slack Crashes			noticeboard
+2016:11:09 14:25:32: com.apple.launchd.1eU4e1es35	pip-u9SJ92-build
+2016:11:09 14:25:32: com.apple.launchd.PTObXpnbgC	wifi-voUPHI.log
+2016:11:09 14:25:32: Task finished, name: Task-2, status: 0, msg: Bash task finished
+2016:11:09 14:25:32: Task started: Task-3
+2016:11:09 14:25:32: branch is dev
+2016:11:09 14:25:32: Task finished, name: Task-3, status: 0, msg: Bash task finished
+2016:11:09 14:25:32: Pipeline finished. Duration: 0.21s, 0 failed tasks

@@ -1,6 +1,4 @@
-name: Sample Pipeline
-
-vars:
+sample-deploy.yamlvars:
  code_branch: dev
 
 triggers:
