@@ -2,35 +2,46 @@
 '''
 Usage: 
     pipelines (--version|--help)
-    pipelines api [--config=<config>] [--host=<host>] [--port=<port>] [--workspace=<workspace>] [--username=<username>] [--password=<password>] [--ask-password]
+    pipelines server [--host=<host>] [--port=<port>] [--workspace=<workspace>] [--username=<username>] [--password=<password>] [--ask-password]
 
 Options:
-    --config=<config>           Path to config file [default: /etc/pipelines/pipelines.conf]
     --host=<host>               Bind address [default: 127.0.0.1]
     --port=<port>               Bind port [default: 8888]
-    --username=<port>           Admin Username
-    --password=<port>           Admin Password
+    --username=<username>       Admin Username
+    --password=<password>       Admin Password
     --ask-password              Ask to type in password manually
     --workspace=<workspace>     Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
 
 Help:
-    pipelines api       Starts pipelines' API
+    pipelines server            Starts pipelines' server (API + UI)
 '''
-from getpass import getpass
-
-import docopt
-
 import sys
 import os
+
+import docopt
+from getpass import getpass
 
 from pipelines import __version__, PipelinesError
 from pipelines.api import server
 
 MIN_PASSWORD_LEN = 4
 
-def parse_config(config_file):
-    if not os.path.exists(config_file):
-        return
+def _get_username(args):
+    if args['--username']:
+        return args['--username']
+    if 'USERNAME' in os.environ:
+        return os.environ['USERNAME']
+    return None
+
+def _get_password(args):
+    if args['--password']:
+        return args['--password']
+    if args['--ask-password']:
+        return getpass()
+    if 'PASSWORD' in os.environ:
+        return os.environ['PASSWORD']
+    return None
+
 
 def main():
     args = docopt.docopt(
@@ -39,7 +50,7 @@ def main():
         help=True
     )
 
-    if args.get('api'):
+    if args.get('server'):
         options = {
             'workspace': args.get('--workspace'),
             'host': args.get('--host'),
@@ -60,24 +71,6 @@ def main():
     else:
         print __doc__.strip('\n')
         sys.exit(0)
-
-
-
-def _get_username(args):
-    if args['--username']:
-        return args['--username']
-    if 'USERNAME' in os.environ:
-        return os.environ['USERNAME']
-    return None
-
-def _get_password(args):
-    if args['--password']:
-        return args['--password']
-    if args['--ask-password']:
-        return getpass()
-    if 'PASSWORD' in os.environ:
-        return os.environ['PASSWORD']
-    return None
 
 
 if __name__ == '__main__':
