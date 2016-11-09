@@ -1,6 +1,6 @@
 # Pipelines
 
-![image](https://cloud.githubusercontent.com/assets/919180/20129201/179e6c20-a689-11e6-8d6c-39987804e462.png)
+![image](https://cloud.githubusercontent.com/assets/919180/20129399/425a0c2a-a68a-11e6-82ef-b252424a4b48.png)
 
 ## What is Pipelines
 
