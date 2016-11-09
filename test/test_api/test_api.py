@@ -65,7 +65,7 @@ class TestAPIs(AsyncHTTPTestCase):
         Fetch the status of a pipeline run
         '''
         url = ("/api/pipelines/sample-deploy/"
-        "50ec8b7b-ea4f-4df3-9362-1912b971c406/status")
+        "29010ce2-7c89-440e-8f8f-77839069580b/status")
     
         response = self.fetch(url)
         self.assertEqual(response.code, 200)
@@ -77,13 +77,14 @@ class TestAPIs(AsyncHTTPTestCase):
             self.assertTrue(False)
 
         # Expect status in the parsed response
+        print content
         self.assertTrue(content['status'])
 
     def test_get_log(self):
         '''
         Fetching logs from saved pipeline's run
         '''
-        url = ("/api/pipelines/sample-deploy/f3387895-bdcf-4261-9d3f-4214d64db520/log")
+        url = ("/api/pipelines/sample-deploy/29010ce2-7c89-440e-8f8f-77839069580b/log")
         response = self.fetch(url)
         self.assertEqual(response.code, 200)
 
@@ -100,11 +101,18 @@ class TestAPIs(AsyncHTTPTestCase):
         resp_list = self.fetch(url_list)
         self.assertTrue(resp_list.code, 200)
         json_list = json.loads(resp_list.body)
-        pipeline_id = json_list[0]['slug']
+        pipeline_id = 'sample-deploy' # json_list[0]['slug']
 
         # Run the pipeline, and extract the task id
-        resp_run = self.fetch(url_run % pipeline_id, method='POST', body='')
-        self.assertTrue(resp_list.code, 200)
+        print 'asdf'
+        print url_run % pipeline_id
+        print 'asdf'
+        resp_run = self.fetch(url_run % pipeline_id, method='POST', body='{"prompt": {}}')
+        self.assertEquals(resp_run.code, 200)
+        print 'ss'
+        print resp_run.code
+        print resp_run.body
+        print 'ss2'
         json_run = json.loads(resp_run.body)
         task_id = json_run['task_id']
 

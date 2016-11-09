@@ -366,12 +366,15 @@ class RunPipelineHandler(PipelinesRequestHandler):
         workspace = self.settings['workspace_path']
         log.debug('Running pipeline')
 
-        try:
-            json_body = tornado.escape.json_decode(self.request.body)
-        except ValueError:
-            raise HTTPError(400, 'Bad Request')
+        prompted_params = {}
+        if self.request.body:
+            try:
+                json_body = tornado.escape.json_decode(self.request.body)
+            except ValueError:
+                raise HTTPError(400, 'Bad Request')
 
-        prompted_params = json_body.get('prompt', {})
+                prompted_params = json_body.get('prompt', {})
+
         return _run_pipeline(self, workspace, pipeline_slug, params=prompted_params)
 
     def options(self, pipeline_slug):
