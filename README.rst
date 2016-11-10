@@ -58,8 +58,9 @@ Start the API with the following:
 
 .. code-block:: bash
 
-    pipelines server --workspace=~/pipelines_workspace --username=admin --password=admin
+    pipelines server --workspace ~/pipelines_workspace --username admin --password admin
 
+You may want to specify a different binding IP address (default: ``127.0.0.1``) or different port (defaut: ``8888``). Refer to the ``pipelines --help`` for additional parameters.
 
 Run as a daemon
 ---------------
@@ -99,7 +100,7 @@ Copy and adapt de config file from ``etc/supervisor/pipelines.conf`` to ``/etc/s
     supervisorctl update
     supervisorctl start pipelines
 
-Access the web interface at http://localhost:8888/web
+Access the web interface at http://localhost:8888
 
 Additionaly you may want to use nginx as reverse proxy as well. See sample config from ``etc/nginx``.
 
