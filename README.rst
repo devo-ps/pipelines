@@ -62,6 +62,8 @@ Start the API with the following:
 
 You may want to specify a different binding IP address (default: ``127.0.0.1``) or different port (defaut: ``8888``). Refer to the ``pipelines --help`` for additional parameters.
 
+You can now access **pipelines** at http://localhost:8888
+
 Run as a daemon
 ---------------
 
