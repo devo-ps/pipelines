@@ -17,6 +17,7 @@ Help:
 '''
 import sys
 import os
+import os.path
 
 import docopt
 from getpass import getpass
@@ -52,7 +53,7 @@ def main():
 
     if args.get('server'):
         options = {
-            'workspace': args.get('--workspace'),
+            'workspace': os.path.realpath(os.path.expanduser(args.get('--workspace'))),
             'host': args.get('--host'),
             'port': args.get('--port')
         }
