@@ -11,5 +11,6 @@ assets.json
 .DS_Store
 
 venv
+
 dist
-!bundle*
+!pipelines/api/app_dist/client/dist/bundle.min.js
