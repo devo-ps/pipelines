@@ -61,11 +61,13 @@ class AsyncRunner(object):
 
     @concurrent.run_on_executor
     def run(self, pipeline_file, folder_path, params={}):
-        pipe = Pipeline.from_yaml(pipeline_file, params={
+        base_params = {
             'status_file': os.path.join(folder_path, 'status.json'),
             'log_file': os.path.join(folder_path, 'output.log')
-        })
-        return pipe.run(params=params)
+        }
+        base_params.update(params)
+        pipe = Pipeline.from_yaml(pipeline_file, params)
+        return pipe.run()
 
 def _file_iterator(folder, extensions):
     for path in os.listdir(folder):
@@ -356,9 +358,6 @@ class GetStatusHandler(PipelinesRequestHandler):
                 self.finish()
 
 
-
-
-
 class RunPipelineHandler(PipelinesRequestHandler):
     @gen.coroutine
     def post(self, pipeline_slug):
@@ -373,7 +372,7 @@ class RunPipelineHandler(PipelinesRequestHandler):
             except ValueError:
                 raise HTTPError(400, 'Bad Request')
 
-                prompted_params = json_body.get('prompt', {})
+        prompted_params = json_body.get('prompt', {})
 
         return _run_pipeline(self, workspace, pipeline_slug, params=prompted_params)
 

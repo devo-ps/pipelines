@@ -2,7 +2,7 @@ import logging
 from copy import copy
 import re
 
-from pipelines.pipeline.exceptions import PipelineError
+from pipelines.pipeline.exceptions import MissingVariableError
 from dotmap import DotMap
 
 log = logging.getLogger('pipelines')
@@ -25,7 +25,7 @@ def substitute_variables(pipeline_context, obj):
             variable_name = match.groupdict()['var']
 
             if variable_name not in prepped_vars:
-                raise PipelineError('Missing variable: {}'.format(variable_name))
+                raise MissingVariableError('Missing variable: {}'.format(variable_name))
 
             value = prepped_vars[variable_name]
 
