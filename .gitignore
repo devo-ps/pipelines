@@ -12,5 +12,5 @@ assets.json
 
 venv
 
-dist
+dist/*
 !pipelines/api/app_dist/client/dist/bundle.min.js

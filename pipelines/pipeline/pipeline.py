@@ -87,12 +87,12 @@ class Pipeline(object):
 
         tasks = definition_dict['actions']
         plugins = definition_dict.get('plugins', [])
+
         return Pipeline(tasks, plugins, context=definition_dict)
 
 
     @staticmethod
     def from_yaml(file_path, params={}):
-
         if not isinstance(file_path, basestring):
             raise PipelineError('Unexpected argument type %s expecting string' % type(file_path))
 
@@ -152,7 +152,7 @@ class Pipeline(object):
             'vars': self.context.get('vars', {}),
             'status': PIPELINE_STATUS_OK,
             'prev_result': None,
-            'params': params
+            'params': self.context.get('params', {})
         }
 
         pipeline_context = DotMap(pipeline_context)
@@ -254,6 +254,8 @@ class Pipeline(object):
         return task
 
 def _parse_class(plugin_path):
+    if '.' not in plugin_path:
+        raise PluginError('Invalid plugin: %s' % plugin_path)
     try:
         module, class_name = plugin_path.rsplit('.', 1)
         m = importlib.import_module(module)

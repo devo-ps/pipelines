@@ -22,6 +22,7 @@ from tornado.web import (
     StaticFileHandler
 )
 from pipelines import PipelinesError
+from pipelines.plugin.exceptions import PluginError
 from pipelines.utils import conf_logging
 from pipelines.pipeline.pipeline import Pipeline
 
@@ -58,16 +59,22 @@ class AsyncRunner(object):
     def __init__(self):
         self.executor = ThreadPoolExecutor(max_workers=4)
         self.io_loop = ioloop.IOLoop.current()
+        self.pipe = None
 
-    @concurrent.run_on_executor
-    def run(self, pipeline_file, folder_path, params={}):
+    def load(self, pipeline_filepath, folder_path, params={}):
         base_params = {
             'status_file': os.path.join(folder_path, 'status.json'),
             'log_file': os.path.join(folder_path, 'output.log')
         }
         base_params.update(params)
-        pipe = Pipeline.from_yaml(pipeline_file, params)
-        return pipe.run()
+        self.pipe = Pipeline.from_yaml(pipeline_filepath, base_params)
+
+    @concurrent.run_on_executor
+    def run(self):
+        if self.pipe:
+            return self.pipe.run()
+        else:
+            raise PipelinesError('AsyncRunner error. No pipeline.')
 
 def _file_iterator(folder, extensions):
     for path in os.listdir(folder):
@@ -113,13 +120,22 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}):
 
     task_id = str(uuid4())
     folder_path = os.path.join(workspace, pipeline_slug, task_id)
+
+    try:
+        runner = AsyncRunner()
+        runner.load(pipeline_filepath, folder_path, params)
+    except (PipelinesError, PluginError) as e:
+        handler.clear()
+        handler.set_status(400)
+        handler.finish(json.dumps({'message': 'Error loading pipeline: %s' % e.message}))
+        return
+
     os.makedirs(folder_path)
 
     handler.write(json.dumps({'task_id': task_id}, indent=2))
     handler.finish()
 
-    runner = AsyncRunner()
-    yield runner.run(pipeline_filepath, folder_path, params)
+    yield runner.run()
 
 
 def _authenticate_user(auth_settings, username, password):
