@@ -9,7 +9,7 @@ from dotmap import DotMap
 
 from pipelines.pipeline.task import TaskResult, EXECUTION_FAILED
 from pipelines.plugins import builtin_plugins
-from pipelines.pipeline.exceptions import PipelineError
+from pipelines.pipeline.exceptions import PipelineError, MissingVariableError
 from pipelines.pipeline.task import Task
 from pipelines.pipeline.var_processing import substitute_variables
 from pipelines.plugin.exceptions import PluginError
@@ -41,7 +41,7 @@ DEFAULTS = {
 
 PIPELINES_SCHEMA = Schema({
     Optional('vars'): {
-        basestring: basestring
+        Optional(basestring): Optional(basestring)
     },
     Optional('name'): basestring,
     'actions': [
@@ -57,10 +57,10 @@ PIPELINES_SCHEMA = Schema({
         )
     ],
     Optional('plugins'): [
-        basestring
+        Optional(basestring)
     ],
     Optional('prompt'): {
-        basestring: basestring
+        Optional(basestring): Optional(basestring)
     },
     Optional('triggers'): [{
         'type': Or('webhook', 'cron'),
@@ -72,6 +72,16 @@ class Pipeline(object):
 
     @staticmethod
     def form_dict(definition_dict):
+
+        PIPELINES_SCHEMA.validate(definition_dict)
+
+        if 'vars' not in definition_dict:
+            definition_dict['vars'] = {}
+        if 'params' not in definition_dict:
+            definition_dict['params'] = {}
+        if 'triggers' not in definition_dict:
+            definition_dict['triggers'] = {}
+
         if not isinstance(definition_dict, dict):
             raise PipelineError('Unexpected argument type %s expecting dict' % type(definition_dict))
 
@@ -81,7 +91,7 @@ class Pipeline(object):
 
 
     @staticmethod
-    def from_yaml(file_path, params):
+    def from_yaml(file_path, params={}):
 
         if not isinstance(file_path, basestring):
             raise PipelineError('Unexpected argument type %s expecting string' % type(file_path))
@@ -98,15 +108,7 @@ class Pipeline(object):
                 err_msg += ' (line: {})'.format(e.problem_mark.line)
                 raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s - %s' % (file_path, err_msg))
 
-        PIPELINES_SCHEMA.validate(pipeline_def)
-
-        if 'vars' not in pipeline_def:
-            pipeline_def['vars'] = {}
-        if 'triggers' not in pipeline_def:
-            pipeline_def['triggers'] = {}
-
-        # Merge parameters to variables dict
-        pipeline_def['vars'].update(params)
+        pipeline_def['vars'] = deepmerge(pipeline_def.get('vars', {}), params or {})
 
         # Substitute {{ }} variables in tasks
         # vars = pipeline_def.get('vars', {})
@@ -143,28 +145,34 @@ class Pipeline(object):
         return bool(self.plugin_mgr.get_plugin('{}.execute'.format(task_type)))
 
 
-    def run(self, params={}):
-        log.debug('Run pipeline. params: {}, {}'.format(params, self.context))
+    def run(self):
+        log.debug('Run pipeline. params: {}'.format(self.context))
         pipeline_context ={
             'results': [],
-            'vars': deepmerge(self.context.get('vars'), params),
+            'vars': self.context.get('vars', {}),
             'status': PIPELINE_STATUS_OK,
             'prev_result': None,
             'params': params
         }
+
         pipeline_context = DotMap(pipeline_context)
 
         self.plugin_mgr.trigger('on_pipeline_start', pipeline_context)
         log.debug('Pipeline starting. context: %s' % pipeline_context)
         for task in self.tasks:
             if self._should_run(task, pipeline_context):
-                task.args = substitute_variables(pipeline_context, task.args)
+                result_obj = None
+                try:
+                    task.args = substitute_variables(pipeline_context, task.args)
+                except MissingVariableError as e:
+                    result_obj = TaskResult(EXECUTION_FAILED, e.message)
 
-                result_obj = self._run_task(task)
+                if not result_obj:
+                    result_obj = self._run_task(task)
 
                 pipeline_context.results.append(result_obj)
                 pipeline_context['prev_result'] = result_obj
-                print result_obj
+
                 if pipeline_context['status'] == PIPELINE_STATUS_OK and result_obj.get('status') != 0:
                     pipeline_context['status'] = PIPELINE_STATUS_FAIL
             else:
@@ -268,14 +276,11 @@ if __name__ == '__main__':
     if 'LOG_FILE' in os.environ:
         log_file = os.environ['LOG_FILE']
 
-    pipeline_yaml_path = sys.argv[1]
-
-    if not pipeline_yaml_path or not pipeline_yaml_path.endswith('yaml') or not os.path.exists(pipeline_yaml_path):
-        raise PipelineError('Missing pipeline file')
+    pipeline_yaml_path = sys.argv[-1]
 
     params = {}
     if log_file:
         params['log_file'] = log_file
 
-    pipe = Pipeline.from_yaml(pipeline_yaml_path, params=params)
-    pipe.run(trigger_data={})
+    pipe = Pipeline.from_yaml(pipeline_yaml_path, params=None)
+    pipe.run()
