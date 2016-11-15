@@ -2,7 +2,7 @@
 '''
 Usage: 
     pipelines (--version|--help)
-    pipelines server [--host=<host>] [--port=<port>] [--workspace=<workspace>] [--username=<username>] [--password=<password>] [--ask-password]
+    pipelines server --workspace=<workspace> [--host=<host>] [--port=<port>]  [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
 
 Options:
     --host=<host>               Bind address [default: 127.0.0.1]
@@ -10,6 +10,7 @@ Options:
     --username=<username>       Admin Username
     --password=<password>       Admin Password
     --ask-password              Ask to type in password manually
+    --github-auth=<Org/Team>    Enable Github Authentication (OAuth). Allow specific Team.
     --workspace=<workspace>     Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
 
 Help:
@@ -60,10 +61,20 @@ def main():
 
         username = _get_username(args)
         password = _get_password(args)
-        if username and password:
+        ghauth = args.get('--github-auth')
+
+        if ghauth:
+            teams = []
+            for allowed_team in ghauth.split(','):
+                if not '/' in allowed_team:
+                    return PipelinesError('github-auth requires organization and team in format of "(org)/(team)"')
+                org, team = allowed_team.split('/', 1)
+                teams.append((org, team))
+            options['auth'] = ('gh', teams)
+        elif username and password:
             if len(password) < MIN_PASSWORD_LEN:
-                return PipelinesError('Too short password')
-            options['auth'] = (username, password)
+                raise PipelinesError('Too short password')
+            options['auth'] = ('static', username, password)
 
         try:
             server.main(options)
