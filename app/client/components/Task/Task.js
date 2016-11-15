@@ -324,13 +324,34 @@ export default class Task extends Component {
   getPromptFieldsHtml() {
     if (this.state.task.definition.prompt){
       var that = this;
-      var fieldsHtml =  Object.keys(this.state.promptHolder).map(function(key){
-        return (
-          <div className="field" key={key}>
-            <label>{key}</label>
-            <input type='text' value={that.state.promptHolder[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
-          </div>
-        )
+      var prompt_def = this.state.task.definition.prompt;
+      var fieldsHtml =  Object.keys(prompt_def).map(function(key){
+        if (typeof prompt_def[key] === 'string' || prompt_def[key] instanceof String){
+            return (
+              <div className="field" key={key}>
+                <label>{key}</label>
+                <input type='text' value={prompt_def[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
+              </div>
+            )
+        } else {
+            if (prompt_def[key]['type'] == 'select'){
+
+                var optionsHtml = prompt_def[key]['options'].map(function(option){
+                    return <option>{ option }</option>
+                })
+
+                return (
+                  <div className="field" key={key}>
+                    <label>{key}</label>
+                        <select onChange={that.handlePropFormChange.bind(that, key)}>
+                            { optionsHtml }
+                        </select>
+                  </div>
+                )
+            }
+
+        }
+
       });
 
 

@@ -60,7 +60,14 @@ PIPELINES_SCHEMA = Schema({
         Optional(basestring)
     ],
     Optional('prompt'): {
-        Optional(basestring): Optional(basestring)
+        Optional(basestring): Or(
+            Optional(basestring),
+            {
+                'type': Or('text', 'select'),
+                Optional('default'): basestring,
+                Optional('options'): [basestring],
+            }
+        )
     },
     Optional('triggers'): [{
         'type': Or('webhook', 'cron'),
