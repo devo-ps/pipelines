@@ -385,10 +385,9 @@ class RunPipelineHandler(PipelinesRequestHandler):
         if self.request.body:
             try:
                 json_body = tornado.escape.json_decode(self.request.body)
+                prompted_params = json_body.get('prompt', {})
             except ValueError:
                 raise HTTPError(400, 'Bad Request')
-
-        prompted_params = json_body.get('prompt', {})
 
         return _run_pipeline(self, workspace, pipeline_slug, params=prompted_params)
 
