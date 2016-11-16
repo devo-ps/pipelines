@@ -11,6 +11,7 @@ prompt:
  your_name: ''
  test1:
    type: select
+   default: 'Abba2'
    options:
     - 'Abba'
     - 'Abba2'

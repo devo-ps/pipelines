@@ -12,15 +12,44 @@ var log = function(){
   }
 }
 
+
+var process_prompt_def = function(prompt_def){
+    var ret = {};
+    prompt_def = prompt_def || {};
+    Object.keys(prompt_def).map(function(key){
+      if (typeof prompt_def[key] === 'string' || prompt_def[key] instanceof String){
+        prompt[key] = prompt_def[key];
+      } else {
+        if (prompt_def[key]['default']){
+          // Take default
+          console.log('taking default', prompt_def[key]['default'])
+          ret[key] = prompt_def[key]['default'];
+        } else {
+          if (Object.keys(prompt_def[key]).length > 0){
+            // Take first
+            ret[key] = Object.keys(prompt_def[key]['options'])[0];
+          } else {
+            // Make empty
+            ret[key] = '';
+          }
+        }
+      }
+    })
+    return ret;
+}
+
 export default class Task extends Component {
 
   static propTypes = {
     task: PropTypes.object
   };
 
+
+
   constructor(props) {
     super(props);
-    var prompt = props.task.definition.prompt || {}
+
+    var prompt = process_prompt_def(props.task.definition.prompt)
 
     this.state = {
         open: false,
@@ -334,16 +363,17 @@ export default class Task extends Component {
               </div>
             )
         } else {
+            console.log('getPromptFieldsHtml', that.state.promptHolder)
             if (prompt_def[key]['type'] == 'select'){
 
                 var optionsHtml = prompt_def[key]['options'].map(function(option){
-                    return <option>{ option }</option>
+                    return <option key={option}>{ option }</option>
                 })
 
                 return (
                   <div className="field" key={key}>
                     <label>{key}</label>
-                        <select onChange={that.handlePropFormChange.bind(that, key)}>
+                        <select onChange={that.handlePropFormChange.bind(that, key)} value={that.state.promptHolder[key]}>
                             { optionsHtml }
                         </select>
                   </div>
