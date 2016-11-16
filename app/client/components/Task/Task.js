@@ -26,7 +26,7 @@ var process_prompt_def = function(prompt_def){
         } else {
           if (Object.keys(prompt_def[key]).length > 0){
             // Take first
-            ret[key] = Object.keys(prompt_def[key]['options'])[0];
+            ret[key] = prompt_def[key]['options'][0];
           } else {
             // Make empty
             ret[key] = '';
