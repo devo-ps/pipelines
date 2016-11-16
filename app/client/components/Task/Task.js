@@ -373,9 +373,11 @@ export default class Task extends Component {
                 return (
                   <div className="field" key={key}>
                     <label>{key}</label>
-                        <select onChange={that.handlePropFormChange.bind(that, key)} value={that.state.promptHolder[key]}>
-                            { optionsHtml }
-                        </select>
+                        <span className='select'>
+                            <select onChange={that.handlePropFormChange.bind(that, key)} value={that.state.promptHolder[key]}>
+                                { optionsHtml }
+                            </select>
+                        </span>
                   </div>
                 )
             }
