@@ -18,11 +18,10 @@ var process_prompt_def = function(prompt_def){
     prompt_def = prompt_def || {};
     Object.keys(prompt_def).map(function(key){
       if (typeof prompt_def[key] === 'string' || prompt_def[key] instanceof String){
-        prompt[key] = prompt_def[key];
+        ret[key] = prompt_def[key];
       } else {
         if (prompt_def[key]['default']){
           // Take default
-          console.log('taking default', prompt_def[key]['default'])
           ret[key] = prompt_def[key]['default'];
         } else {
           if (Object.keys(prompt_def[key]).length > 0){
@@ -185,7 +184,6 @@ export default class Task extends Component {
   }
 
   selectWebhookTab () {
-    console.log('wb')
     this.setState({ tab: 'webhook' })
   }
 
@@ -359,7 +357,7 @@ export default class Task extends Component {
             return (
               <div className="field" key={key}>
                 <label>{key}</label>
-                <input type='text' value={prompt_def[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
+                <input type='text' value={that.state.promptHolder[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
               </div>
             )
         } else {
@@ -381,7 +379,6 @@ export default class Task extends Component {
                   </div>
                 )
             }
-
         }
 
       });
