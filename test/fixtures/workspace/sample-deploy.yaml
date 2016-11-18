@@ -9,6 +9,13 @@ triggers:
 prompt:
  code_branch: dev
  your_name: ''
+ test1:
+   type: select
+   default: 'Abba2'
+   options:
+    - 'Abba'
+    - 'Abba2'
+    - 'Abba3'
 
 actions:
  - 'ls -la'
