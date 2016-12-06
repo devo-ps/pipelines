@@ -31,7 +31,9 @@ install_pipelines(){
     sudo mkdir -p /var/lib/pipelines/workspace
     sudo chown -R pipelines:pipelines /var/lib/pipelines
 
+    echo ""
     pipelines --version
+    echo ""
 
     echo "Successfully installed"
 }
