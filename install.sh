@@ -3,6 +3,11 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 
 set -e
 
+help(){
+
+    echo "Please specify the version to install (dev/stable) "
+}
+
 install_pipelines(){
 
     echo "Checking dependencies..."
@@ -23,7 +28,8 @@ install_pipelines(){
     # curl -fsSL https://.../install.sh | sh -s dev/stable
     version=$1
     if [ -z "$version" ]; then
-        version=stable
+        help
+        exit 1
     fi
 
     if [ "$version" == "dev" ]; then
