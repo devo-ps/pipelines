@@ -148,10 +148,11 @@ class GithubOAuth2Mixin(object):
 
 class GithubOAuth2LoginHandler(RequestHandler,
                                GithubOAuth2Mixin):
+    raise RuntimeError('Please fill in github oauth key/secret') # Remove this if keys are added
     gh_settings = {
         'github_oauth': {
-            "key": 'dcd33db3250987a3fc35',
-            'secret': 'f429676060038c98f4772ea21b5f11729357c4f7'
+            "key": 'TODO', # These should be made configurable
+            'secret': 'TODO' # These should be made configurable
         }
     }
 
