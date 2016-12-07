@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 
 set -e
 
@@ -19,7 +20,7 @@ install_pipelines(){
     fi
 
     echo "Installing pipelines..."
-    echo -n "Which version of pipelines to install? (dev/stable)"
+    echo -n "Which version of pipelines to install? (dev/stable) "
     read version
     if [ -z "$version" ]; then
         version=stable
@@ -35,12 +36,10 @@ install_pipelines(){
     fi
 
     echo "Creating user..."
-    id pipelines > /dev/null 2>&1
-    if [ $? -nq 0 ]; then
+    if ! id pipelines > /dev/null 2>&1; then
         sudo useradd -m -d /var/lib/pipelines -s /bin/false pipelines
         sudo -u pipelines ssh-keygen -P '' -f /var/lib/pipelines/.ssh/id_rsa -b 2048 -q
         echo "Pipelines' SSH public KEY:"
-        echo ""
         sudo cat /var/lib/pipelines/.ssh/id_rsa.pub
         echo ""
     fi
