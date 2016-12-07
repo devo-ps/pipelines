@@ -20,8 +20,8 @@ install_pipelines(){
     fi
 
     echo "Installing pipelines..."
-    echo -n "Which version of pipelines to install? (dev/stable) "
-    read version
+    # curl -fsSL https://.../install.sh | sh -s dev/stable
+    version=$1
     if [ -z "$version" ]; then
         version=stable
     fi
