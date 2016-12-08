@@ -13,8 +13,6 @@ export default class Index extends Component {
   componentWillMount () {
     getAllPipelines()
     .then((data) => {
-
-      console.log(data)
       this.setState({pipelines: data, loaded: true})
     })
 
@@ -58,5 +56,3 @@ export default class Index extends Component {
     );
   }
 };
-
-
