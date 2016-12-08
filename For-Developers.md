@@ -5,7 +5,7 @@
 
 ```
 pip install -r requirements.txt
-PYTHONPATH=. bin/pipelines api --workspace=fixtures/workspace
+PYTHONPATH=. bin/pipelines server --workspace=test/fixtures/workspace
 ```
 
 It runs on port 8888.

@@ -130,7 +130,7 @@ This is a very basic pipeline definition. Save it in your workspace within a ``.
     # Triggers define the automated ways to run the task. In addition to manual execution 
     # through the UI, only webhook is supported for now.
     triggers:
-        - webhook
+        - type: webhook
     
     # Actions are the steps that are run for this pipeline. The default action plugin is bash, 
     # but you can use others by defining the "type" field.
