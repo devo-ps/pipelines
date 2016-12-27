@@ -41,7 +41,10 @@ DEFAULTS = {
 
 PIPELINES_SCHEMA = Schema({
     Optional('vars'): {
-        Optional(basestring): Optional(basestring)
+        Optional(basestring): Or(
+            Optional(basestring),
+            Optional(dict)
+        )
     },
     Optional('name'): basestring,
     'actions': [
