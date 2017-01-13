@@ -1,13 +1,11 @@
 ### Start pipelines via `systemd`
 
-- change [config](pipelines.sevice) accordingly
+alter [config](pipelines.sevice) file accordingly
 
-- `chmod 644 pipelines.service`
- 
-- `chown root:root pipelines.service`
-
-- `cp pipelines.service /usr/lib/systemd/system/pipelines.service`
-
-- `systemctl daemon-reload`
-
-- `systemctl start pipelines`
+```bash 
+chmod 644 pipelines.service
+sudo chown root:root pipelines.service
+sudo cp pipelines.service /usr/lib/systemd/system/pipelines.service
+sudo systemctl daemon-reload
+sudo systemctl start pipelines
+```
