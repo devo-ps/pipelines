@@ -6,6 +6,7 @@ from pipelines.plugins.status_logger import StatusLogger
 from pipelines.plugins.stdout_logger import StdoutLogger
 from pipelines.plugins.webhook_logger import WebhookLogger
 from pipelines.plugins.slack_executor import SlackExecutor
+from pipelines.plugins.zato_executor import ZatoExecutor
 
 builtin_plugins = {
     'stdout_logger': StdoutLogger,
@@ -15,5 +16,6 @@ builtin_plugins = {
     'bash': BashExecutor,
     'python': PythonExecutor,
     'dummy': DummyExecutor,
-    'slack': SlackExecutor
+	'zato': ZatoExecutor
+    # 'slack': SlackExecutor
 }

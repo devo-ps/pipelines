@@ -28,7 +28,8 @@ DEFAULT_PLUGINS = [
     'bash',
     'python',
     'status_logger',
-    'slack'
+    # 'slack',
+    'zato'
     # 'webhook_logger'
 ]
 
