@@ -1,6 +1,6 @@
 ### Start pipelines via `systemd`
 
-alter [config](pipelines.sevice) file accordingly
+alter [config](pipelines.service) file accordingly
 
 ```bash 
 chmod 644 pipelines.service
