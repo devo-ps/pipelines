@@ -1,7 +1,7 @@
 FROM python:2.7
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN groupadd -r pipelines && useradd -r -g pipelines pipelines
+RUN groupadd -r pipelines && useradd -m -r -g pipelines pipelines
 
 # grab gosu for easy step-down from root
 ENV GOSU_VERSION 1.7
