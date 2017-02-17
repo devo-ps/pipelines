@@ -31,4 +31,5 @@ RUN ln -s /usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 8888
-CMD [ "pipelines", "server", "--workspace", "$WORKSPACE", "--username", "$ADMIN_USER", "--password", "$ADMIN_PASS", "--host", "0.0.0.0" ]
+
+CMD pipelines server --workspace ${WORKSPACE} --username ${ADMIN_USER} --password ${ADMIN_PASS} --host 0.0.0.0
