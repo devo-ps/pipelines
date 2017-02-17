@@ -299,6 +299,16 @@ Dirty line by line setup
 - ``pipelines server --workspace ~/pipelines_workspace --username admin --password admin``
 
 
+Docker
+======
+
+**Note**: Not heavily tested. 
+
+.. code-block:: bash
+
+    docker run -d boratbot/pipelines
+ 
+
 Roadmap
 =======
 

@@ -32,6 +32,3 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 8888
 CMD [ "pipelines", "server", "--workspace", "$WORKSPACE", "--username", "$ADMIN_USER", "--password", "$ADMIN_PASS" ]
-
-
-
