@@ -16,7 +16,7 @@ RUN set -x \
     && gosu nobody true
 
 # Install pipelines
-RUN pip install pipelines
+RUN pip install git+git://github.com/Wiredcraft/pipelines@dev
 
 RUN mkdir /workspace && chown pipelines:pipelines /workspace
 VOLUME /workspace
