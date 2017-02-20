@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+import os
 import functools
 import json
 from urllib import urlencode
@@ -148,11 +148,11 @@ class GithubOAuth2Mixin(object):
 
 class GithubOAuth2LoginHandler(RequestHandler,
                                GithubOAuth2Mixin):
-    raise RuntimeError('Please fill in github oauth key/secret') # Remove this if keys are added
+
     gh_settings = {
         'github_oauth': {
-            "key": 'TODO', # These should be made configurable
-            'secret': 'TODO' # These should be made configurable
+            "key": os.getenv('GH_OAUTH_KEY', 'MISSING_KEY'),
+            'secret': os.getenv('GH_OAUTH_SECRET', 'MISSING_SECRET')
         }
     }
 
