@@ -151,7 +151,7 @@ class GithubOAuth2LoginHandler(RequestHandler,
 
     gh_settings = {
         'github_oauth': {
-            "key": os.getenv('GH_OAUTH_KEY', 'MISSING_KEY')
+            "key": os.getenv('GH_OAUTH_KEY', 'MISSING_KEY'),
             'secret': os.getenv('GH_OAUTH_SECRET', 'MISSING_SECRET')
         }
     }
