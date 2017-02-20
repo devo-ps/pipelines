@@ -16,7 +16,7 @@ setup(
     description='Pipelines',
     url = 'https://getpipelines.com',
     author=__author__,
-    author_email='pipelines@wirecraft.com',
+    author_email='info@wiredcraft.com',
     license='MIT',
     package_dir={ 
         'pipelines': 'pipelines',
