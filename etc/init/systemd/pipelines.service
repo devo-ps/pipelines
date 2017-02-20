@@ -1,0 +1,16 @@
+[Unit]
+Description=Pipelines For Automation
+Documentation=https://github.com/Wiredcraft/pipelines
+After=network.target
+
+[Service]
+User=pipelines
+Group=pipelines
+Environment=HOME=/var/lib/pipelines
+
+Restart=on-failure
+ExecStart=/usr/bin/pipelines server --host 0.0.0.0 --port 8888 --username admin --password admin
+ExecReload=/bin/kill -s HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
