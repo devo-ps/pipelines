@@ -254,15 +254,19 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         log.debug('Getting all pipelines')
         pipelines = []
         for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
-            with open(os.path.join(workspace, path)) as f:
-                yaml_string = f.read()
+            try:
+                with open(os.path.join(workspace, path)) as f:
+                    yaml_string = f.read()
+            except IOError as e:
+                log.error('Can not read pipelines, file missing: {}'.format(path))
+                continue
 
             try:
                 pipeline_def = yaml.load(yaml_string)
             except YAMLError:
                 log.error('Skipping pipeline. Could not load yaml for: {}'.format(path))
-
                 continue
+
             slug = _slugify_file(path)
             full_path = os.path.join(workspace, slug)
             run_dict = {
