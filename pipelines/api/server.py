@@ -22,6 +22,7 @@ from tornado.web import (
     StaticFileHandler
 )
 from pipelines import PipelinesError
+from pipelines.api.ghauth import GithubOAuth2LoginHandler
 from pipelines.plugin.exceptions import PluginError
 from pipelines.utils import conf_logging
 from pipelines.pipeline.pipeline import Pipeline
@@ -31,14 +32,20 @@ PIPELINES_EXT = ('yml', 'yaml')
 
 log = logging.getLogger('pipelines')
 
+
 class PipelinesRequestHandler(RequestHandler):
     def get_current_user(self):
+        log.debug('Get current user')
+        log.debug(self.settings)
         if not self.settings.get('auth'):
+            log.debug('noauth')
             # No authentication required
             return 'guest'
         user_cookie = self.get_secure_cookie("user")
         if user_cookie:
+            log.debug('user cookie %s' % user_cookie)
             return json.loads(user_cookie)
+        log.debug('none')
         return None
 
     def set_default_headers(self):
@@ -76,32 +83,37 @@ class AsyncRunner(object):
         else:
             raise PipelinesError('AsyncRunner error. No pipeline.')
 
+
 def _file_iterator(folder, extensions):
     for path in os.listdir(folder):
         for ext in extensions:
             if path.endswith('.%s' % ext):
                 yield path
 
+
 def _slugify_file(filename):
     basename = filename.rsplit('/', 1)[-1]
     return basename.rsplit('.', 1)[0]
+
 
 def _run_id_iterator(slug):
     for sub_folder in os.listdir(slug):
         if _is_valid_uuid(sub_folder):
             yield sub_folder
 
+
 def _is_valid_uuid(uuid):
     regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
     match = regex.match(uuid)
     return bool(match)
 
-def _get_webhook_id(trigger_identifier, wh_config):
 
-    for k,v in wh_config.items():
+def _get_webhook_id(trigger_identifier, wh_config):
+    for k, v in wh_config.items():
         if trigger_identifier == v:
             return k
     return str(uuid4())
+
 
 def _get_pipeline_filepath(workspace, slug):
     for ext in PIPELINES_EXT:
@@ -110,6 +122,7 @@ def _get_pipeline_filepath(workspace, slug):
             return yaml_filepath
             break
     return None
+
 
 def _run_pipeline(handler, workspace, pipeline_slug, params={}):
     log.debug('Running pipeline %s with params %s' % (pipeline_slug, json.dumps(params)))
@@ -142,6 +155,7 @@ def _authenticate_user(auth_settings, username, password):
     if username != auth_settings['username'] or password != auth_settings['password']:
         return False
     return True
+
 
 class WebhookHandler(RequestHandler):
     def _get_wh_context(self, webhook_id, workspace):
@@ -181,8 +195,8 @@ class WebhookHandler(RequestHandler):
 
         return _run_pipeline(self, workspace, wh_context['slug'], params=params)
 
-class GetTriggersHandler(PipelinesRequestHandler):
 
+class GetTriggersHandler(PipelinesRequestHandler):
     @authenticated
     def get(self, pipeline_slug):
         workspace = self.settings['workspace_path']
@@ -227,10 +241,16 @@ class GetTriggersHandler(PipelinesRequestHandler):
             self.write(json.dumps({'triggers': pipeline_def.get('triggers', [])}, indent=2))
             self.finish()
 
+
 class LoginHandler(PipelinesRequestHandler):
     def get(self):
-        log.debug('Login page')
-        self.render('templates/login.html', error_msg=None)
+        log.debug('Login page %s.' % self.settings['auth'])
+        login_type = self.settings['auth'].get('type') if self.settings['auth'] else None
+        self.render(
+            'templates/login.html',
+            error_msg=None,
+            login_type=login_type
+        )
 
     def post(self):
         if _authenticate_user(
@@ -242,11 +262,14 @@ class LoginHandler(PipelinesRequestHandler):
             print 'set secure cookie'
             self.redirect("/index.html")
         else:
-            self.render('templates/login.html', error_msg='Wrong username or password')
+            self.render(
+                'templates/login.html',
+                error_msg='Wrong username or password',
+                login_type=self.settings['auth'].get('type') if self.settings['auth'] else None
+            )
 
 
 class GetPipelinesHandler(PipelinesRequestHandler):
-
     @authenticated
     def get(self):
         log.debug('Get pipelines')
@@ -287,8 +310,8 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
-class GetPipelineHandler(PipelinesRequestHandler):
 
+class GetPipelineHandler(PipelinesRequestHandler):
     @authenticated
     def get(self, pipeline_slug):
         log.debug('Get pipeline %s' % pipeline_slug)
@@ -323,7 +346,6 @@ class GetPipelineHandler(PipelinesRequestHandler):
         self.finish()
 
 
-
 def _fetch_runs(path, run_ids):
     ret = []
 
@@ -344,10 +366,10 @@ def _fetch_runs(path, run_ids):
     ret.sort(key=lambda run: run.get('start_time'), reverse=True)
     return ret
 
-class GetLogsHandler(PipelinesRequestHandler):
 
+class GetLogsHandler(PipelinesRequestHandler):
     def get(self, pipeline_slug, task_id):
-        log.debug('Get logs: {}, {}'.format(pipeline_slug,task_id))
+        log.debug('Get logs: {}, {}'.format(pipeline_slug, task_id))
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline logs')
 
@@ -360,10 +382,10 @@ class GetLogsHandler(PipelinesRequestHandler):
                 self.write(json.dumps({'output': f.read()}, indent=2))
                 self.finish()
 
-class GetStatusHandler(PipelinesRequestHandler):
 
+class GetStatusHandler(PipelinesRequestHandler):
     def get(self, pipeline_slug, task_id):
-        log.debug('Get status of: {}, {}'.format(pipeline_slug,task_id))
+        log.debug('Get status of: {}, {}'.format(pipeline_slug, task_id))
         workspace = self.settings['workspace_path']
         log.debug('Getting pipeline status')
 
@@ -407,20 +429,33 @@ class AuthStaticFileHandler(StaticFileHandler, PipelinesRequestHandler):
     def get(self, *args, **kwargs):
         return super(AuthStaticFileHandler, self).get(*args, **kwargs)
 
+
+def _get_auth_dict(auth_settings):
+    if not auth_settings or len(auth_settings) == 0:
+        return None
+
+    if auth_settings[0] == 'static':
+        return {
+            'type': 'static',
+            'username': auth_settings[1],
+            'password': auth_settings[2]
+        }
+
+    if auth_settings[0] == 'gh':
+        return {
+            'type': 'gh',
+            'teams': auth_settings[1]
+        }
+
+
 def make_app(workspace='fixtures/workspace', auth=None):
     if not os.path.isdir(workspace):
         raise PipelinesError('Workspace is not a valid directory: %s' % workspace)
 
-    auth_dict=None
-    if auth:
-        auth_dict = {
-            'type': 'static',
-            'username': auth[0],
-            'password': auth[1]
-        }
+    auth_dict = _get_auth_dict(auth)
 
     slug_regexp = '[0-9a-zA-Z_\-]+'
-    return Application([
+    endpoints = [
         url(r"/api/pipelines/", GetPipelinesHandler),
         url(r"/api/pipelines/({slug})/".format(slug=slug_regexp), GetPipelineHandler),
         url(r"/api/pipelines/({slug})/run".format(slug=slug_regexp), RunPipelineHandler),
@@ -430,13 +465,19 @@ def make_app(workspace='fixtures/workspace', auth=None):
         url(r"/api/webhook/({slug})".format(slug=slug_regexp), WebhookHandler),
         (r"/login", LoginHandler),
         (r'/(.*)', AuthStaticFileHandler, {'path': _get_static_path('app'), "default_filename": "index.html"}),
-    ],
-        workspace_path=workspace,
-        auth=auth_dict,
-        login_url= "/login",
-        debug="True",
-        cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="  # TODO: make configurable
-    )
+    ]
+
+    if auth_dict and auth_dict.get('type') == 'gh':
+        endpoints.insert(len(endpoints) - 1, (r"/ghauth", GithubOAuth2LoginHandler)),
+
+    return Application(endpoints,
+                       workspace_path=workspace,
+                       auth=auth_dict,
+                       login_url="/login",
+                       debug="True",
+                       cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="  # TODO: make configurable
+                       )
+
 
 def _get_static_path(subpath):
     this_path = os.path.realpath(__file__)
@@ -448,8 +489,8 @@ def _get_static_path(subpath):
 
 def _hide_pw(conf_dict):
     out = copy(conf_dict)
-    if 'auth' in out and len(out['auth']) == 2:
-        out['auth'] = (out['auth'][0], '*******')
+    if 'auth' in out and len(out['auth']) > 0 and out['auth'][0] == 'static':
+        out['auth'] = (out['auth'][0], out['auth'][1], '*******')
     return out
 
 
@@ -464,6 +505,7 @@ def main(config):
     log.info('Starting server: {}'.format(_hide_pw(config)))
     io_loop = IOLoop.current()
     io_loop.start()
+
 
 if __name__ == '__main__':
     main()
