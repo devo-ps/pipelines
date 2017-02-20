@@ -1,0 +1,15 @@
+vars:
+ code_branch: dev
+
+triggers:
+  - type: webhook
+
+prompt:
+ code_branch: dev
+ your_name: ''
+
+actions:
+ - 'ls -la'
+ - 'cd /tmp && ls'
+ - type: bash
+   cmd: echo "branch is {{ code_branch }}"

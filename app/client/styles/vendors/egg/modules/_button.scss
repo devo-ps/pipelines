@@ -1,0 +1,75 @@
+@mixin button($color: $blue, $clear: false, $border: true) {
+  background: $color;
+  border-radius: $radius;
+  box-sizing: border-box;
+  @if $clear == true {
+    color: inherit;
+  }
+  @else {
+    color: #FFF;
+  }
+  display: inline-block;
+  outline: none;
+  padding: $space/6 $space;
+  @include transition-property(background, border, color);
+  @include transition-duration($ease);
+  &:hover,
+  &:focus {
+    @if $clear == true {
+      background: tint($color, 30%);
+      color: inherit;
+    }
+    @else {
+      background: tint($color, 15%);
+      color: #FFF;
+    }
+    text-decoration: none;
+  }
+  &:active,
+  &.active {
+    @if $clear == true {
+      background: shade($color, 5%);
+      color: inherit;
+    }
+    @else {
+      background: shade($color, 10%);
+      color: #FFF;
+    }
+    text-decoration: none;
+  }
+  &[disabled=disabled],
+  &[disabled=true],
+  &[disabled],
+  &.disabled {
+    background: $silver;
+    border-color: shade($silver, 10%);
+    color: $grey;
+  }
+  @if $border == true {
+    border: 1px solid shade($color, 10%);
+  }
+}
+
+@mixin bundle($border: true) {
+  @include clearfix;
+  display: inline-block;
+  > .button,
+  > * .button {
+    @if $border == true {
+      border-right-width: 0;
+    }
+    border-radius: 0;
+    float: left;
+  }
+  > .button:first-child,
+  > *:first-child .button {
+    border-radius: $radius 0 0 $radius;
+  }
+  > .button:last-child,
+  > *:last-child .button {
+    border-radius: 0 $radius $radius 0;
+    @if $border == true {
+      border-right-width: 1px;
+    }
+  }
+}

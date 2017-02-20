@@ -1,0 +1,44 @@
+/* Colors */
+
+$line: #CFD8DC;
+$light: #ECEFF1;
+
+
+$black: #263238;
+$blue: #2196F3;
+$brown: #795548;
+$cyan: #00BCD4;
+$green: #4CAF50;
+$grey: #B0BEC5;
+$gray: $grey;
+$purple: #9C27B0;
+$red: #F44336;
+$yellow: #FFEB3B;
+$white: #FFF;
+
+$light-blue: #81D4FA;
+$light-cyan: #80DEEA;
+$light-grey: #EEEEEE;
+$light-gray: $light-grey;
+$light-green: #A5D6A7;
+$light-purple: #CE93D8;
+$light-red: #FFAB91;
+
+$primary: $blue;
+
+/* Misc */
+
+$width: 800px;
+$login: 288px;
+$modal: 400px;
+$thickness: 2px;
+
+/* Partials */
+
+$partials: (
+  base,
+  button,
+  form,
+  menu,
+  tooltip
+);

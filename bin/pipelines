@@ -2,50 +2,79 @@
 '''
 Usage: 
     pipelines (--version|--help)
-    pipelines api [--config=<config>] [--host=<host>] [--port=<port>] [--workspace=<workspace>] [--username=<username>] [--password=<password>]
+    pipelines server --workspace=<workspace> [--host=<host>] [--port=<port>]  [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
 
 Options:
-    --config=<config>           Path to config file [default: /etc/pipelines/pipelines.conf]
     --host=<host>               Bind address [default: 127.0.0.1]
     --port=<port>               Bind port [default: 8888]
-    --username=<port>           Admin Username [default: admin]
-    --password=<port>           Admin Password [default: admin]
+    --username=<username>       Admin Username
+    --password=<password>       Admin Password
+    --ask-password              Ask to type in password manually
+    --github-auth=<Org/Team>    Enable Github Authentication (OAuth). Allow specific Team.
     --workspace=<workspace>     Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
 
 Help:
-    pipelines api       Starts pipelines' API
+    pipelines server            Starts pipelines' server (API + UI)
 '''
-import docopt
-
 import sys
 import os
+import os.path
 
-from pipelines import __version__
+import docopt
+from getpass import getpass
+
+from pipelines import __version__, PipelinesError
 from pipelines.api import server
-from pipelines.utils import conf_logging
+
+MIN_PASSWORD_LEN = 4
+
+def _get_username(args):
+    if args['--username']:
+        return args['--username']
+    if 'USERNAME' in os.environ:
+        return os.environ['USERNAME']
+    return None
+
+def _get_password(args):
+    if args['--password']:
+        return args['--password']
+    if args['--ask-password']:
+        return getpass()
+    if 'PASSWORD' in os.environ:
+        return os.environ['PASSWORD']
+    return None
 
 
-def parse_config(config_file):
-    if not os.path.exists(config_file):
-        return
-
-if __name__ == '__main__':
+def main():
     args = docopt.docopt(
         __doc__,
         version="version "+ __version__,
         help=True
     )
 
-    if args.get('api'):
+    if args.get('server'):
         options = {
-            'workspace': args.get('--workspace'),
+            'workspace': os.path.realpath(os.path.expanduser(args.get('--workspace'))),
             'host': args.get('--host'),
             'port': args.get('--port')
         }
-        if '--username' in args and '--password' in args:
-            username = args.get('--username')
-            password = args.get('--password')
-            options['auth'] = (username, password)
+
+        username = _get_username(args)
+        password = _get_password(args)
+        ghauth = args.get('--github-auth')
+
+        if ghauth:
+            teams = []
+            for allowed_team in ghauth.split(','):
+                if not '/' in allowed_team:
+                    return PipelinesError('github-auth requires organization and team in format of "(org)/(team)"')
+                org, team = allowed_team.split('/', 1)
+                teams.append((org, team))
+            options['auth'] = ('gh', teams)
+        elif username and password:
+            if len(password) < MIN_PASSWORD_LEN:
+                raise PipelinesError('Too short password')
+            options['auth'] = ('static', username, password)
 
         try:
             server.main(options)
@@ -55,3 +84,6 @@ if __name__ == '__main__':
         print __doc__.strip('\n')
         sys.exit(0)
 
+
+if __name__ == '__main__':
+    main()

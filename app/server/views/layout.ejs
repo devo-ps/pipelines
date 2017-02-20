@@ -5,19 +5,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Pipelines Dashboard</title>
-
-    <link href="//cdn.muicss.com/mui-0.6.0/css/mui.min.css" rel="stylesheet" type="text/css" />
-
   </head>
   <body>
     <%- body %>
     
-    <div id="js-main" class="content"></div>
+    <section id="js-main" class="content"></section>
 
     <% if (env.production) { %>
-      <script async src="<%= env.assets.main.js %>"></script>
+      <script async src="<%= env.assets.main.js %>">1</script>
     <% } else { %>
-      <script src="http://localhost:3000/client/main.js"></script>
+      <script src="http://localhost:3000/client/main.js">2</script>
     <% } %>
   </body>
 </html>

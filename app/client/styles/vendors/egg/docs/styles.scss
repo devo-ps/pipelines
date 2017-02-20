@@ -1,0 +1,99 @@
+// Loading egg
+@import './egg.scss';
+
+/* Below is the custom code for the example page */
+
+$wrapper: 700px;
+
+body {
+  background: $light;
+  text-align: center;
+}
+
+.wrapper {
+	margin: 0 auto;
+  max-width: $wrapper;
+  position: relative;
+  width: 92%;
+}
+
+#header {
+  background: $background;
+  padding: $space 0;
+  h1 {
+    @include font-size($humongous);
+  }
+  .credit {
+    color: $grey;
+    a {
+      color: inherit;
+    }
+  }
+  .button {
+    @include font-size($large);
+    margin-bottom: $space/2;
+    padding: $space/2 1.5*$space;
+  }
+  small {
+    display: block;
+  }
+}
+
+.section {
+  border-top: 1px solid $line;
+  padding: $space;
+  .wrapper {
+    text-align: left;
+    p,
+    pre,
+    ol,
+    table,
+    ul {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  h2 a {
+    color: inherit;
+  }
+  .excerpt {
+    border: 1px solid $line;
+    border-radius: $radius;
+    margin-bottom: $space;
+    .title {
+      background: $light;
+      border-bottom: 1px dotted $line;
+      color: $grey;
+      @include font-size($small);
+      padding: $space/4 $space;
+      text-transform: uppercase;
+    }
+    p,
+    pre,
+    ol,
+    table,
+    ul {
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    .example {
+      padding: $space;
+    }
+    code {
+      background: $light;
+      border-radius: 0 0 $radius $radius;
+      border-width: 1px 0 0 0;
+      padding: $space;
+      position: relative;
+    }
+    &#Table .example {
+      overflow-x: auto;
+    }
+  }
+}
+
+#sink {
+  background: $background;
+}

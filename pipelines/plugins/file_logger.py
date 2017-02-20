@@ -18,7 +18,7 @@ class FileLogger(StdoutLogger):
         self.file_path = file_path
 
     @classmethod
-    def from_dict(cls, conf_dict):
+    def from_dict(cls, conf_dict, event_mgr=None):
         if 'status_file' not in conf_dict:
             raise PluginError('File logger is missing status_file'
                               'configuration parameter')
@@ -30,7 +30,6 @@ class FileLogger(StdoutLogger):
 
     def write(self, msg):
         with open(self.file_path) as f:
-            json.dump({
+            f.write(json.dump({
                 'status': 'success'
-            }, indent=2)
-
+            }, indent=2))

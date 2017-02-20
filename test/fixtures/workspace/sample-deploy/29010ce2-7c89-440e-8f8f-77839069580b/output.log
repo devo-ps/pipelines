@@ -1,0 +1,22 @@
+2016:11:09 14:41:34: Pipeline started. vars: {"status_file": "/Users/juha/work/pipelines/test/fixtures/workspace/sample-deploy/29010ce2-7c89-440e-8f8f-77839069580b/status.json", "code_branch": "dev", "log_file": "/Users/juha/work/pipelines/test/fixtures/workspace/sample-deploy/29010ce2-7c89-440e-8f8f-77839069580b/output.log"}
+2016:11:09 14:41:34: Task started: Task-1
+2016:11:09 14:41:34: total 0
+2016:11:09 14:41:34: drwxr-xr-x   8 juha  staff   272 Nov  9 13:06 .
+2016:11:09 14:41:34: drwxr-xr-x  30 juha  staff  1020 Nov  9 13:52 ..
+2016:11:09 14:41:34: drwxr-xr-x   3 juha  staff   102 Nov  9 13:06 api
+2016:11:09 14:41:34: drwxr-xr-x   5 juha  staff   170 Nov  7 12:29 files
+2016:11:09 14:41:34: drwxr-xr-x   3 juha  staff   102 Nov  9 13:06 fixtures
+2016:11:09 14:41:34: drwxr-xr-x   3 juha  staff   102 Nov  9 13:06 plugins
+2016:11:09 14:41:34: drwxr-xr-x   4 juha  staff   136 Nov  9 14:07 test_api
+2016:11:09 14:41:34: drwxr-xr-x   4 juha  staff   136 Nov  9 13:56 test_load_pipelines
+2016:11:09 14:41:34: Task finished, name: Task-1, status: 0, msg: Bash task finished
+2016:11:09 14:41:34: Task started: Task-2
+2016:11:09 14:41:34: Atom Crashes			mysql.sock
+2016:11:09 14:41:34: Slack Crashes			noticeboard
+2016:11:09 14:41:34: com.apple.launchd.1eU4e1es35	pip-u9SJ92-build
+2016:11:09 14:41:34: com.apple.launchd.PTObXpnbgC	wifi-voUPHI.log
+2016:11:09 14:41:34: Task finished, name: Task-2, status: 0, msg: Bash task finished
+2016:11:09 14:41:34: Task started: Task-3
+2016:11:09 14:41:34: branch is dev
+2016:11:09 14:41:34: Task finished, name: Task-3, status: 0, msg: Bash task finished
+2016:11:09 14:41:34: Pipeline finished. Duration: 0.16s, 0 failed tasks

@@ -1,0 +1,76 @@
+$loading_thickness: $thickness;
+$loading_size: 42px;
+$img_size: $space;
+&.running {
+  .run,
+  .run:hover {
+    cursor: not-allowed;
+    svg {
+      fill: $primary;
+    }
+    &:after {
+      animation: spin 3*$ease linear infinite;
+      border: $loading_thickness solid $line;
+      border-top: $loading_thickness solid $primary;
+    }
+  }
+}
+&:not(.running) {
+  .run {
+    &:hover {
+      @include transform(scale(1.1));
+      &:after {
+        background: rgba($primary, 1);
+        border-color: $primary;
+      }
+      svg {
+        fill: #FFF;
+      }
+    }
+    &:active {
+      @include transform(scale(1));
+      &:after {
+        background: rgba($primary, 0);
+        border-color: $primary;
+      }
+      svg {
+        fill: $primary;
+      }
+    }
+  }
+}
+.run {
+  float: left;
+  height: $loading_size + 2*$loading_thickness;
+  position: relative;
+  width: $loading_size + 2*$loading_thickness;
+  @include transition-property(transform);
+  @include transition-duration($ease);
+  svg {
+    fill: $grey;
+    @include font-size($micro);
+    position: absolute;
+    text-transform: uppercase;
+    @include transition-property(fill);
+    @include transition-duration($ease);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999;
+  }
+  &:after {
+    background: rgba($primary, 0);
+    border: $loading_thickness solid $line;
+    border-radius: 50%;
+    bottom: 0;
+    content: '';
+    height: $loading_size;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: $loading_size;
+    z-index: 998;
+  }
+}

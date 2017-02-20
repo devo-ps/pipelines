@@ -1,0 +1,80 @@
+html,
+body,
+#js-main,
+#app {
+  height: 100%;
+}
+
+body {
+  background: $light;
+}
+
+.wrapper {
+  @include clearfix;
+  margin: 0 auto;
+  max-width: $width;
+  width: 92%;
+}
+
+.controls {
+  float: right;
+}
+
+.icon {
+  background: transparent;
+  border: 0;
+  line-height: 1;
+  outline: none;
+  padding: 0;
+}
+
+.svg {
+  svg {
+    display: block;
+  }
+}
+
+.loading {
+  @include loading;
+}
+
+.credit {
+  color: $grey;
+  display: block;
+  padding: $space/4 0;
+  text-align: center;
+  a {
+    color: $grey;
+    text-decoration: underline;
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.black { color: $black; }
+.blue { color: $blue; }
+.brown { color: $yellow; }
+.cyan { color: $cyan; }
+.green { color: $green; }
+.purple { color: $purple; }
+.red { color: $red; }
+.yellow { color: $yellow; }
+.white { color: #FFF; }
+
+.light-blue { color: $light-blue; }
+.light-cyan { color: $light-cyan; }
+.light-gray { color: $light-gray; }
+.light-green { color: $light-green; }
+.light-purple { color: $light-purple; }
+.light-red { color: $light-red; }
+
+.dark-gray { color: $gray; }
+
+
+

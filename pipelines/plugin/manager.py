@@ -21,11 +21,11 @@ class PluginManager():
             try:
                 ret = cb(*args)
                 results.append(ret)
-            except Exception as e:
+            except Exception:
                 log.error('Unknown error running callback {} hook {}, aborting.'.format(
                     cb.__name__, event_name)
                 )
-                raise e
+                raise
         return results
 
     def get_plugin_count(self, hook_name=None):
@@ -42,7 +42,7 @@ class PluginManager():
                 class_name(plugin_class))
             )
 
-        plugin = plugin_class.from_dict(conf_dict)
+        plugin = plugin_class.from_dict(conf_dict, self)
 
         for k in ['hook_prefix', 'hooks']:
             if not hasattr(plugin, k):

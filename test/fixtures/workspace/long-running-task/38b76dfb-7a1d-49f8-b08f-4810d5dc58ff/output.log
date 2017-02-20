@@ -1,0 +1,30 @@
+2016:11:09 14:24:24: Pipeline started. vars: {"status_file": "test/fixtures/workspace/long-running-task/38b76dfb-7a1d-49f8-b08f-4810d5dc58ff/status.json", "log_file": "test/fixtures/workspace/long-running-task/38b76dfb-7a1d-49f8-b08f-4810d5dc58ff/output.log"}
+2016:11:09 14:24:24: Task started: Task-1
+2016:11:09 14:24:24: pre sleep task
+2016:11:09 14:24:24: Task finished, name: Task-1, status: 0, msg: Bash task finished
+2016:11:09 14:24:24: Task started: Task-2
+2016:11:09 14:24:24: test 0
+2016:11:09 14:24:26: test 1
+2016:11:09 14:24:28: test 2
+2016:11:09 14:24:30: test 3
+2016:11:09 14:24:32: test 4
+2016:11:09 14:24:34: test 5
+2016:11:09 14:24:36: test 6
+2016:11:09 14:24:38: test 7
+2016:11:09 14:24:40: test 8
+2016:11:09 14:24:42: test 9
+2016:11:09 14:24:44: test 10
+2016:11:09 14:24:46: test 11
+2016:11:09 14:24:48: test 12
+2016:11:09 14:24:50: test 13
+2016:11:09 14:24:52: test 14
+2016:11:09 14:24:54: test 15
+2016:11:09 14:24:56: test 16
+2016:11:09 14:24:58: test 17
+2016:11:09 14:25:00: test 18
+2016:11:09 14:25:02: test 19
+2016:11:09 14:25:04: Task finished, name: Task-2, status: 0, msg: Bash task finished
+2016:11:09 14:25:04: Task started: Task-3
+2016:11:09 14:25:04: Post sleep task
+2016:11:09 14:25:04: Task finished, name: Task-3, status: 0, msg: Bash task finished
+2016:11:09 14:25:04: Pipeline finished. Duration: 40.27s, 0 failed tasks

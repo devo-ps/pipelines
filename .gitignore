@@ -9,3 +9,8 @@ node_modules
 npm-debug.log
 assets.json
 .DS_Store
+
+venv
+
+dist/*
+!pipelines/api/app_dist/client/dist/bundle.min.js

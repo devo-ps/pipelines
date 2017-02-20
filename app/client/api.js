@@ -1,9 +1,9 @@
 import superagent from 'superagent'
 
-//const API_URL = '/api/pipelines'
-const API_URL = 'https://pipelines.service.wiredcraft.com:4443/api/pipelines'
+//const API_URL = '/api/pipelines' // for DIST mode
+const API_URL = 'http://localhost:8888/api/pipelines'
 
-function request(method, url) {
+function request(method, url, body) {
   return superagent(method, `${API_URL}${url}`)
     .set('Accept', 'application/json')
 }
@@ -17,11 +17,22 @@ export function getAllPipelines() {
     })
   })
   .then(bodyParser)
+  .then(function(pipelines){
+    return pipelines.map(function(item){
+      if (!item.runs){
+        item.runs = [];
+      }
+      return item
+    })
+  })
 }
 
-export function runPipeline(pipeline) {
+export function runPipeline(pipeline, params) {
+  console.log('api.runPipeline', pipeline, params)
+  params = params || {}
   return new Promise((resolve, reject) => {
     request('POST', `/${pipeline}/run`)
+    .send({'prompt': params})
     .end((err, res) => {
       if (err) return reject(err)
       resolve(res.text)
@@ -41,6 +52,29 @@ export function getPipelineStatus(pipeline, taskId) {
   .then(bodyParser)
 }
 
+export function getPipeline(pipeline) {
+  return new Promise((resolve, reject) => {
+    request('GET', `/${pipeline}/`)
+    .end((err, res) => {
+      if (err) return reject(err)
+      resolve(res.text)
+    })
+  })
+  .then(bodyParser)
+}
+
+export function getTriggers(pipeline) {
+  return new Promise((resolve, reject) => {
+    request('GET', `/${pipeline}/triggers`)
+    .end((err, res) => {
+      if (err) return reject(err)
+      resolve(res.text)
+    })
+  })
+  .then(bodyParser)
+}
+
+
 export function getPipelineLog(pipeline, taskId) {
   return new Promise((resolve, reject) => {
     request('GET', `/${pipeline}/${taskId}/log`)
@@ -57,7 +91,8 @@ const bodyParser = res => {
   try {
     body = JSON.parse(res)
   } catch (err) {
-    throw new Error("error occurs!")
+    console.log('Error parsing response', err);
+    throw err;
   }
   return body
 }

@@ -1,0 +1,24 @@
+name: Sample Pipeline
+
+vars:
+ code_branch: dev
+
+triggers:
+  - type: webhook
+
+prompt:
+ code_branch: dev
+ your_name: ''
+ test1:
+   type: select
+   default: 'Abba2'
+   options:
+    - 'Abba'
+    - 'Abba2'
+    - 'Abba3'
+
+actions:
+ - 'ls -la'
+ - 'cd /tmp && ls'
+ - type: bash
+   cmd: echo "branch is {{ code_branch }}"

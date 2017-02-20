@@ -1,0 +1,54 @@
+@if index($partials, notification) {
+  .notification {
+    border: 1px solid $line;
+    border-left: 3px solid $line;
+    border-radius: $radius;
+    display: block;
+    padding: $space/4 $space/2;
+    &.error {
+      border-color: $red;
+      color: $red;
+    }
+    &.info {
+      border-color: $blue;
+      color: $blue;
+    }
+    &.success {
+      border-color: $green;
+      color: $green;
+    }
+    &.undefined {
+      border-color: $purple;
+      color: $purple;
+    }
+    &.warning {
+      border-color: $orange;
+      color: $orange;
+    }
+    > *:last-child {
+      margin-bottom: 0;
+    }
+    a {
+      color: inherit;
+      text-decoration: underline;
+      &:active,
+      &:hover {
+        text-decoration: none;
+      }
+    }
+    .close {
+      background: transparent;
+      border: 0;
+      color: inherit;
+      float: right;
+      opacity: 0.5;
+      padding: 0;
+      text-decoration: none;
+      @include transition-property(opacity);
+      @include transition-duration($ease);
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+}

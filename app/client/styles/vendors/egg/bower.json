@@ -1,0 +1,17 @@
+{
+  "name": "egg",
+  "description": "A simple SASS boilerplate",
+  "keywords": [ "sass", "bourbon", "css", "style"],
+  "version": "v1.0.4",
+  "main": [ "egg.scss" ],
+  "dependencies": {
+    "normalize-scss": "*",
+    "bourbon": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Wiredcraft/egg.git"
+  },
+  "license": "MIT",
+  "authors": [ "Ronan Berder <ronan@wiredcraft.com> (https://wiredcraft.com)" ]
+}

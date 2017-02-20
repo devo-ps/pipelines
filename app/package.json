@@ -17,15 +17,17 @@
   "dependencies": {
     "babel-polyfill": "6.3.14",
     "babel-runtime": "6.3.19",
+    "bourbon": "^4.2.7",
     "classnames": "2.2.5",
     "compression": "1.6.1",
     "cross-env": "1.0.7",
     "ejs": "2.4.1",
     "express": "4.13.4",
     "express-ejs-layouts": "2.0.0",
+    "moment": "2.15.1",
     "react": "0.14.6",
-    "react-bootstrap": "0.29.3",
     "react-dom": "0.14.6",
+    "react-syntax-highlight": "0.0.2",
     "superagent": "1.8.3",
     "webpack": "1.13.0"
   },

@@ -1,0 +1,31 @@
+#header {
+  border-bottom: 1px solid $line;
+  @include clearfix;
+  margin-bottom: $space/2;
+  padding: $space/2 0;
+  a {
+    color: inherit;
+    &:hover {
+      color: $primary;
+      text-decoration: none;
+    }
+  }
+  h1 {
+    font-size: inherit;
+    margin: 0;
+  }
+  .links {
+    float: right;
+    line-height: 1;
+    a {
+      float: left;
+      margin-left: $space;
+      img {
+        border-radius: $space;
+        float: left;
+        margin-right: $space/4;
+        width: $space;
+      }
+    }
+  }
+}

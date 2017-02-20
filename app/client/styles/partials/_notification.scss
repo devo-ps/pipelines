@@ -1,0 +1,36 @@
+.notification {
+  border-radius: $radius;
+  color: #FFF;
+  display: block;
+  padding: $space/4 $space/2;
+  &.info { background: $red; }
+  &.info { background: $blue; }
+  &.success { background: $green; }
+  &.undefined { background: $purple; }
+  &.warning { background: $orange; }
+  > *:last-child {
+    margin-bottom: 0;
+  }
+  a {
+    color: #FFF;
+    text-decoration: underline;
+    &:active,
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  .close {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    float: right;
+    opacity: 0.5;
+    padding: 0;
+    text-decoration: none;
+    @include transition-property(opacity);
+    @include transition-duration($ease);
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

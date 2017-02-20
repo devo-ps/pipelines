@@ -1,0 +1,8 @@
+actions:
+ - type: python
+   script: 'print "test"'
+ - type: python
+   script: |
+     import json
+     a = {'test': 'value', 'array': [1,2,3]}
+     print json.dumps(a, indent=2)

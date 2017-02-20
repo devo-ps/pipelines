@@ -1,8 +1,8 @@
+import json
 import logging
 from datetime import datetime
 
 from pipelines.plugin.base_plugin import BasePlugin
-from pipelines.plugin.utils import datetime_serializer
 
 log = logging.getLogger('pipelines')
 
@@ -14,12 +14,15 @@ class StdoutLogger(BasePlugin):
         'on_task_start',
         'on_task_finish',
         'on_pipeline_finish',
+        'on_task_event'
     )
 
     write_on = ['on_pipeline_start',
                 'on_pipeline_finish',
                 'on_task_start',
-                'on_task_finish']
+                'on_task_output',
+                'on_task_finish',
+                'on_task_event']
 
     timestamp_format = '%Y:%m:%d %H:%M:%S'
     log_format = '{timestamp}: {message}'
@@ -35,18 +38,18 @@ class StdoutLogger(BasePlugin):
         self.log_file = log_file
 
     @classmethod
-    def from_dict(cls, conf_dict):
+    def from_dict(cls, conf_dict, event_mgr=None):
         if 'log_file' in conf_dict:
             log.debug('Found Log File for stdout logger: %s' % conf_dict['log_file'])
         else:
             log.debug('No Log File for stdout logger')
         return cls(conf_dict.get('log_file'))
 
-    def on_pipeline_start(self, *args):
+    def on_pipeline_start(self, pipeline_context, *args):
         self._add_pipeline_start_stats()
 
         if 'on_pipeline_start' in self.write_on:
-            self.write('Pipeline started')
+            self.write('Pipeline started. vars: %s' % json.dumps(pipeline_context.toDict().get('vars', 'None')))
 
     def on_pipeline_finish(self, *args):
         self._add_pipeline_finish_stats()
@@ -56,6 +59,12 @@ class StdoutLogger(BasePlugin):
         if 'on_pipeline_finish' in self.write_on:
             self.write(msg)
 
+    def on_task_event(self, event_dict):
+        log.debug('on_task_event: %s' % (event_dict))
+        if event_dict.get('output'):
+            if 'on_task_event' in self.write_on:
+                log.debug('2')
+                self.write(event_dict.get('output'))
 
     def on_task_start(self, task):
         self._add_task_start_stats(task)
@@ -118,9 +127,6 @@ class StdoutLogger(BasePlugin):
 
 
     def _generate_report(self, msg_format):
-        # import json
-        # print json.dumps(self.stats['tasks'], default=datetime_serializer)
-
         fail_count = len(filter(lambda task: not task['result'].is_successful(),
                                 self.stats['tasks']))
 

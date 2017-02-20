@@ -1,8 +1,9 @@
 import json
 import logging
+from datetime import datetime
+import os.path
 
 from pipelines.plugin.base_plugin import BasePlugin
-from pipelines.plugin.exceptions import PluginError
 
 
 log = logging.getLogger('pipelines')
@@ -22,19 +23,30 @@ class StatusLogger(BasePlugin):
             self.file_path = file_path
 
     @classmethod
-    def from_dict(cls, conf_dict):
+    def from_dict(cls, conf_dict, event_mgr=None):
         return StatusLogger(conf_dict.get('status_file'))
 
     def on_pipeline_start(self, *args):
-        self._write({'status': 'processing'})
+
+        self._write({
+            'status': 'running',
+            'start_time': datetime.now().isoformat()
+        })
 
     def on_pipeline_finish(self, pipeline_context):
-        self._write({'status': pipeline_context['status']})
+        self._write({
+            'status': pipeline_context['status'],
+            'finish_time': datetime.now().isoformat()
+        })
 
     def _write(self, status):
         if self.file_path:
+            base = {}
+            if os.path.isfile(self.file_path):
+                with open(self.file_path) as f:
+                    base = json.load(f)
+
+            base.update(status)
+
             with open(self.file_path, 'w+') as f:
-                json.dump(status, f, indent=2)
-        # else:
-        #     # Write to stdout
-        #     print(json.dumps(status, indent=2))
+                json.dump(base, f, indent=2)

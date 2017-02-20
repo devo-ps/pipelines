@@ -16,7 +16,7 @@ config.output = {
   path: '../pipelines/api/app_dist/client/dist',
   pathInfo: true,
   publicPath: '/client/dist/',
-  filename: 'bundle.[hash].min.js'
+  filename: 'bundle.min.js'
 };
 
 config.plugins = config.plugins.concat([

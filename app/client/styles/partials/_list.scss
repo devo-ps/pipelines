@@ -1,0 +1,208 @@
+#main {
+  .wrapper > .header {
+    display: none;
+  }
+  .item {
+    background: #FFF;
+    border-radius: $radius;
+    border: 1px solid $line;
+    margin-bottom: $space/2;
+    @import '_run';
+    @import '_modal';
+    &.fullscreen {
+      border: 0;
+      border-radius: 0;
+      bottom: 0;
+      left: 0;
+      margin: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 9999;
+      > .body .console {
+        height: auto;
+      }
+    }
+    &:hover {
+      border-color: $grey;
+    }
+    .status {
+      span {
+        text-transform:capitalize;
+      }
+      &:before {
+        background: $green;
+        border-radius: $space;
+        display: inline-block;
+        content: '';
+        @include font-size($small);
+        height: $space/3;
+        width: $space/3;
+      }
+      &.error:before {
+        background: $red;
+      }
+
+    }
+    .header {
+      cursor: pointer;
+      line-height: 1;
+      padding: $space/2;
+      h2 {
+        font-size: inherit;
+        margin: 0 0 $space/6;
+      }
+      .run {
+        margin-right: $space/2;
+        margin-top: -$space/6;
+      }
+      .empty {
+        color: $grey;
+        @include font-size($smaller);
+      }
+      .status {
+        display: inline-block;
+        @include tooltip;
+        &:before {
+          margin: 0 $space/8 0 0;
+          @include transition-property(transform);
+          @include transition-duration($ease);
+        }
+        &:hover {
+          &:before {
+            @include transform(scale(1.3));
+          }
+        }
+      }
+      .modal {
+        line-height: 160%;
+      }
+    }
+    > .body {
+      border-top: 1px solid $line;
+      display: none;
+      .status:before {
+        box-shadow: 0 0 0 1px #FFF;
+        margin-right: $space/4;
+      }
+      .tabs,
+      .toolbar {
+        .fullscreen {
+          float: right;
+          padding: 1.5*$space/4 $space/2;
+          svg {
+            fill: $grey;
+          }
+          &:hover {
+            svg {
+              fill: $primary;
+            }
+          }
+        }
+        .icon {
+          @include tooltip;
+        }
+      }
+      .tabs {
+        @include font-size($smaller);
+        font-weight: bold;
+        a {
+          color: inherit;
+          display: inline-block;
+          margin: 0 $space/2;
+          padding: 1.5*$space/4 $space/2 (1.5*$space/4 - 2);
+          &:hover {
+            color: $primary;
+            text-decoration: none;
+          }
+          &.active {
+            border-bottom: 2px solid $blue;
+            color: $primary;
+          }
+        }
+        @include breakpoint(mobile) {
+          a {
+            padding: 1.5*$space/4 $space/4 (1.5*$space/4 - 2);
+          }
+        }
+      }
+      .toolbar {
+        border-top: 1px solid $light;
+        @include clearfix;
+        @include font-size($smaller);
+        vertical-align: middle;
+        .menu > a,
+        .icon,
+        .empty {
+          // border-right: 1px solid $light;
+          color: inherit;
+          display: block;
+          padding: 1.5*$space/4 $space/2;
+          svg {
+            fill: $black;
+          }
+          &:hover {
+            color: $primary;
+            text-decoration: none;
+            svg {
+              fill: $primary;
+            }
+          }
+        }
+        .empty {
+          color: $grey;
+        }
+        .menu {
+          .options {
+            max-height: 200px;
+            overflow: auto;
+            a.active {
+              background: $light;
+              &:hover {
+                background: $blue;
+              }
+            }
+            svg {
+              float: right;
+              margin-left: $space/6;
+              width: $space/2;
+            }
+          }
+        }
+        > * {
+          float: left;
+          vertical-align: middle;
+        }
+      }
+      .content {
+        border-top: 1px solid $light;
+        padding: $space/2;
+        input {
+          width: 100%;
+        }
+      }
+      .console {
+        background: $black;
+        border-radius: 0 0 $radius $radius;
+        color: #FFF;
+        font-family: $code;
+        @include font-size($small);
+        line-height: 160%;
+        height: 288px;
+        margin: 0 -1px -1px;
+        overflow: auto;
+        padding: $space/2;
+        position: relative;
+        white-space: pre-wrap;
+        time {
+          opacity: 0.4;
+        }
+      }
+    }
+    &.active {
+      .body {
+        display: block;
+      }
+    }
+  }
+}

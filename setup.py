@@ -22,7 +22,7 @@ setup(
         'pipelines': 'pipelines',
     },
     package_data={
-        'pipelines.api': ['app_dist/*.html', 'app_dist/client/dist/*']
+        'pipelines.api': ['app_dist/*.html', 'app_dist/client/dist/*', 'templates/*.html']
     },
     packages=[
         'pipelines',
@@ -43,6 +43,7 @@ setup(
         'tornado==4.3',
         'docopt==0.6.2',
         'dotmap==1.1.16',
-        'schema==0.5.0'
+        'schema==0.5.0',
+        'filelock==2.0.6'
     ],
 )

@@ -1,0 +1,5 @@
+---
+actions:
+ - echo 'pre sleep task'
+ - "echo 'from time import sleep\nfor a in range(20):\n  print \"test %s\" % a\n  sleep(2)' | python"
+ - echo 'Post sleep task'
