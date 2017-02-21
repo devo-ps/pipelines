@@ -1,39 +1,19 @@
 import logging
-from copy import copy
-import re
-
-from pipelines.pipeline.exceptions import MissingVariableError
 from dotmap import DotMap
+from jinja2 import Template
 
 log = logging.getLogger('pipelines')
 
+
 def substitute_variables(pipeline_context, obj):
+    if isinstance(pipeline_context, DotMap):
+        pipeline_context = pipeline_context.toDict()
 
-    prepped_vars = pipeline_context.toDict()
-    prepped_vars = copy(prepped_vars)
-    prepped_vars.update(prepped_vars.get('vars'))  # Flatten vars
-    prepped_vars = DotMap(prepped_vars)
-
-    pattern = re.compile(r'\{\{' + r'[\s]{0,2}' + r'(?P<var>[\w-]+)' + r'[\s]{0,2}' + r'\}\}')
+    pipeline_context.update(pipeline_context.get('vars'))  # Pull everything from "vars" to root
 
     def replace_vars_func(token):
-        substituted = ''
-        content_cursor = 0
-        for match in re.finditer(pattern, token):
-            substituted += token[content_cursor:match.start()]
-
-            variable_name = match.groupdict()['var']
-
-            if variable_name not in prepped_vars:
-                raise MissingVariableError('Missing variable: {}'.format(variable_name))
-
-            value = prepped_vars[variable_name]
-
-            substituted += str(value)
-
-            content_cursor = match.end()
-
-        substituted += token[content_cursor:]
+        template = Template(token)
+        substituted = template.render(**pipeline_context)
 
         return substituted
 
@@ -51,24 +31,33 @@ def _loop_strings(func, obj):
 
 if __name__ == '__main__':
     vars = {
-        'var1': 11,
-        'var-2': 'var2works',
-        'var_3': 'var 3 also works',
+        'vars': {
+            'var1': 11,
+            'var_2': 'var2works',
+            'var_3': 'var 3 also works',
+            'nested': {
+                'n1': 'nestedWorks'
+            }
+        }
     }
     obj = {
         'testnorm': '11 22',
         'testvar1': '{{var1}}',
-        'testvar2': '--{{ var-2 }}',
+        'testvar2': '--{{ var_2 }}',
         'testvar3': '{{ var_3}}jj',
         'test:{{var1}}': '{{var1}}',
-        'testlist': ['norm', '{{var1}}', '{{var-2}}', 'norm2'],
+        'testlist': ['norm', '{{var1}}', '{{var_2}}', 'norm2'],
         'testdict': {
             '{{var1}}': 'vvv',
             'd2': '{{var1}}',
-            'nested': ['nest1', 'nestvar{{var-2}}']
-        }
-
+            'nested': ['nest1', 'nestvar{{var_2}}']
+        },
+        'test1': 'nestedTest: {{ nested.n1 }}',
+        'if test': 'should say ok: {% if var1 %} ok {% else %} TEST FAIL!! {% endif %}'
     }
+
+    vars = DotMap(vars)
     res = substitute_variables(vars, obj)
     import json
     print json.dumps(res, indent=2)
+

@@ -37,6 +37,15 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
 <body>
   <!-- LOGIN SCREEN -->
   <div id="login">
+
+    {% if not login_type %}
+    <form action="/login" method="post">
+      <h1>No login required</h1>
+      <a class="button primary" href="/">Go to homepage</a>
+    </form>
+    {% end %}
+
+    {% if login_type == 'static' %}
     <form action="/login" method="post">
       <h1>Log in</h1>
       {% if error_msg %}
@@ -48,10 +57,19 @@ html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:1
       </div>
       <div class="field">
         <label>Password</label>
-        <input type="text" name="password">
+        <input type="password" name="password">
       </div>
       <input type="submit" value="Sign in" class="button primary"/>
     </form>
+    {% end %}
+
+    {% if login_type == 'gh' %}
+    <form>
+      <h1>Log in</h1>
+      <a class="button primary" href="/ghauth?next=/">GitHub Login</a>
+    </form>
+    {% end %}
+
     <small class="credit">Powered by <a href="http://github.com/Wiredcraft/pipelines" target="_blank">Pipelines</a></small>
   </div>
 </body>

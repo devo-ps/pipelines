@@ -106,6 +106,34 @@ Access the web interface at http://localhost:8888
 
 Additionaly you may want to use nginx as reverse proxy as well. See sample config from ``etc/nginx``.
 
+Authentication
+--------------
+
+Static authentication
+`````````````````````
+
+You can define a static admin user by specifying the following options when running pipelines:
+
+.. code-block:: bash
+
+    --username ADMIN_USER
+    --password ADMIN_PASS
+
+
+Github Oauth
+````````````
+
+You can add ``oauth`` support from Github to allow **teams** to access pipelines. You will need to set it by using environment variables for the Oauth Apps, and the ``--github-auth`` to limit teams access.
+
+.. code-block:: bash
+  
+    GH_OAUTH_KEY=my_oauth_app_key \
+    GH_OAUTH_SECRET=my_super_secret \
+    pipelines server [--options] --github-auth=MY_ORG/MY_TEAM
+
+You can create Oauth Key/Secret in `Github Oauth Applications <https://github.com/settings/developers>`_ 
+
+**Note**: If you use Github Oauth, you will **not** be able to use static authentication.
 
 Pipelines file format
 =====================
@@ -136,7 +164,8 @@ This is a very basic pipeline definition. Save it in your workspace within a ``.
     # but you can use others by defining the "type" field.
     actions:
         - 'echo "Starting task for {{ code_branch }}"'
-        - type: bash
+        - name: 'My custom name step'
+          type: bash
           cmd: "echo 'less compact way to define actions'"
         - 'ls -la /tmp'
 
@@ -274,13 +303,14 @@ If you want to run your pipeline by triggering it through a webhook you can enab
         - type: webhook
 
 
-If you open the web-UI you can see the webhook URL that was generated for this pipeline in the "Webhook" tab. You can
-for example `configure GitHub repository <https://developer.github.com/webhooks/creating/>`_ to call this url after every commit.
+If you open the web-UI you can see the webhook URL that was generated for this pipeline in the "Webhook" tab. You can for example `configure GitHub repository <https://developer.github.com/webhooks/creating/>`_ to call this url after every commit.
 
+You can access the content of the webhook content in the actions in the ``webhook_content`` variable; e.g. ``echo {{ webhook_content.commit_id }}``
 
 **Note**:
 
-- documentation is coming to explain how to use the content of the data sent through the hook.
+- You need to send the message via POST as ``application/json`` Content-Type.
+- Documentation is coming to explain how to use the content of the data sent through the hook.
 
 
 Dirty line by line setup
@@ -298,6 +328,16 @@ Dirty line by line setup
 - ``mkdir ~/pipelines_workspace``
 - ``pipelines server --workspace ~/pipelines_workspace --username admin --password admin``
 
+
+Docker
+======
+
+**Note**: Not heavily tested. 
+
+.. code-block:: bash
+
+    docker run -d boratbot/pipelines
+ 
 
 Roadmap
 =======
