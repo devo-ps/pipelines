@@ -5,11 +5,12 @@ import sys
 
 import yaml
 
+from jinja2 import TemplateError
 from dotmap import DotMap
 
 from pipelines.pipeline.task import TaskResult, EXECUTION_FAILED
 from pipelines.plugins import builtin_plugins
-from pipelines.pipeline.exceptions import PipelineError, MissingVariableError
+from pipelines.pipeline.exceptions import PipelineError
 from pipelines.pipeline.task import Task
 from pipelines.pipeline.var_processing import substitute_variables
 from pipelines.plugin.exceptions import PluginError
@@ -174,7 +175,7 @@ class Pipeline(object):
                 result_obj = None
                 try:
                     task.args = substitute_variables(pipeline_context, task.args)
-                except MissingVariableError as e:
+                except TemplateError as e:
                     result_obj = TaskResult(EXECUTION_FAILED, e.message)
 
                 if not result_obj:
