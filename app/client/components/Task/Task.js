@@ -1,46 +1,13 @@
 import React, { Component, PropTypes } from 'react'
 import * as API from '../../api'
 import moment from 'moment';
+import { processPromptDef } from 'helpers/prompt'
+import { relativeTime } from 'helpers/time'
+import { highlightLog } from 'helpers/log'
+import EnterFullScreen from '../svg/EnterFullScreen'
+import LeaveFullScreen from '../svg/LeaveFullScreen'
 
-// var Highlight = require('react-syntax-highlight');
-// require('highlight.js/styles/default.css');
-
-var log = function(){
-  // For easily enabling logs
-  if (true){
-    console.log.apply(console, arguments)
-  }
-}
-
-
-var process_prompt_def = function(prompt_def){
-    var ret = {};
-    prompt_def = prompt_def || {};
-    Object.keys(prompt_def).map(function(key){
-      if (prompt_def[key] === null){
-        prompt_def[key] = ''
-      }
-      if (typeof prompt_def[key] === 'string' || prompt_def[key] instanceof String){
-        ret[key] = prompt_def[key];
-      } else if(prompt_def[key]['type'] == 'checkbox'){
-        ret[key] = prompt_def[key]['default'] || false;
-      } else if(prompt_def[key]['type'] == 'select'){
-        if (prompt_def[key]['default']){
-          // Take default
-          ret[key] = prompt_def[key]['default'];
-        } else {
-          if (Object.keys(prompt_def[key]).length > 0){
-            // Take first
-            ret[key] = prompt_def[key]['options'][0];
-          } else {
-            // Make empty
-            ret[key] = '';
-          }
-        }
-      }
-    })
-    return ret;
-}
+const log = console.log
 
 export default class Task extends Component {
 
@@ -48,14 +15,14 @@ export default class Task extends Component {
     task: PropTypes.object
   };
 
-
-
   constructor(props) {
     super(props);
-    var prompt = {}
+
+    const prompt = {}
     if (props.task.definition){
-      prompt = process_prompt_def(props.task.definition.prompt)
+      prompt = processPromptDef(props.task.definition.prompt)
     }
+
     this.state = {
         open: false,
         task: props.task,
@@ -70,7 +37,7 @@ export default class Task extends Component {
   }
 
 
-  componentDidMount () {
+  componentDidMount() {
     log('Component mounted', this.props)
     const {task} = this.props
     this.fetchTriggers(task.slug)
@@ -85,8 +52,7 @@ export default class Task extends Component {
     }
   }
 
-  refreshLogs(runId){
-
+  refreshLogs(runId) {
     return API.getPipelineLog(this.state.task.slug, runId)
       .then((result) => {
         log('Refreshed logs', runId)
@@ -97,17 +63,17 @@ export default class Task extends Component {
       })
   }
 
-  fetchTriggers(slug){
+  fetchTriggers(slug) {
     log('Fetch Triggers', slug)
     return API.getTriggers(slug)
       .then((result) => {
         log('Fetched triggers for', slug)
-        var triggers = result.triggers || []
+        const triggers = result.triggers || []
         this.setState({triggers: triggers})
       })
   }
 
-  getRunWithId (targetId) {
+  getRunWithId(targetId) {
     var runs = this.state.task.runs;
     if (!runs){
       return undefined;
@@ -120,7 +86,7 @@ export default class Task extends Component {
     return undefined
   }
 
-  onRun (params, ev) {
+  onRun(params, ev) {
     ev.stopPropagation();
     log('onRun', params)
     if (Object.keys(this.state.promptHolder).length && !params){
@@ -143,7 +109,6 @@ export default class Task extends Component {
           logs: logs,
           status: 'running',
           activeRunId: '0'
-
         })
 
         API.runPipeline(task.slug, params)
@@ -165,34 +130,33 @@ export default class Task extends Component {
 
   }
 
-  toggleMenu () {
+  toggleMenu() {
     this.setState({ open: !this.state.open })
   }
 
-  toggleItem (item) {
+  toggleItem(item) {
     if (!this.state.fullscreen){
       this.setState({ open: !this.state.open })
     }
   }
 
-  toggleFullscreen (item) {
-    log('Toggle fullscreen', this.state.fullscreen)
+  toggleFullscreen(item) {
     this.setState({ fullscreen: !this.state.fullscreen })
   }
 
-  selectLogsTab () {
+  selectLogsTab() {
     this.setState({ tab: 'logs' })
   }
 
-  selectConfigTab () {
+  selectConfigTab() {
     this.setState({ tab: 'configuration' })
   }
 
-  selectWebhookTab () {
+  selectWebhookTab() {
     this.setState({ tab: 'webhook' })
   }
 
-  pollPipeline(){
+  pollPipeline() {
     if (this.pipelineInterval){
       log('pollPipeline: Already polling')
     } else {
@@ -231,15 +195,15 @@ export default class Task extends Component {
     }
   }
 
-  pollingLog (runId) {
+  pollingLog(runId) {
     if (this.state.intervals[runId] != undefined){
       log('pollingLog: Already polling for logs for task.')
       return
     }
-    function getLog(){
+    const getLog = () => {
       this.refreshLogs(runId);
     }
-    this.state.intervals[runId] = setInterval(getLog.bind(this), 2200)
+    this.state.intervals[runId] = setInterval(getLog, 2200)
     this.setState({intervals: this.state.intervals})
   }
 
@@ -249,64 +213,58 @@ export default class Task extends Component {
     this.refreshLogs(runId)
   }
 
-  relativeTime(timestamp){
-    if (!timestamp) {
-      return 'No runs'
-    }
-    if (timestamp == 'now') {
-      return 'Now'
-    }
-    return moment.utc(timestamp, "YYYY-MM-DDThh:mm:ss.SSSSSS").local().fromNow();
-  }
-
   getRunHistoryPointers(runs){
     var that = this;
-    if (!runs || runs.length == 0){
+    if (!runs || runs.length == 0) {
       return <div className='empty'>No runs yet</div>
     }
-    return runs.slice(0,6).map(function(run){
-      var status = run.status == 'success'? 'ok' : 'error';
-      return <div className={`status ${status}`} key={run.id}><span>{run.status} &middot; { that.relativeTime(run.start_time)}</span></div>
+    return runs.slice(0,6).map(run => {
+      const status = run.status == 'success'? 'ok' : 'error';
+      return (
+         <div className={`status ${status}`} key={run.id}>
+           <span>{run.status} &middot; { relativeTime(run.start_time)}</span>
+         </div>
+       )
     })
   }
+
   calculateRunDuration(run) {
     var duration;
-    if (run['start_time'] && run['finish_time']){
+    if (run['start_time'] && run['finish_time']) {
       try {
         duration = (moment(run['finish_time']) - moment(run['start_time']))/1000
         duration = (duration + 1).toFixed(0) // round to integer
       } catch(e){
         console.warn('Could not calculate duration', run['finish_time'], run['finish_time'])
       }
-
     }
     return duration;
   }
-  getRunsHtml(runs){
+
+  getRunsHtml(runs) {
     var that = this;
     var runsHtml = '';
 
-    if (runs && runs.length > 0){
+    if (runs && runs.length > 0) {
 
-          var runsHtml = runs.map((item, index) => {
-            if (!item){
-              console.log('Undefined run', runs)
-              return
-            }
+      var runsHtml = runs.map((item, index) => {
+        if (!item){
+          console.log('Undefined run', runs)
+          return
+        }
 
-            var statusClass = item.status == 'success'? 'ok' : 'error';
-            var duration = that.calculateRunDuration(item)
-
-            return (
-              <a
-                key={'runs'+index}
-                onClick={this.selectRun.bind(this, item.id)}
-                className={ `status ${statusClass} ${item.id == that.state.activeRunId ? 'active': ''}`}>
-                  {item.status}{ duration && ` (${duration}s)`}	&middot; { that.relativeTime(item.start_time) }
-                </a>
-            )
-          });
-      }
+        const statusClass = item.status == 'success'? 'ok' : 'error';
+        var duration = that.calculateRunDuration(item)
+        return (
+          <a
+            key={'runs'+index}
+            onClick={this.selectRun.bind(this, item.id)}
+            className={ `status ${statusClass} ${item.id == that.state.activeRunId ? 'active': ''}`}>
+              {item.status}{ duration && ` (${duration}s)`}	&middot; { that.relativeTime(item.start_time) }
+            </a>
+        )
+      });
+    }
     return runsHtml;
   }
   getLogsToolbar(runsHtml) {
@@ -314,19 +272,20 @@ export default class Task extends Component {
     var activeRunObj = this.getRunWithId(this.state.activeRunId) || {};
     var statusClass = activeRunObj.status == 'success'? 'ok' : 'error';
     var latestDuration = this.calculateRunDuration(activeRunObj)
-    return (
-      <header className='toolbar'>
-        <span className='menu'>
-          <div className='options'>
-            { this.getRunsHtml(this.state.task.runs) }
-          </div>
-          <a className={`status ${statusClass}`}>{activeRunObj.status}{ latestDuration && ` (${latestDuration}s)`}	{}&middot; {activeRunObj && this.relativeTime(activeRunObj.start_time)}</a>
-        </span>
+
+     return (
+       <header className='toolbar'>
+         <span className='menu'>
+           <div className='options'>
+             { this.getRunsHtml(this.state.task.runs) }
+           </div>
+           <a className={`status ${statusClass}`}>{activeRunObj.status}{ latestDuration && ` (${latestDuration}s)`}	{}&middot; {activeRunObj && relativeTime(activeRunObj.start_time)}</a>
+         </span>
        </header>
-      )
+     )
   }
 
-  getPastRunHtml (runs) {
+  getPastRunHtml(runs) {
     return runs.map((item, index) => {
       return (
         <li key={'runs'+index}
@@ -346,7 +305,6 @@ export default class Task extends Component {
       )
     })
   }
-
 
   handlePropFormChange(key, e) {
     var promptHolder = this.state.promptHolder;
@@ -397,7 +355,6 @@ export default class Task extends Component {
 
       });
 
-
       return (
         <div className={`overlay ${this.state.showPrompt ? 'active' : 'inactive'}`} onClick={ function(ev){ ev.stopPropagation();} }>
           <div className="modal">
@@ -418,9 +375,10 @@ export default class Task extends Component {
     }
   }
 
-  hidePrompt(){
+  hidePrompt() {
     this.setState({showPrompt: false})
   }
+
   render () {
     const {task} = this.props
 
@@ -433,45 +391,11 @@ export default class Task extends Component {
 
     if (this.state.tab == 'logs'){
 
-      function highlight(input){
-        var timestampRegex = /(\d\d\d\d:\d\d:\d\d) (\d\d:\d\d:\d\d):/g;
-        var failRegex = /([1-9] failed|failed|fail|error|err|status: 1)/g;
-        var succRegex = /(0 failed|status: 0|success)/g;
-        var bashColors = [
-        [/\[(0;)?30m(.*?)\[(0)?m/g, '<span class="black">$2</span>'],
-        [/\[(0;)?31m(.*?)\[(0)?m/g, '<span class="red">$2</span>'],
-        [/\[(0;)?32m(.*?)\[(0)?m/g, '<span class="green">$2</span>'],
-        [/\[(0;)?33m(.*?)\[(0)?m/g, '<span class="brown">$2</span>'],
-        [/\[(0;)?34m(.*?)\[(0)?m/g, '<span class="blue">$2</span>'],
-        [/\[(0;)?35m(.*?)\[(0)?m/g, '<span class="purple">$2</span>'],
-        [/\[(0;)?36m(.*?)\[(0)?m/g, '<span class="cyan">$2</span>'],
-        [/\[(0;)?37m(.*?)\[(0)?m/g, '<span class="light-gray">$2</span>'],
-        [/\[1;30m(.*?)\[0m/g, '<span class="dark-gray">$1</span>'],
-        [/\[1;31m(.*?)\[0m/g, '<span class="light-red">$1</span>'],
-        [/\[1;32m(.*?)\[0m/g, '<span class="light-green">$1</span>'],
-        [/\[1;33m(.*?)\[0m/g, '<span class="yellow">$1</span>'],
-        [/\[1;34m(.*?)\[0m/g, '<span class="light-blue">$1</span>'],
-        [/\[1;35m(.*?)\[0m/g, '<span class="light-purple">$1</span>'],
-        [/\[1;36m(.*?)\[0m/g, '<san class="light-cyan">$1</span>'],
-        [/\[1;37m(.*?)\[0m/g, '<span class="white">$1</span>'],
-        ]
-        bashColors.map(function(code){
-          input = input.replace(code[0], code[1])
-        })
-
-        if (input !== undefined){
-          input =  input.replace(timestampRegex, '<time class="time">$2</time>')
-          input = input.replace(failRegex, '<span class="red">$1</span>')
-          input = input.replace(succRegex, '<span class="green">$1</span>')
-        }
-        return input;
-
-      };
       if (this.state.task.runs && this.state.task.runs.length){
         tabContent = this.getLogsToolbar()
 
         tabContent2 = (
-        <div className='console' dangerouslySetInnerHTML={ {__html: highlight(this.state.logs[activeRunObj.id] || 'No logs yet')} } >
+        <div className='console' dangerouslySetInnerHTML={ {__html: highlightLog(this.state.logs[activeRunObj.id] || 'No logs yet')} } >
         </div>
         );
       } else {
@@ -543,8 +467,9 @@ export default class Task extends Component {
           <section className='body'>
             <nav className='tabs'>
               <button className='icon fullscreen' onClick={::this.toggleFullscreen}>
-                <div className='svg'
-                    dangerouslySetInnerHTML={{__html:fullscreenSvg}}/>
+                <div className='svg'>
+                  { this.state.fullscreen ? <LeaveFullScreen /> : <EnterFullScreen /> }
+                </div>
                 <span>Fullscreen</span>
               </button>
 
