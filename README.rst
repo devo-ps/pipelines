@@ -39,9 +39,9 @@ Configuration
 -------------
 
 **Pipelines** runs solely on files. No database is currently required.
-All the pipelines, the logs of each run and various temporary files are stored in the ``workspace``. 
+All the pipelines, the logs of each run and various temporary files are stored under the ``workspace`` folder. 
 
-The workspace is a folder that needs to be specified when running ``pipelines``.
+Workspace is a folder that needs to be specified when running ``pipelines``.
 
 .. code-block:: bash
 
@@ -64,7 +64,7 @@ You may want to specify a different binding IP address (default: ``127.0.0.1``) 
 
 You can now access **pipelines** at http://localhost:8888
 
-Run as a daemon
+How to run as a daemon
 ---------------
 
 Create a dedicated user to run pipelines
@@ -122,6 +122,8 @@ You can define a static admin user by specifying the following options when runn
 
 Github Oauth
 ````````````
+
+**This is an experimental feature**
 
 You can add ``oauth`` support from Github to allow **teams** to access pipelines. You will need to set it by using environment variables for the Oauth Apps, and the ``--github-auth`` to limit teams access.
 
@@ -193,7 +195,7 @@ You can then use the variables as seen above.
 Prompts
 -------
 
-You can prompt users to manually input fields when they run the pipeine through the web-UI. To do this add a ``prompt``
+You can prompt users to manually input fields when they run the pipeline through the web-UI. To do this add a ``prompt``
 section to your pipeline definition. The ``prompt`` fields will **override** the variables from the ``vars`` section.
 
 .. code-block:: yaml
