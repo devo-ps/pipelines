@@ -195,8 +195,9 @@ You can then use the variables as seen above.
 Prompts
 -------
 
-You can prompt users to manually input fields when they run the pipeline through the web-UI. To do this add a ``prompt``
-section to your pipeline definition. The ``prompt`` fields will **override** the variables from the ``vars`` section.
+You can prompt users to manually input fields when they run the pipeline through the web-UI. To do this add a ``prompt`` section to your pipeline definition. The ``prompt`` fields will **override** the variables from the ``vars`` section.
+
+You can alternatively provide a list of acceptable values; the prompt will then appear as a select field and let you choose from the available values
 
 .. code-block:: yaml
 
@@ -208,12 +209,22 @@ section to your pipeline definition. The ``prompt`` fields will **override** the
         # This is the default value when triggered via the web UI
         my_var: default_with_prompt
 
+        # This will appear as a select field
+        my_var_from_select:
+            type: select
+            options:
+                - value1
+                - value2
+
     actions:
         # This will display:
         #    "default_no_prompt" when call via webhook
         #    "default_with_prompt" when call via UI but keeping the default
         #    "other" when call via UI and "other" is inputted by the user
         - echo {{ my_var }}
+
+        # Depending on the selected value, will display value1 or value2
+        - echo {{ my_var_from_select }}
 
 
 Actions
@@ -313,6 +324,35 @@ You can access the content of the webhook content in the actions in the ``webhoo
 
 - You need to send the message via POST as ``application/json`` Content-Type.
 - Documentation is coming to explain how to use the content of the data sent through the hook.
+
+Advanced Templates
+==================
+
+Pipelines uses `Jinja2 <http://jinja.pocoo.org/docs/2.9/templates/>`_ to do variables replacement. You can use the whole set of builtin features from the Jinja2 engine to perform advanced operations.
+
+.. code-block:: yaml
+
+    prompt:
+        stuff:
+            type: select
+            options:
+                - good
+                - bad
+
+    actions:
+        - name: Print something
+          type: bash
+          cmd: |
+              {% if stuff == 'good' %}
+                echo "Do good stuff..."
+              {% else %}
+                echo "Do not so good stuff..."
+              {% endif %}
+
+        - name: Use builtin filters
+          type: bash
+          # Will display 'goose' or 'base'
+          cmd: echo {{ stuff | replace('d', 'se') }}
 
 
 Dirty line by line setup
