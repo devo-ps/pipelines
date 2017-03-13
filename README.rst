@@ -65,7 +65,7 @@ You may want to specify a different binding IP address (default: ``127.0.0.1``) 
 You can now access **pipelines** at http://localhost:8888
 
 How to run as a daemon
----------------
+----------------------
 
 Create a dedicated user to run pipelines
 
