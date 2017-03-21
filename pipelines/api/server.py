@@ -3,6 +3,8 @@ import re
 import json
 from copy import copy
 
+from operator import itemgetter
+
 import yaml
 import logging
 import tornado
@@ -304,10 +306,12 @@ class GetPipelinesHandler(PipelinesRequestHandler):
                 runs = _fetch_runs(full_path, ids)
                 run_dict['run_ids'] = ids
                 run_dict['runs'] = runs
-
             pipelines.append(run_dict)
 
-        self.write(json.dumps(pipelines, indent=2))
+        # Sort the pipelines alphabetically
+        sorted_pipelines = sorted(pipelines, key=itemgetter('slug'))
+        
+        self.write(json.dumps(sorted_pipelines, indent=2))
         self.finish()
 
 
