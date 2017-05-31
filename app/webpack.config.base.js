@@ -22,24 +22,24 @@ module.exports = {
 
   entry: [
     'babel-polyfill',
-    './client/main.jsx'
+    './client/main.js'
   ],
 
   output: {
     path: path.join(process.cwd(), '/client'),
-    pathInfo: true,
+//    pathInfo: true,
     publicPath: 'http://localhost:3000/client/',
-    filename: 'main.js'
+    filename: 'main2.js'
   },
 
   resolve: {
-    root: path.join(__dirname, ''),
-    modulesDirectories: [
-      'web_modules',
-      'node_modules',
-      'client'
+    modules: [
+      path.join(__dirname, ""),
+      "web_modules",
+      "node_modules",
+      "client"
     ],
-    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.scss', '.css'],
+    extensions: ['.webpack.js', '.web.js', '.js', '.jsx', '.scss', '.css'],
     alias:  {
       styles: 'client/styles',
     }
@@ -53,13 +53,51 @@ module.exports = {
       __CURRENT_ENV__: '\'' + (NODE_ENV) + '\''
     })
   ],
-
   module: {
-    loaders: [
-      {test: /\.scss$/, loader: 'style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded?includePaths[]=' + bourbonPaths},
-      {test: /\.css$/, loader: 'style-loader!css-loader'}
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: "style-loader"
+          }, {
+            loader: "css-loader"
+          }, {
+            loader: "sass-loader",
+            options: {
+              includePaths: bourbonPaths
+            }
+          }
+        ]
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.json$/,
+        use: 'json-loader'
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: 'babel-loader'
+      }
     ],
-
     noParse: /\.min\.js/
   }
 };
+
+//config.module.rules.push(
+//  {
+//    test: /\.jsx?$/,
+//    use: [
+//      {
+//        loaders: [ 'babel'],
+//        options: {
+//          exclude: /node_modules/
+//        }
+//      }
+//    ]
+//  }
+//);
+

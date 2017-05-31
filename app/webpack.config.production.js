@@ -8,29 +8,29 @@ var FileSystem = require('fs')
 var Path = require("path");
 
 config.bail = true;
-config.debug = false;
+//config.debug = false;
 config.profile = false;
 config.devtool = '#source-map';
 
 config.output = {
-  path: '../pipelines/api/app_dist/client/dist',
-  pathInfo: true,
+  path: __dirname + '../pipelines/api/app_dist/client/dist',
+//  pathInfo: true,
   publicPath: '/client/dist/',
   filename: 'bundle.min.js'
 };
 
 config.plugins = config.plugins.concat([
-  new webpack.optimize.OccurenceOrderPlugin(true),
-  new webpack.optimize.DedupePlugin(),
-  new webpack.optimize.UglifyJsPlugin({
-    output: {
-      comments: false
-    },
-    compress: {
-      warnings: false,
-      screw_ie8: true
-    }
-  }),
+  new webpack.optimize.OccurrenceOrderPlugin(true),
+//  new webpack.optimize.DedupePlugin(),
+//  new webpack.optimize.UglifyJsPlugin({
+//    output: {
+//      comments: false
+//    },
+//    compress: {
+//      warnings: false,
+//      screw_ie8: true
+//    }
+//  }),
   new SaveAssetsJson({
     path: process.cwd(),
     filename: 'assets.json'
@@ -60,9 +60,9 @@ config.plugins = config.plugins.concat([
             });
         }
 ]);
-
-config.module.loaders = config.module.loaders.concat([
-  {test: /\.jsx?$/, loaders: [ 'babel'], exclude: /node_modules/}
-]);
+//
+//config.module.rules = config.module.loaders.concat([
+//  {test: /\.jsx?$/, loaders: [ 'babel'], exclude: /node_modules/}
+//]);
 
 module.exports = config;

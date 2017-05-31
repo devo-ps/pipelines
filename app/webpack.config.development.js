@@ -16,8 +16,24 @@ config.plugins = config.plugins.concat([
   new webpack.HotModuleReplacementPlugin()
 ]);
 
-config.module.loaders = config.module.loaders.concat([
-  {test: /\.jsx?$/, loaders: [ 'react-hot', 'babel'], exclude: /node_modules/}
-]);
+//config.module.rules.push(
+//  {
+//    test: /\.jsx?$/,
+//    use: [
+//      {
+//        loader: 'react-hot-loader',
+//        options: {
+//          exclude: /node_modules/
+//        }
+//      },
+////      {
+////        loader: 'babel-loader',
+//////        options: {
+//////          exclude: /node_modules/
+//////        }
+////      },
+//    ]
+//  }
+//);
 
 module.exports = config;
