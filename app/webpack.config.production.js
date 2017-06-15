@@ -13,8 +13,8 @@ config.profile = false;
 config.devtool = '#source-map';
 
 config.output = {
-  path: __dirname + '../pipelines/api/app_dist/client/dist',
-//  pathInfo: true,
+  path: Path.join(__dirname, '../pipelines/api/app_dist/client/dist'),
+  pathinfo: true,
   publicPath: '/client/dist/',
   filename: 'bundle.min.js'
 };
@@ -41,7 +41,9 @@ config.plugins = config.plugins.concat([
     }
   }),
         function() {
+            console.error('WORKING !!!')
             this.plugin("done", function(statsData) {
+                console.error('WORKING 2!!!')
                 var stats = statsData.toJson();
 
                 if (!stats.errors.length) {
@@ -56,7 +58,10 @@ config.plugins = config.plugins.concat([
                     FileSystem.writeFileSync(
                         Path.join(__dirname, outFileName),
                         htmlOutput);
+                } else {
+                    console.error('ERRORS', stats.errors)
                 }
+
             });
         }
 ]);

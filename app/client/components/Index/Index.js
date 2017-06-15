@@ -2,7 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import Task from '../Task/Task';
 import {getAllPipelines} from '../../api';
 import 'styles/main'
-import 'assets/moment-timezone-with-data-2012-2022.min.js'
+
+
+
 export default class Index extends Component {
 
   constructor(props) {
