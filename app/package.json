@@ -23,7 +23,6 @@
     "express": "4.13.4",
     "express-ejs-layouts": "2.0.0",
     "moment": "2.15.1",
-    "moment-timezone": "0.5.13",
     "react": "0.14.6",
     "react-dom": "0.14.6",
     "react-syntax-highlight": "0.0.2",

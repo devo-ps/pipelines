@@ -41,9 +41,7 @@ config.plugins = config.plugins.concat([
     }
   }),
         function() {
-            console.error('WORKING !!!')
             this.plugin("done", function(statsData) {
-                console.error('WORKING 2!!!')
                 var stats = statsData.toJson();
 
                 if (!stats.errors.length) {

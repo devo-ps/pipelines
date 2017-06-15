@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import * as API from '../../api'
 import moment from 'moment';
-import momentTimezone from 'moment-timezone';
-// var Highlight = require('react-syntax-highlight');
 
+// var Highlight = require('react-syntax-highlight');
 // require('highlight.js/styles/default.css');
 
 var log = function(){
@@ -48,7 +47,6 @@ export default class Task extends Component {
 
   constructor(props) {
     super(props);
-    console.log('moment.tz', moment.tz, moment  )
     var prompt = process_prompt_def(props.task.definition.prompt)
 
     this.state = {
