@@ -2,6 +2,7 @@
 
 var webpack = require('webpack');
 var config = require('./webpack.config.base.js');
+var Path = require("path");
 
 if (process.env.NODE_ENV !== 'test') {
   config.entry = [
@@ -16,24 +17,5 @@ config.plugins = config.plugins.concat([
   new webpack.HotModuleReplacementPlugin()
 ]);
 
-//config.module.rules.push(
-//  {
-//    test: /\.jsx?$/,
-//    use: [
-//      {
-//        loader: 'react-hot-loader',
-//        options: {
-//          exclude: /node_modules/
-//        }
-//      },
-////      {
-////        loader: 'babel-loader',
-//////        options: {
-//////          exclude: /node_modules/
-//////        }
-////      },
-//    ]
-//  }
-//);
 
 module.exports = config;

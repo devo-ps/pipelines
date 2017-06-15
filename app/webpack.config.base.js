@@ -26,10 +26,10 @@ module.exports = {
   ],
 
   output: {
-    path: path.join(process.cwd(), '/client'),
+    path: process.cwd(),
 //    pathInfo: true,
-    publicPath: 'http://localhost:3000/client/',
-    filename: 'main2.js'
+    publicPath: '/client',
+    filename: 'bundle.js'
   },
 
   resolve: {
@@ -80,7 +80,8 @@ module.exports = {
       },
       {
         test: /\.(js|jsx)$/,
-        use: 'babel-loader'
+        use: 'babel-loader',
+        exclude: /node_modules/
       }
     ],
     noParse: /\.min\.js/
