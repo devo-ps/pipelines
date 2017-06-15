@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import * as API from '../../api'
 import moment from 'moment';
-// var Highlight = require('react-syntax-highlight');
 
+// var Highlight = require('react-syntax-highlight');
 // require('highlight.js/styles/default.css');
 
 var log = function(){
@@ -47,7 +47,6 @@ export default class Task extends Component {
 
   constructor(props) {
     super(props);
-
     var prompt = process_prompt_def(props.task.definition.prompt)
 
     this.state = {

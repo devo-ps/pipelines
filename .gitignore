@@ -14,3 +14,4 @@ venv
 
 dist/*
 !pipelines/api/app_dist/client/dist/bundle.min.js
+bundle.min.js
