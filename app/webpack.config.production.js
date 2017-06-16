@@ -54,7 +54,7 @@ config.plugins = config.plugins.concat([
                         "<script src=$1$2" + stats.assetsByChunkName.main[0] + "$1");
 
                     FileSystem.writeFileSync(
-                        Path.join(__dirname, outFileName),
+                        outFileName,
                         htmlOutput);
                 } else {
                     console.error('ERRORS', stats.errors)
