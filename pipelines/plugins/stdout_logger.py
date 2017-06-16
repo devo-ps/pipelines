@@ -1,4 +1,5 @@
 import json
+import yaml
 import logging
 from datetime import datetime
 
@@ -6,6 +7,7 @@ from pipelines.plugin.base_plugin import BasePlugin
 
 log = logging.getLogger('pipelines')
 
+VAR_LOG_MAX_LEN = 3000
 
 class StdoutLogger(BasePlugin):
     hook_prefix = ''
@@ -49,7 +51,34 @@ class StdoutLogger(BasePlugin):
         self._add_pipeline_start_stats()
 
         if 'on_pipeline_start' in self.write_on:
-            self.write('Pipeline started. vars: %s' % json.dumps(pipeline_context.toDict().get('vars', 'None')))
+
+            def limit_log_len(input_str, limit):
+                length = len(input_str)
+                ret = input_str[:limit]
+                if length > limit:
+                    ret += ' ...(%s more characters)' % (length-VAR_LOG_MAX_LEN)
+                return ret
+
+            def custom_var_serializer(vars):
+                vars_log = '\n'
+                if vars.get('webhook_content', {}).get('raw'):
+                    del vars['webhook_content']['raw']  # Remove from logs to avoid pollution
+
+                if vars:
+                    for k,v in vars.items():
+                        if isinstance(v, dict) or isinstance(v, list):
+                            log_str = yaml.safe_dump(v, default_style=False, default_flow_style=False)[:-1]
+                        else:
+                            log_str = v
+                        value_log = limit_log_len(log_str, VAR_LOG_MAX_LEN)
+                        vars_log += '[1;30m%s[0m: %s' % (k, value_log)  # Adds color to highlight keys
+                        vars_log += '\n'
+                else:
+                    vars_log += 'No variables'
+                return vars_log
+
+            pipeline_vars = pipeline_context.toDict().get('vars', {})
+            self.write('Pipeline started. vars: %s' % custom_var_serializer(pipeline_vars))
 
     def on_pipeline_finish(self, *args):
         self._add_pipeline_finish_stats()
