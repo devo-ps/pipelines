@@ -194,8 +194,10 @@ class WebhookHandler(RequestHandler):
         if self.request.body:
             try:
                 json_body = tornado.escape.json_decode(self.request.body)
-                if (isinstance(json_body, dict)):
+                if isinstance(json_body, dict):
                     params['webhook_content'].update(json_body)
+                else:
+                    log.warning('JSON content not dict, it was %s' % type(json_body))
             except ValueError as e:
                 log.warning('ValueError processing webhook content: %s' % e)
                 pass
