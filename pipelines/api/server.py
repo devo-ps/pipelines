@@ -194,8 +194,10 @@ class WebhookHandler(RequestHandler):
         if self.request.body:
             try:
                 json_body = tornado.escape.json_decode(self.request.body)
-                params['webhook_content'].update(json_body)
-            except ValueError:
+                if (isinstance(json_body, dict)):
+                    params['webhook_content'].update(json_body)
+            except ValueError as e:
+                log.warning('ValueError processing webhook content: %s' % e)
                 pass
 
         return _run_pipeline(self, workspace, wh_context['slug'], params=params)
