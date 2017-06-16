@@ -3,14 +3,17 @@ import logging
 from pipelines.plugins.base_executor import BaseExecutorPlugin
 from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
 from pipelines.plugin.exceptions import PluginError
-from sh import ErrorReturnCode
+from sh import ErrorReturnCode, TimeoutException
 from sh import bash
 
 log = logging.getLogger('pipelines')
+TIMEOUT = 60*60  # Timeout to 1h
+f2455441c363126a31043a5057e8c0122fdb0bd3
+8ca487aae1ed40ac0fb8a67e79678d6d59ba35e9
 
 class BashExecuteError(PluginError):
-    def __init__(self, stderr, code):
-        self.stderr = stderr
+    def __init__(self, msg, code):
+        self.msg = msg
         self.code = code
 
 
@@ -41,11 +44,13 @@ class BashExecutor(BaseExecutorPlugin):
             # stdout = self._run_bash(cmd)
             self._run_bash(cmd)
             status = EXECUTION_SUCCESSFUL
-        except BashExecuteError:
+            msg = 'Bash task finished'
+        except BashExecuteError as e:
             status = EXECUTION_FAILED
             # stdout = e.stderr
+            msg = 'Bash task failed: %s' % e.msg
 
-        return TaskResult(status, 'Bash task finished')
+        return TaskResult(status, msg)
 
 
     def _run_bash(self, bash_input):
@@ -68,13 +73,16 @@ class BashExecutor(BaseExecutorPlugin):
                         line = line[:-1]
                     self.event_mgr.trigger('on_task_event', {'output': line})
 
-            proc = bash(_in=bash_input, _out=process_line, _err=process_line)
+            proc = bash(_in=bash_input, _out=process_line, _err=process_line, _timeout=TIMEOUT)
             proc.wait()
             log.debug('Finished: %s, %s, %s' % (proc.exit_code, proc.stdout, proc.stderr))
 
         except ErrorReturnCode as e:
             log.debug('BashExec failed')
-            raise BashExecuteError(e.stderr, e.exit_code)
+            raise BashExecuteError("Execution failed with code: %s" % e.exit_code, e.exit_code)
+        except TimeoutException as e:
+            log.debug('BashExec timed out after %s seconds' % TIMEOUT)
+            raise BashExecuteError("Task Timed Out", 1)
         return output['stdout']
 
     @classmethod
