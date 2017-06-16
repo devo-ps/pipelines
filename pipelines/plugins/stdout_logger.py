@@ -61,7 +61,7 @@ class StdoutLogger(BasePlugin):
 
             def custom_var_serializer(vars):
                 vars_log = '\n'
-                if vars.get('webhook_content', {}).get('raw'):
+                if vars.get('webhook_content', {}).get('raw') and len(vars.get('webhook_content', {})) > 1:
                     del vars['webhook_content']['raw']  # Remove from logs to avoid pollution
 
                 if vars:
