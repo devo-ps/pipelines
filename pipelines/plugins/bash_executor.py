@@ -8,8 +8,6 @@ from sh import bash
 
 log = logging.getLogger('pipelines')
 TIMEOUT = 60*60  # Timeout to 1h
-f2455441c363126a31043a5057e8c0122fdb0bd3
-8ca487aae1ed40ac0fb8a67e79678d6d59ba35e9
 
 class BashExecuteError(PluginError):
     def __init__(self, msg, code):
