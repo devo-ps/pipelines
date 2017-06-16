@@ -89,7 +89,7 @@ class StdoutLogger(BasePlugin):
             self.write(msg)
 
     def write(self, msg):
-        now_str = self._timestamp(datetime.now())
+        now_str = self._timestamp(datetime.utcnow())
 
         to_write = self.log_format.format(timestamp=now_str,
                                           message=msg)

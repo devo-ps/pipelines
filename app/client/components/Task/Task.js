@@ -250,7 +250,7 @@ export default class Task extends Component {
     if (timestamp == 'now') {
       return 'Now'
     }
-    return moment(timestamp, "YYYY-MM-DDThh:mm:ss.SSSSSS").fromNow();
+    return moment.utc(timestamp, "YYYY-MM-DDThh:mm:ss.SSSSSS").local().fromNow();
   }
 
   getRunHistoryPointers(runs){

@@ -30,13 +30,13 @@ class StatusLogger(BasePlugin):
 
         self._write({
             'status': 'running',
-            'start_time': datetime.now().isoformat()
+            'start_time': datetime.utcnow().isoformat()
         })
 
     def on_pipeline_finish(self, pipeline_context):
         self._write({
             'status': pipeline_context['status'],
-            'finish_time': datetime.now().isoformat()
+            'finish_time': datetime.utcnow().isoformat()
         })
 
     def _write(self, status):
