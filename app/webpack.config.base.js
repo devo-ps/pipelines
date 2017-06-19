@@ -7,7 +7,8 @@ var env = {
   production: NODE_ENV === 'production',
   staging: NODE_ENV === 'staging',
   test: NODE_ENV === 'test',
-  development: NODE_ENV === 'development' || typeof NODE_ENV === 'undefined'
+  development: NODE_ENV === 'development' || typeof NODE_ENV === 'undefined',
+  api_host:  JSON.stringify(process.env.API_HOST || '')
 };
 
 Object.assign(env, {
@@ -49,6 +50,7 @@ module.exports = {
     new webpack.DefinePlugin({
       __DEV__: env.development,
       __STAGING__: env.staging,
+      __API_HOST__: env.api_host,
       __PRODUCTION__: env.production,
       __CURRENT_ENV__: '\'' + (NODE_ENV) + '\''
     })
