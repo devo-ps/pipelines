@@ -45,7 +45,19 @@ export default class Index extends Component {
             {
               this.state.pipelines && this.state.pipelines.length ?
               this.state.pipelines.map((item, index) => {
-                return <Task key={index} task={item}/>;
+                if (item._error){
+                    return (
+                      <article className='item pipeline'>
+                      <div className='notification warning'>
+                        Error loading pipeline { item._filepath } : { item._error }
+                      </div>
+                      </article>
+                      )
+                }
+                else {
+                    return <Task key={index} task={item}/>;
+                }
+
               })
               :
                 (<div className='notification info'>No pipelines yet. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>See how to add a pipeline</a></div>)

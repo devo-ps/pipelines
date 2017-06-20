@@ -10,6 +10,9 @@ import logging
 import tornado
 import filelock
 from uuid import uuid4
+
+from pipelines.pipeline.exceptions import PipelineError
+from schema import SchemaError
 from yaml import YAMLError
 from concurrent.futures import ThreadPoolExecutor
 from tornado import gen
@@ -279,8 +282,19 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         log.debug('Getting all pipelines')
         pipelines = []
         for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
+            full_path = os.path.join(workspace, path)
+            # Validate first
             try:
-                with open(os.path.join(workspace, path)) as f:
+                Pipeline.from_yaml(full_path)
+            except (PipelineError, SchemaError) as e:
+                pipelines.append({
+                    '_error': 'Invalid pipeline definition: %s' % e,
+                    '_filepath': path
+                })
+
+            # Read
+            try:
+                with open(full_path) as f:
                     yaml_string = f.read()
             except IOError as e:
                 log.error('Can not read pipelines, file missing: {}'.format(path))
@@ -309,7 +323,7 @@ class GetPipelinesHandler(PipelinesRequestHandler):
             pipelines.append(run_dict)
 
         # Sort the pipelines alphabetically
-        sorted_pipelines = sorted(pipelines, key=itemgetter('slug'))
+        sorted_pipelines = sorted(pipelines, key=lambda x: x.get('slug'))
         
         self.write(json.dumps(sorted_pipelines, indent=2))
         self.finish()
