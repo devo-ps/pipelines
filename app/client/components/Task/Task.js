@@ -17,6 +17,9 @@ var process_prompt_def = function(prompt_def){
     var ret = {};
     prompt_def = prompt_def || {};
     Object.keys(prompt_def).map(function(key){
+      if (prompt_def[key] === null){
+        prompt_def[key] = ''
+      }
       if (typeof prompt_def[key] === 'string' || prompt_def[key] instanceof String){
         ret[key] = prompt_def[key];
       } else {
@@ -47,8 +50,10 @@ export default class Task extends Component {
 
   constructor(props) {
     super(props);
-    var prompt = process_prompt_def(props.task.definition.prompt)
-
+    var prompt = {}
+    if (props.task.definition){
+      prompt = process_prompt_def(props.task.definition.prompt)
+    }
     this.state = {
         open: false,
         task: props.task,
@@ -138,7 +143,6 @@ export default class Task extends Component {
           activeRunId: '0'
 
         })
-
 
         API.runPipeline(task.slug, params)
           .then((data) => {
@@ -360,7 +364,6 @@ export default class Task extends Component {
               </div>
             )
         } else {
-            console.log('getPromptFieldsHtml', that.state.promptHolder)
             if (prompt_def[key]['type'] == 'select'){
 
                 var optionsHtml = prompt_def[key]['options'].map(function(option){
