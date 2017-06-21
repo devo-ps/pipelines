@@ -291,6 +291,7 @@ class GetPipelinesHandler(PipelinesRequestHandler):
                     '_error': 'Invalid pipeline definition: %s' % e,
                     '_filepath': path
                 })
+                continue
 
             # Read
             try:
