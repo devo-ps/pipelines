@@ -127,13 +127,17 @@ Github Oauth
 
 You can add ``oauth`` support from Github to allow **teams** to access pipelines. You will need to set it by using environment variables for the Oauth Apps, and the ``--github-auth`` to limit teams access.
 
+To get your OAUTH Key and Secret:
+- Register new application in Github: https://github.com/settings/applications/new
+- Only field on that form that is important is the `Authorization callback URL`. This should point to your pipelines, for example if you run it locally it should be `http://localhost:8888/ghauth`. The last part (`/ghauth`) always stays the same.
+- Copy the `Client ID` and `Client Secret` from that page.
+
+To start the pipelines server with Github OAuth enabled.
 .. code-block:: bash
   
     GH_OAUTH_KEY=my_oauth_app_key \
     GH_OAUTH_SECRET=my_super_secret \
-    pipelines server [--options] --github-auth=MY_ORG/MY_TEAM
-
-You can create Oauth Key/Secret in `Github Oauth Applications <https://github.com/settings/developers>`_ 
+    pipelines server [--options] --github-auth=MY_ORG/MY_TEAM[,MY_ORG/ANOTHER_TEAM]
 
 **Note**: If you use Github Oauth, you will **not** be able to use static authentication.
 
