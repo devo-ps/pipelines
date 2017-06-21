@@ -67,7 +67,7 @@ def main():
             teams = []
             for allowed_team in ghauth.split(','):
                 if not '/' in allowed_team:
-                    return PipelinesError('github-auth requires organization and team in format of "(org)/(team)"')
+                    raise PipelinesError('github-auth requires organization and team in format of "(org)/(team)"')
                 org, team = allowed_team.split('/', 1)
                 teams.append((org, team))
             options['auth'] = ('gh', teams)
