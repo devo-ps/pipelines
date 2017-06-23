@@ -1,9 +1,10 @@
 import os
 import re
 import json
+import string
 from copy import copy
 
-from operator import itemgetter
+from random import choice
 
 import yaml
 import logging
@@ -125,7 +126,6 @@ def _get_pipeline_filepath(workspace, slug):
         yaml_filepath = os.path.join(workspace, '%s.%s' % (slug, ext))
         if os.path.exists(yaml_filepath):
             return yaml_filepath
-            break
     return None
 
 
@@ -489,14 +489,48 @@ def make_app(workspace='fixtures/workspace', auth=None):
     if auth_dict and auth_dict.get('type') == 'gh':
         endpoints.insert(len(endpoints) - 1, (r"/ghauth", GithubOAuth2LoginHandler)),
 
+    cookie_secret = _ensure_cookie_secret(workspace)
     return Application(endpoints,
                        workspace_path=workspace,
                        auth=auth_dict,
                        login_url="/login",
                        debug="True",
-                       cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="  # TODO: make configurable
+                       cookie_secret=cookie_secret
                        )
 
+
+def _update_json_file(path, transformation, workspace, overwrite=False):
+    with filelock.FileLock(os.path.join(workspace, '.pipelinelock')):
+        # Read
+        input_content = {}
+        if os.path.isfile(path):
+            with open(path) as input_file:
+                input_content = json.load(input_file)
+
+        # Update
+        if isinstance(transformation, dict):
+            [input_content.update({k: transformation[k]}) for k in transformation if overwrite or k not in input_content]
+        elif isinstance(transformation, type(lambda: True)):
+            transformation(input_content)
+        else:
+            raise RuntimeError('_update_json_dict got unsupported transformation type: %s' % type(transformation))
+
+        # Write
+        with open(path, 'w') as output_file:
+            json.dump(input_content, output_file, indent=2)
+
+    return input_content
+
+
+def _ensure_cookie_secret(workspace):
+    pipelines_store_path = os.path.join(workspace, WEB_HOOK_CONFIG)
+
+    transformer = {
+        'cookie_secret': ''.join([choice(string.letters + string.digits) for _ in range(40)])
+    }
+    full_dict = _update_json_dict(pipelines_store_path, transformer, workspace, overwrite=False)
+
+    return full_dict['cookie_secret']
 
 def _get_static_path(subpath):
     this_path = os.path.realpath(__file__)
