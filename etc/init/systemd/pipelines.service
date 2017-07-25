@@ -9,7 +9,7 @@ Group=pipelines
 Environment=HOME=/var/lib/pipelines
 
 Restart=on-failure
-ExecStart=/usr/bin/pipelines server --host 0.0.0.0 --port 8888 --username admin --password admin
+ExecStart=/usr/bin/pipelines server --workspace /var/lib/pipelines/workspace --host 0.0.0.0 --port 8888 --username admin --password admin
 ExecReload=/bin/kill -s HUP $MAINPID
 
 [Install]
