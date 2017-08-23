@@ -7,21 +7,23 @@ from sh import ErrorReturnCode, TimeoutException
 from sh import bash
 
 log = logging.getLogger('pipelines')
-TIMEOUT = 60*60  # Timeout to 1h
+DEFAULT_TIMEOUT = 60*60  # Timeout to 1h
 
 class BashExecuteError(PluginError):
-    def __init__(self, msg, code):
+    def __init__(self, msg, code, data={}):
         self.msg = msg
         self.code = code
+        self.data = data
 
 
 class BashExecutor(BaseExecutorPlugin):
     hook_prefix = 'bash'
     hooks = ('execute',)
 
-    def __init__(self, log_file=None, event_mgr=None):
+    def __init__(self, log_file=None, event_mgr=None, timeout=DEFAULT_TIMEOUT):
         self.log_file = log_file
         self.event_mgr = event_mgr
+        self.timeout = timeout
 
     def _parse_args_dict(self, args_dict):
         if 'cmd' not in args_dict:
@@ -40,15 +42,16 @@ class BashExecutor(BaseExecutorPlugin):
 
         try:
             # stdout = self._run_bash(cmd)
-            self._run_bash(cmd)
+            output = self._run_bash(cmd)
             status = EXECUTION_SUCCESSFUL
             msg = 'Bash task finished'
         except BashExecuteError as e:
             status = EXECUTION_FAILED
             # stdout = e.stderr
             msg = 'Bash task failed: %s' % e.msg
+            output = e.data['stdout']
 
-        return TaskResult(status, msg)
+        return TaskResult(status, msg, data={'output': output})
 
 
     def _run_bash(self, bash_input):
@@ -71,7 +74,7 @@ class BashExecutor(BaseExecutorPlugin):
                         line = line[:-1]
                     self.event_mgr.trigger('on_task_event', {'output': line})
 
-            proc = bash(_in=bash_input, _out=process_line, _err=process_line, _timeout=TIMEOUT)
+            proc = bash(_in=bash_input, _out=process_line, _err=process_line, _timeout=self.timeout)
             proc.wait()
             log.debug('Finished: %s, %s, %s' % (proc.exit_code, proc.stdout, proc.stderr))
 
@@ -79,8 +82,8 @@ class BashExecutor(BaseExecutorPlugin):
             log.debug('BashExec failed')
             raise BashExecuteError("Execution failed with code: %s" % e.exit_code, e.exit_code)
         except TimeoutException as e:
-            log.debug('BashExec timed out after %s seconds' % TIMEOUT)
-            raise BashExecuteError("Task Timed Out", 1)
+            log.debug('BashExec timed out after %s seconds' % self.timeout)
+            raise BashExecuteError("Task Timed Out", 1, data=output)
         return output['stdout']
 
     @classmethod
