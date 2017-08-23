@@ -32,9 +32,10 @@ class Task(object):
 
 
 class TaskResult(dict):
-    def __init__(self, status, message=''):
+    def __init__(self, status, message='', data={}):
         self['status'] = status
         self['message'] = message
+        self['data'] = data
 
     @property
     def status(self):
@@ -44,6 +45,9 @@ class TaskResult(dict):
     def message(self):
         return self.get('message')
 
+    @property
+    def data(self):
+        return self.get('data')
 
     def is_successful(self):
         return self.status == EXECUTION_SUCCESSFUL
