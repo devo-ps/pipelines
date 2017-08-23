@@ -8,7 +8,7 @@ import yaml
 from jinja2 import TemplateError
 from dotmap import DotMap
 
-from pipelines.pipeline.task import TaskResult, EXECUTION_FAILED
+from pipelines.pipeline.task import TaskResult, EXECUTION_FAILED, EXECUTION_SUCCESSFUL
 from pipelines.plugins import builtin_plugins
 from pipelines.pipeline.exceptions import PipelineError
 from pipelines.pipeline.task import Task
@@ -54,6 +54,7 @@ PIPELINES_SCHEMA = Schema({
             {
                 'type': basestring,
                 Optional('cmd'): basestring,
+                Optional('ignore_errors'): bool,
                 Optional('always_run'): bool,
                 Optional('message'): basestring,
                 Optional(basestring): basestring  # Allow custom keys for actions
@@ -180,6 +181,10 @@ class Pipeline(object):
 
                 if not result_obj:
                     result_obj = self._run_task(task)
+                    if task.ignore_errors and result_obj.status == EXECUTION_FAILED:
+                        log.debug('Task has ignore_errors set, overriding to successful')
+                        # Override to be successful
+                        result_obj['status'] = EXECUTION_SUCCESSFUL
 
                 pipeline_context.results.append(result_obj)
                 pipeline_context['prev_result'] = result_obj
@@ -190,6 +195,7 @@ class Pipeline(object):
                 log.debug('Skipping task: {}'.format(task.name))
         log.debug('Pipeline finished. Status: {}'.format(pipeline_context['status']))
         self.plugin_mgr.trigger('on_pipeline_finish', pipeline_context)
+        return pipeline_context
 
     def _should_run(self, task, pipeline_context):
 

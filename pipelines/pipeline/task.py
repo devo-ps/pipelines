@@ -8,11 +8,12 @@ EXECUTION_FAILED = 1
 log = logging.getLogger('pipelines')
 
 class Task(object):
-    def __init__(self, name, executor, args, always_run):
+    def __init__(self, name, executor, args, always_run, ignore_errors):
         self.name = name
         self.executor = executor
         self.args = args
         self.always_run = always_run
+        self.ignore_errors = ignore_errors
 
 
     @staticmethod
@@ -28,7 +29,11 @@ class Task(object):
         if 'always_run' in task_dict:
             always_run = task_dict.pop('always_run')
 
-        return Task(name, executor, task_args, always_run)
+        ignore_errors = False
+        if 'ignore_errors' in task_dict:
+            ignore_errors = task_dict.pop('ignore_errors')
+
+        return Task(name, executor, task_args, always_run, ignore_errors)
 
 
 class TaskResult(dict):
