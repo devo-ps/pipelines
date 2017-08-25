@@ -22,7 +22,9 @@ var process_prompt_def = function(prompt_def){
       }
       if (typeof prompt_def[key] === 'string' || prompt_def[key] instanceof String){
         ret[key] = prompt_def[key];
-      } else {
+      } else if(prompt_def[key]['type'] == 'checkbox'){
+        ret[key] = prompt_def[key]['default'] || false;
+      } else if(prompt_def[key]['type'] == 'select'){
         if (prompt_def[key]['default']){
           // Take default
           ret[key] = prompt_def[key]['default'];
@@ -347,7 +349,7 @@ export default class Task extends Component {
 
   handlePropFormChange(key, e) {
     var promptHolder = this.state.promptHolder;
-    promptHolder[key] = e.target.value;
+    promptHolder[key] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     this.setState({promptHolder: promptHolder})
   }
 
@@ -363,7 +365,16 @@ export default class Task extends Component {
                 <input type='text' value={that.state.promptHolder[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
               </div>
             )
-        } else {
+        }
+        else if (prompt_def[key]['type'] === 'checkbox'){
+            return (
+              <div className="field" key={key}>
+                <label>{key}</label>
+                <input type='checkbox' onChange={that.handlePropFormChange.bind(that, key)} checked={that.state.promptHolder[key] || false}></input>
+              </div>
+            )
+        }
+        else {
             if (prompt_def[key]['type'] == 'select'){
 
                 var optionsHtml = prompt_def[key]['options'].map(function(option){
@@ -513,7 +524,13 @@ export default class Task extends Component {
             {this.getPromptFieldsHtml()}
 
             <button className='icon run' onClick={this.onRun.bind(this, undefined)}>
-              <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
+              {
+                Object.keys(this.state.promptHolder).length &&
+                 <div className='svg' dangerouslySetInnerHTML={{__html:"<svg width='24' height='24' xmlns='http://www.w3.org/2000/svg'>   <g>   <title>background</title>   <rect fill='none' id='canvas_background' height='402' width='582' y='-1' x='-1'/>  </g>  <g>   <title>Layer 1</title>   <path id='svg_1' d='m8.031905,5.13684l0,13.99996l11.00001,-7l-11.00001,-6.99996z' stroke-linejoin='round' stroke-width='0.2'/>   <ellipse stroke='null' ry='2.080978' rx='2.080978' id='svg_2' cy='17.590776' cx='16.861037' stroke-width='0.2'/>  </g> </svg>"}}/>
+                 || <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
+              }
+
+
             </button>
 
             <h2>{this.state.task.definition.name ? this.state.task.definition.name : this.state.task.slug}</h2>
