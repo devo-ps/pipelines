@@ -7,6 +7,8 @@ triggers:
 prompt:
  code_branch: dev
  your_name: ''
+ testing:
+   type: checkbox
 
 actions:
  - 'ls -la'

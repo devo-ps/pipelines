@@ -44,6 +44,7 @@ PIPELINES_SCHEMA = Schema({
     Optional('vars'): {
         Optional(basestring): Or(
             Optional(basestring),
+            Optional(bool),
             Optional(dict)
         )
     },
@@ -66,10 +67,10 @@ PIPELINES_SCHEMA = Schema({
     ],
     Optional('prompt'): {
         Optional(basestring): Or(
-            Optional(basestring),
+            Optional(basestring, bool),
             {
-                'type': Or('text', 'select'),
-                Optional('default'): basestring,
+                'type': Or('text', 'select', 'checkbox'),
+                Optional('default'): Or(basestring, bool),
                 Optional('options'): [basestring],
             }
         )
