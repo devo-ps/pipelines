@@ -1,5 +1,8 @@
+.. image:: https://travis-ci.org/Wiredcraft/pipelines.svg?branch=dev
+
 Pipelines
 =========
+
 
 .. image:: https://cloud.githubusercontent.com/assets/919180/20129399/425a0c2a-a68a-11e6-82ef-b252424a4b48.png
     :align: center
