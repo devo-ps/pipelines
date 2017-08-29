@@ -59,7 +59,7 @@ class BashExecutor(BaseExecutorPlugin):
         return TaskResult(status, msg, data={'output': output})
 
 
-    def _run_bash(self, bash_input, timeout):
+    def _run_bash(self, bash_input, timeout=DEFAULT_TIMEOUT):
         log.debug('Running bash command: "{}"'.format(bash_input))
         f = None
         if self.log_file:
@@ -84,8 +84,8 @@ class BashExecutor(BaseExecutorPlugin):
             log.debug('Finished: %s, %s, %s' % (proc.exit_code, proc.stdout, proc.stderr))
 
         except ErrorReturnCode as e:
-            log.debug('BashExec failed')
-            raise BashExecuteError("Execution failed with code: %s" % e.exit_code, e.exit_code)
+            log.warning('BashExec failed %s' % e.message)
+            raise BashExecuteError("Execution failed with code: %s" % e.exit_code, e.exit_code, data=output)
         except TimeoutException as e:
             log.debug('BashExec timed out after %s seconds' % timeout)
             raise BashExecuteError("Task Timed Out", 1, data=output)

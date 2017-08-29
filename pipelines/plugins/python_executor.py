@@ -69,10 +69,10 @@ class PythonExecutor(BashExecutor):
             status = EXECUTION_SUCCESSFUL
         except BashExecuteError as e:
             status = EXECUTION_FAILED
-            stdout = e.stderr
+            stdout = e.data.get('stdout')
         print 'Finished, stdout: %s' % (stdout)
 
-        return TaskResult(status, 'Execution finished')
+        return TaskResult(status, 'Execution finished', data={'output': stdout})
 
 
 
