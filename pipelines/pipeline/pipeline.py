@@ -58,7 +58,7 @@ PIPELINES_SCHEMA = Schema({
                 Optional('ignore_errors'): bool,
                 Optional('always_run'): bool,
                 Optional('message'): basestring,
-                Optional(basestring): basestring  # Allow custom keys for actions
+                Optional(basestring): object  # Allow custom keys for actions
             }
         )
     ],
@@ -226,7 +226,11 @@ class Pipeline(object):
 
         try:
             results = self.plugin_mgr.trigger(event_name, task.args)  # Run the task
-        except KeyboardInterrupt as e:
+        except PluginError as e:
+            log.warning('Unexpected plugin error running task: %s' % e)
+            raise
+        except (KeyboardInterrupt, SystemExit) as e:
+            log.warning('Unexpected system error running task: %s' % e)
             raise
         except Exception as e:
             log.warning('Unexpected error running task: %s' % e)
