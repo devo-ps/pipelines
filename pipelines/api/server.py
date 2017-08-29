@@ -312,6 +312,7 @@ class GetPipelinesHandler(PipelinesRequestHandler):
             run_dict = {
                 'slug': slug,
                 'run_ids': [],
+                'runs': [],
                 'definition': pipeline_def,
                 'raw': yaml_string
             }
@@ -325,7 +326,7 @@ class GetPipelinesHandler(PipelinesRequestHandler):
 
         # Sort the pipelines alphabetically
         sorted_pipelines = sorted(pipelines, key=lambda x: x.get('slug'))
-        
+
         self.write(json.dumps(sorted_pipelines, indent=2))
         self.finish()
 
