@@ -8,7 +8,7 @@ import pipelines.api.server as server
 
 from tornado.testing import AsyncHTTPTestCase
 
-WORKSPACE = os.path.realpath('fixtures/workspace')
+WORKSPACE = os.path.realpath('test/fixtures/workspace')
 
 
 class TestAPIs(AsyncHTTPTestCase):
@@ -28,9 +28,16 @@ class TestAPIs(AsyncHTTPTestCase):
         except:
             # TODO - better way to raise the error
             self.assertTrue(False)
-
-        self.assertTrue(content[0]['slug'])
-        self.assertTrue(content[0]['run_ids'])
+        print 'gg'
+        for pipeline_item in content:
+            if '_error' in pipeline_item:
+                self.assertTrue(pipeline_item['_filepath'])
+            else:
+                self.assertTrue(pipeline_item['slug'])
+                self.assertIsInstance(pipeline_item['run_ids'], list)
+                self.assertIsInstance(pipeline_item['runs'], list)
+                self.assertIsInstance(pipeline_item['definition'], dict)
+                self.assertIsInstance(pipeline_item['raw'], basestring)
 
 
     def test_run_pipeline_404(self):
@@ -102,15 +109,10 @@ class TestAPIs(AsyncHTTPTestCase):
         pipeline_id = 'sample-deploy' # json_list[0]['slug']
 
         # Run the pipeline, and extract the task id
-        print 'asdf'
+
         print url_run % pipeline_id
-        print 'asdf'
         resp_run = self.fetch(url_run % pipeline_id, method='POST', body='{"prompt": {}}')
         self.assertEquals(resp_run.code, 200)
-        print 'ss'
-        print resp_run.code
-        print resp_run.body
-        print 'ss2'
         json_run = json.loads(resp_run.body)
         task_id = json_run['task_id']
 
