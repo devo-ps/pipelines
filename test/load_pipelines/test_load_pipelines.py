@@ -14,7 +14,6 @@ import os.path
 
 WORKSPACE = os.path.realpath('test/fixtures/workspace')
 
-print WORKSPACE
 class TestAPIs(AsyncHTTPTestCase):
     def get_app(self):
         return server.make_app(WORKSPACE)
@@ -24,7 +23,7 @@ class TestAPIs(AsyncHTTPTestCase):
             print 'yielding: {}'.format(os.path.join(WORKSPACE, path))
             yield os.path.join(WORKSPACE, path)
 
-    def test_get_pipelines(self):
+    def test_load_sample_pipelines(self):
         for pipeline_path in self._get_pipelines():
             try:
                 res = Pipeline.from_yaml(pipeline_path, {})
@@ -32,9 +31,7 @@ class TestAPIs(AsyncHTTPTestCase):
                 print e
                 self.assertTrue(False, 'Pipeline failed to validate: {}'.format(pipeline_path))
 
-
+        # TODO: Add more validation
 
 if __name__ == '__main__':
     unittest.main()
-    # suite = unittest.TestLoader().loadTestsFromTestCase(TestAPIs)
-    # unittest.TextTestRunner(verbosity=2).run(suite)

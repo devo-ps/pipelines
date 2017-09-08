@@ -1,6 +1,8 @@
 import logging
 from dotmap import DotMap
-from jinja2 import Template
+import jinja2
+import yaml
+import json
 
 log = logging.getLogger('pipelines')
 
@@ -11,8 +13,17 @@ def substitute_variables(pipeline_context, obj):
 
     pipeline_context.update(pipeline_context.get('vars'))  # Pull everything from "vars" to root
 
+    jinja_env = jinja2.Environment()
+    jinja_env.filters['to_json'] = json.dumps
+
+    def to_yaml(input):
+        return yaml.dump(input, default_flow_style=False)
+
+    jinja_env.filters['to_yaml'] = to_yaml
+
     def replace_vars_func(token):
-        template = Template(token)
+
+        template = jinja_env.from_string(token)
         substituted = template.render(**pipeline_context)
 
         return substituted
@@ -43,6 +54,8 @@ if __name__ == '__main__':
     obj = {
         'testnorm': '11 22',
         'testvar1': '{{var1}}',
+        'testjson': '{{ nested | to_json }}',
+        'testyaml': '{{ nested | to_yaml }}',
         'testvar2': '--{{ var_2 }}',
         'testvar3': '{{ var_3}}jj',
         'test:{{var1}}': '{{var1}}',
@@ -58,6 +71,6 @@ if __name__ == '__main__':
 
     vars = DotMap(vars)
     res = substitute_variables(vars, obj)
-    import json
+
     print json.dumps(res, indent=2)
 

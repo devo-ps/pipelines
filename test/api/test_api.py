@@ -131,7 +131,6 @@ class TestAPIs(AsyncHTTPTestCase):
         resp_status2 = self.fetch(url_status % (pipeline_id, task_id))
         self.assertTrue(resp_status2.code, 200)
         json_status2 = json.loads(resp_status2.body)
-        print 'ddd'
         print json_status2
         self.assertEqual(json_status2['status'], 'success')
 
