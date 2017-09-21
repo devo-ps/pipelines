@@ -69,7 +69,7 @@ class StdoutLogger(BasePlugin):
                         if isinstance(v, dict) or isinstance(v, list):
                             log_str = yaml.safe_dump(v, default_style=False, default_flow_style=False)[:-1]
                         else:
-                            log_str = v
+                            log_str = str(v)
                         value_log = limit_log_len(log_str, VAR_LOG_MAX_LEN)
                         vars_log += '[1;30m%s[0m: %s' % (k, value_log)  # Adds color to highlight keys
                         vars_log += '\n'
