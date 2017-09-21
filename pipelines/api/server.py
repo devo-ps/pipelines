@@ -11,6 +11,8 @@ import tornado
 import filelock
 from uuid import uuid4
 
+from datetime import datetime
+
 from pipelines.pipeline.exceptions import PipelineError
 from schema import SchemaError
 from yaml import YAMLError
@@ -79,10 +81,25 @@ class AsyncRunner(object):
             'log_file': os.path.join(folder_path, 'output.log')
         }
         base_params.update(params)
+        self.log_file = base_params['log_file']
         self.pipe = Pipeline.from_yaml(pipeline_filepath, base_params)
 
+    def _write_user_context(self, context):
+        user = context.get('username', 'anonymous')
+        ip = context.get('ip', '(unknown ip)')
+        timestamp = datetime.utcnow().strftime('%Y:%m:%d %H:%M:%S')
+        msg = 'Pipeline triggered by: "{}" [ip: {}]'.format(user, ip)
+        to_write = '{timestamp}: {message}'.format(timestamp=timestamp,
+                                                   message=msg)
+        if self.log_file:
+            with open(self.log_file, 'a') as f:
+                f.write(to_write)
+                f.write('\n')
+
     @concurrent.run_on_executor
-    def run(self):
+    def run(self, context):
+        log.debug('Running with context: {}'.format(context))
+        self._write_user_context(context)
         if self.pipe:
             return self.pipe.run()
         else:
@@ -145,7 +162,9 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}):
     except (PipelinesError, PluginError) as e:
         handler.clear()
         handler.set_status(400)
-        handler.finish(json.dumps({'message': 'Error loading pipeline: %s' % e.message}))
+        err_msg = 'Error loading pipeline: {}'.format(e.message)
+        handler.finish(json.dumps({'message': err_msg}))
+        logging.warn(err_msg)
         return
 
     os.makedirs(folder_path)
@@ -153,7 +172,7 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}):
     handler.write(json.dumps({'task_id': task_id}, indent=2))
     handler.finish()
 
-    yield runner.run()
+    yield runner.run({'username': handler.get_current_user(), 'ip': handler.request.remote_ip})
 
 
 def _authenticate_user(auth_settings, username, password):
