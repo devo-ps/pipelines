@@ -2,9 +2,7 @@ import os
 import re
 import json
 from copy import copy
-
-from operator import itemgetter
-
+import base64
 import yaml
 import logging
 import tornado
@@ -450,18 +448,27 @@ def _hide_pw(conf_dict):
     out['cookie_secret'] = '*******'
     return out
 
+def _parse_basicauth_user(basicauth_http_header):
+    try:
+        return base64.decodestring (basicauth_http_header.split(' ')[1]).split(':')[0]
+    except Exception as e:
+        log.warn('Could not parse nginx auth header: {}'.format(basicauth_http_header))
+        return '(problem parsing user)'
+
+
 
 def main(config):
     conf_logging()
     app = make_app(
-            cookie_secret=config.get('cookie_secret'), 
-            workspace=config.get('workspace', 'fixtures/workspace'), 
-            title=config.get('title'), 
-            auth=config.get('auth')
-        )
+        cookie_secret=config.get('cookie_secret'), 
+        workspace=config.get('workspace', 'fixtures/workspace'), 
+        title=config.get('title'), 
+        auth=config.get('auth')
+    )
     app.listen(
         int(config.get('port', 8888)),
         address=config.get('host', '127.0.0.1'),
+        xheaders=True
     )
 
     log.info('Starting server: {}'.format(_hide_pw(config)))
