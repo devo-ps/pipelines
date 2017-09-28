@@ -274,6 +274,7 @@ export default class Task extends Component {
     if (run['start_time'] && run['finish_time']){
       try {
         duration = (moment(run['finish_time']) - moment(run['start_time']))/1000
+        duration = (duration + 1).toFixed(0) // round to integer
       } catch(e){
         console.warn('Could not calculate duration', run['finish_time'], run['finish_time'])
       }
