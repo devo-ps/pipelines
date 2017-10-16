@@ -51,6 +51,7 @@ class PipelinesRequestHandler(RequestHandler):
         if user_cookie:
             log.debug('user cookie %s' % user_cookie)
             return json.loads(user_cookie)
+        if 
         log.debug('none')
         return None
 
