@@ -18,7 +18,7 @@ export default class Task extends Component {
   constructor(props) {
     super(props);
 
-    const prompt = {}
+    var prompt = {}
     if (props.task.definition){
       prompt = processPromptDef(props.task.definition.prompt)
     }
@@ -259,8 +259,8 @@ export default class Task extends Component {
           <a
             key={'runs'+index}
             onClick={this.selectRun.bind(this, item.id)}
-            className={ `status ${statusClass} ${item.id == that.state.activeRunId ? 'active': ''}`}>
-              {item.status}{ duration && ` (${duration}s)`}	&middot; { that.relativeTime(item.start_time) }
+            className={ `status ${statusClass} ${item.id == this.state.activeRunId ? 'active': ''}`}>
+              {item.status}{ duration && ` (${duration}s)`}	&middot; {relativeTime(item.start_time) }
             </a>
         )
       });
