@@ -70,7 +70,6 @@ def _get_pipeline_filepath(workspace, slug):
         yaml_filepath = os.path.join(workspace, '%s.%s' % (slug, ext))
         if os.path.exists(yaml_filepath):
             return yaml_filepath
-            break
     return None
 
 def _authenticate_user(auth_settings, username, password):
