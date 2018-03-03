@@ -269,6 +269,19 @@ export default class Task extends Component {
       return <div className={`status ${status}`} key={run.id}><span>{run.status} &middot; { that.relativeTime(run.start_time)}</span></div>
     })
   }
+  calculateRunDuration(run) {
+    var duration;
+    if (run['start_time'] && run['finish_time']){
+      try {
+        duration = (moment(run['finish_time']) - moment(run['start_time']))/1000
+        duration = (duration + 1).toFixed(0) // round to integer
+      } catch(e){
+        console.warn('Could not calculate duration', run['finish_time'], run['finish_time'])
+      }
+
+    }
+    return duration;
+  }
   getRunsHtml(runs){
     var that = this;
     var runsHtml = '';
@@ -282,13 +295,14 @@ export default class Task extends Component {
             }
 
             var statusClass = item.status == 'success'? 'ok' : 'error';
+            var duration = that.calculateRunDuration(item)
 
             return (
               <a
                 key={'runs'+index}
                 onClick={this.selectRun.bind(this, item.id)}
                 className={ `status ${statusClass} ${item.id == that.state.activeRunId ? 'active': ''}`}>
-                  {item.status}	&middot; { that.relativeTime(item.start_time) }
+                  {item.status}{ duration && ` (${duration}s)`}	&middot; { that.relativeTime(item.start_time) }
                 </a>
             )
           });
@@ -297,32 +311,19 @@ export default class Task extends Component {
   }
   getLogsToolbar(runsHtml) {
 
-      var activeRunObj = this.getRunWithId(this.state.activeRunId) || {};
-      var statusClass = activeRunObj.status == 'success'? 'ok' : 'error';
-
-     return (
-       <header className='toolbar'>
-         <span className='menu'>
-           <div className='options'>
-             { this.getRunsHtml(this.state.task.runs) }
-           </div>
-           <a className={`status ${statusClass}`}>{activeRunObj.status}	&middot; {activeRunObj && this.relativeTime(activeRunObj.start_time)}</a>
-         </span>
-         {/*
-         <button className='icon previous'>
-           <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/></svg>"}}/>
-           <span>Previous</span>
-         </button>
-         <button className='icon next'>
-           <div className='svg'
-                 dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/></svg>"}}/>
-           <span>Next</span>
-         </button>
-         */}
+    var activeRunObj = this.getRunWithId(this.state.activeRunId) || {};
+    var statusClass = activeRunObj.status == 'success'? 'ok' : 'error';
+    var latestDuration = this.calculateRunDuration(activeRunObj)
+    return (
+      <header className='toolbar'>
+        <span className='menu'>
+          <div className='options'>
+            { this.getRunsHtml(this.state.task.runs) }
+          </div>
+          <a className={`status ${statusClass}`}>{activeRunObj.status}{ latestDuration && ` (${latestDuration}s)`}	{}&middot; {activeRunObj && this.relativeTime(activeRunObj.start_time)}</a>
+        </span>
        </header>
-     )
-
-
+      )
   }
 
   getPastRunHtml (runs) {
