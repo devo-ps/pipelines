@@ -1,0 +1,48 @@
+{
+  "webhooks": {
+    "b109fd4b-30c3-4610-8f82-76a5681e1d14": {
+      "index": 0, 
+      "type": "webhook", 
+      "slug": "readme-pipe"
+    }, 
+    "c5c79847-c003-4e9c-9c88-5e6da26005a6": {
+      "index": 0, 
+      "type": "webhook", 
+      "slug": "sample-deploy"
+    }, 
+    "6500c85f-9600-4b81-8fc3-c7be5d729824": {
+      "index": 0, 
+      "type": "webhook", 
+      "slug": "run-sync"
+    }, 
+    "c823d762-449b-44d1-b72d-b2d5a4caff7b": {
+      "index": 0, 
+      "type": "webhook", 
+      "slug": "yml-pipeline"
+    }, 
+    "38ea0144-1d6d-494d-b9f5-0492307850c3": {
+      "index": 0, 
+      "type": "webhook", 
+      "slug": "python-task-testing"
+    }, 
+    "f3590970-1dd5-4da5-8ba5-abea58b0cab0": {
+      "index": 0, 
+      "type": "webhook", 
+      "slug": "bugtest"
+    }, 
+    "00223d51-4755-4462-a4d8-b71c5afb2697": {
+      "index": 0, 
+      "type": "webhook", 
+      "slug": "test-slackbot"
+    }
+  }, 
+  "slackbot-commands": {
+    "deploy": {
+      "slug": "test-slackbot"
+    }
+  }, 
+  "cookie_secret": "75esletxihxzMWBdY6XZ", 
+  "slackbot": {
+    "public_slug": "df9136d0-cec8-4a9b-be79-414a599f54ad"
+  }
+}
