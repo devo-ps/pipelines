@@ -4,7 +4,7 @@ import json
 from tornado.testing import AsyncHTTPTestCase
 import pipelines.api.server as server
 
-WORKSPACE = os.path.realpath('fixtures/workspace')
+WORKSPACE = os.path.realpath('test/fixtures/workspace')
 
 
 class TestSlackbotAPI(AsyncHTTPTestCase):
