@@ -1,7 +1,6 @@
 from pipelines.plugins.bash_executor import BashExecutor
 from pipelines.plugins.dummy_executor import DummyExecutor
 from pipelines.plugins.python_executor import PythonExecutor
-from pipelines.plugins.slackbot import SlackbotPlugin
 from pipelines.plugins.status_logger import StatusLogger
 # from pipelines.plugins.file_logger import FileLogger
 from pipelines.plugins.stdout_logger import StdoutLogger
@@ -16,6 +15,5 @@ builtin_plugins = {
     'bash': BashExecutor,
     'python': PythonExecutor,
     'dummy': DummyExecutor,
-    'slack': SlackExecutor,
-    'slackbot': SlackbotPlugin
+    'slack': SlackExecutor
 }
