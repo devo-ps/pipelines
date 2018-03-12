@@ -105,7 +105,7 @@ class SlackbotHandler(RequestHandler):
     #     return slackbot_context
 
     def usage(self, commands, slash_command):
-        commands = {c['command']: '%s %s' % (slash_command, ' '.join(['(%s)' % arg for arg in c['arguments']]))
+        commands = {c['command']: '%s %s %s' % (slash_command, c['command'], ' '.join(['(%s)' % arg for arg in c['arguments'][1:] ]))
           for c in commands.values()}
         log.debug('Showing slackbot usage, commands: %s', commands)
         self.write({
