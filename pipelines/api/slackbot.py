@@ -21,8 +21,8 @@ slackbot_commands = None
 def load_slackbot_commands(workspace_path):
     slackbot_configs = {}
     for slug, pipeline_def in walk_pipelines(workspace_path):
-        slackbot_conf = pipeline_def.get('vars', {}).get('slackbot')
-        if slackbot_conf:
+        slackbot_confs = filter(lambda d: d.get('type') == 'slackbot', pipeline_def.get('triggers', []))
+        for slackbot_conf in slackbot_confs:
             if slackbot_conf.get('command'):
                 conf = {
                     'command': slackbot_conf.get('command'),
@@ -73,13 +73,12 @@ class SlackbotHandler(RequestHandler):
         parse_body_arguments('application/x-www-form-urlencoded', self.request.body, args, {})
         # command, environment, component, branch = args['text'].split(' ')
         command_args = args['text'][0].split(' ')
-        if len(command_args) < 1:
-            raise HTTPError(404, 'Command is missing')
+
         return {
             'response_url': args.get('response_url')[0],
             'user': args.get('user_name', [''])[0],
             'channel': args['channel_name'][0] if len(args.get('channel_name',[])) else None,
-            'command':  command_args[0],
+            'command':  command_args[0] if len(command_args) else '',
             'args': args['text'][0].split(' '),
             'slash_command': args['command'][0]
         }
@@ -104,6 +103,17 @@ class SlackbotHandler(RequestHandler):
     #
     #     log.debug('Slackbot context %s for command %s', slackbot_context, command_name)
     #     return slackbot_context
+
+    def usage(self, commands, slash_command):
+        commands = {c['command']: '%s %s' % (slash_command, ' '.join(['(%s)' % arg for arg in c['arguments']]))
+          for c in commands.values()}
+        log.debug('Showing slackbot usage, commands: %s', commands)
+        self.write({
+            'response_type': 'in_channel',
+            'text': 'Usage',
+            'attachments': [{"text": yaml.dump(commands, default_flow_style=False)}]
+        })
+        self.finish()
 
     @gen.coroutine
     def post(self, slug):
@@ -130,24 +140,23 @@ class SlackbotHandler(RequestHandler):
 
         command_args = self._parse_body_args(body_args)
 
+        if command_args['command'] in ['', 'usage', 'help', 'commands']:
+            return self.usage(slackbot_commands, command_args['slash_command'])
+
         if command_args['command'] not in slackbot_commands:
             log.warn('Unknown slack command %s' % command_args['command'])
-            raise HTTPError(404, 'Not found')
-
+            self.write({
+                'response_type': 'in_channel',
+                'text': 'Unknown command %s' % command_args['command'],
+                'attachments': []
+            })
+            return self.finish()
 
         command_config = slackbot_commands[command_args['command']]
 
         # slackbot_context = self._get_slackbot_context(command_args['command'], workspace)
         # if not slackbot_context:
         #     raise HTTPError(404, 'Not found')
-
-        params = {'webhook_content': {'raw': self.request.body}}
-        if self.request.body:
-            try:
-                json_body = json_decode(self.request.body)
-                params['webhook_content'].update(json_body)
-            except ValueError:
-                pass
 
         pipeline_args = {
             'trigger': 'slackbot',
@@ -165,6 +174,7 @@ class SlackbotHandler(RequestHandler):
                 named_slackbot_args[arg_name] = command_args['args'][i]
 
         pipeline_args.update(named_slackbot_args)
+        pipeline_args['webhook_content'] = named_slackbot_args  # For legacy reasons
 
         def response_fn(handler, task_id):
             handler.write({

@@ -1,19 +1,14 @@
 name: Slackbot pipeline
 
-triggers:
-  - type: webhook
-
 actions:
  - 'echo "Testing Slackbot cmd: {{command}}, component: {{component}}, env: {{environment}}, version: {{version}}"'
 
-vars:
-  slackbot:
-    command: 'deploy'
+triggers:
+  - type: webhook
+  - type: slackbot
+    command: deploy
     arguments:
       - command
       - component
       - environment
       - version
-
-plugins:
- - slackbot

@@ -29,8 +29,7 @@ DEFAULT_PLUGINS = [
     'bash',
     'python',
     'status_logger',
-    'slack',
-    'slackbot'
+    'slack'
     # 'webhook_logger'
 ]
 
@@ -78,7 +77,7 @@ PIPELINES_SCHEMA = Schema({
         )
     },
     Optional('triggers'): [{
-        'type': Or('webhook', 'cron'),
+        'type': Or('webhook', 'cron', 'slackbot'),
         Optional('schedule'): basestring
     }]
 })
