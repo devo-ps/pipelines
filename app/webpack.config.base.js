@@ -22,7 +22,7 @@ module.exports = {
   target: 'web',
 
   entry: [
-    'babel-polyfill',
+    'idempotent-babel-polyfill',
     './client/main.js'
   ],
 
