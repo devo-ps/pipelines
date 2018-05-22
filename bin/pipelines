@@ -2,7 +2,7 @@
 '''
 Usage:
     pipelines (--version|--help)
-    pipelines server --workspace=<workspace> [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
+    pipelines server --workspace=<workspace> [--title=<title>] [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
 
 Options:
     --host=<host>                       Bind address [default: 127.0.0.1]
@@ -13,6 +13,7 @@ Options:
     --ask-password                      Ask to type in password manually
     --github-auth=<Org/Team>            Enable Github Authentication (OAuth). Allow specific Team.
     --workspace=<workspace>             Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
+    --title=<title>                     Title on tab
 
 Help:
     pipelines server            Starts pipelines' server (API + UI)
@@ -53,6 +54,12 @@ def _get_cookie_secret(args):
         return os.environ['COOKIE_SECRET']
     return None
 
+def _get_title(args):
+    if args['--title']:
+        return args['--title']
+    if 'TITLE' in os.environ:
+        return os.environ['TITLE']
+    return 'Pipelines'
 
 def main():
     args = docopt.docopt(
@@ -64,6 +71,7 @@ def main():
     if args.get('server'):
         options = {
             'workspace': os.path.realpath(os.path.expanduser(args.get('--workspace'))),
+            'title': _get_title(args),
             'host': args.get('--host'),
             'port': args.get('--port')
         }

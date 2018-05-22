@@ -208,15 +208,16 @@ class GetPipelinesHandler(PipelinesRequestHandler):
     def get(self):
         log.debug('Get pipelines')
         workspace = self.settings['workspace_path']
+        title = self.settings['title']
         log.debug('Getting all pipelines')
-        pipelines = []
+        tasks = []
         for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
             full_path = os.path.join(workspace, path)
             # Validate first
             try:
                 Pipeline.from_yaml(full_path)
             except (PipelineError, SchemaError) as e:
-                pipelines.append({
+                tasks.append({
                     '_error': 'Invalid pipeline definition: %s' % e,
                     '_filepath': path
                 })
@@ -251,12 +252,13 @@ class GetPipelinesHandler(PipelinesRequestHandler):
                 runs = _fetch_runs(full_path, ids)
                 run_dict['run_ids'] = ids
                 run_dict['runs'] = runs
-            pipelines.append(run_dict)
+            tasks.append(run_dict)
+        
 
         # Sort the pipelines alphabetically
-        sorted_pipelines = sorted(pipelines, key=lambda x: x.get('slug'))
-
-        self.write(json.dumps(sorted_pipelines, indent=2))
+        sorted_tasks = sorted(tasks, key=lambda x: x.get('slug'))
+        pipelines = {'title': title, 'tasks': sorted_tasks}
+        self.write(json.dumps(pipelines, indent=2))
         self.finish()
 
 
@@ -397,7 +399,7 @@ def _get_auth_dict(auth_settings):
         }
 
 
-def make_app(cookie_secret, workspace='fixtures/workspace', auth=None):
+def make_app(cookie_secret=None, workspace='fixtures/workspace', title='Pipelines', auth=None):
     if cookie_secret is None:
         raise PipelineError('Cookie secret can not be empty')
 
@@ -424,6 +426,7 @@ def make_app(cookie_secret, workspace='fixtures/workspace', auth=None):
         endpoints.insert(len(endpoints) - 1, (r"/ghauth", GithubOAuth2LoginHandler)),
 
     return Application(endpoints,
+                       title=title,
                        workspace_path=workspace,
                        auth=auth_dict,
                        login_url="/login",
@@ -450,7 +453,12 @@ def _hide_pw(conf_dict):
 
 def main(config):
     conf_logging()
-    app = make_app(config.get('cookie_secret'), config.get('workspace', 'fixtures/workspace'), config.get('auth'))
+    app = make_app(
+            cookie_secret=config.get('cookie_secret'), 
+            workspace=config.get('workspace', 'fixtures/workspace'), 
+            title=config.get('title'), 
+            auth=config.get('auth')
+        )
     app.listen(
         int(config.get('port', 8888)),
         address=config.get('host', '127.0.0.1'),
