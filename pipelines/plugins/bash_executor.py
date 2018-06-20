@@ -70,7 +70,6 @@ class BashExecutor(BaseExecutorPlugin):
             def process_line(line):
                 log.debug('Got line: %s' % line)
                 output['stdout'] += line
-                log.debug('BashExec stdout: {}'.format(line))
                 if f:
                     f.write(line)
 
