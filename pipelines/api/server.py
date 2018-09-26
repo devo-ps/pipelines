@@ -491,7 +491,7 @@ def _get_auth_dict(auth_settings):
         }
 
 
-def make_app(workspace='fixtures/workspace', auth=None):
+def make_app(secret, workspace='fixtures/workspace', auth=None):
     if not os.path.isdir(workspace):
         raise PipelinesError('Workspace is not a valid directory: %s' % workspace)
 
@@ -518,7 +518,7 @@ def make_app(workspace='fixtures/workspace', auth=None):
                        auth=auth_dict,
                        login_url="/login",
                        debug="True",
-                       cookie_secret="61oETzKXQAGaYdkL5gEmGeJJFuYh7EQnp2XdTP1o/Vo="  # TODO: make configurable
+                       cookie_secret=secret
                        )
 
 
@@ -539,7 +539,7 @@ def _hide_pw(conf_dict):
 
 def main(config):
     conf_logging()
-    app = make_app(config.get('workspace', 'fixtures/workspace'), config.get('auth'))
+    app = make_app(config.get('secret'), config.get('workspace', 'fixtures/workspace'), config.get('auth'))
     app.listen(
         int(config.get('port', 8888)),
         address=config.get('host', '127.0.0.1'),

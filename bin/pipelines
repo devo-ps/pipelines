@@ -2,11 +2,12 @@
 '''
 Usage: 
     pipelines (--version|--help)
-    pipelines server --workspace=<workspace> [--host=<host>] [--port=<port>]  [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
+    pipelines server --workspace=<workspace> --secret=<secret> [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
 
 Options:
     --host=<host>               Bind address [default: 127.0.0.1]
     --port=<port>               Bind port [default: 8888]
+    --secret=<secret>           Cookie Secret
     --username=<username>       Admin Username
     --password=<password>       Admin Password
     --ask-password              Ask to type in password manually
@@ -44,6 +45,13 @@ def _get_password(args):
         return os.environ['PASSWORD']
     return None
 
+def _get_secret(args):
+    if args['--secret']:
+        return args['--secret']
+    if 'SECRET' in os.environ:
+        return os.environ['SECRET']
+    return None
+
 
 def main():
     args = docopt.docopt(
@@ -61,7 +69,12 @@ def main():
 
         username = _get_username(args)
         password = _get_password(args)
+        secret = _get_secret(args)
         ghauth = args.get('--github-auth')
+
+        if secret is None:
+            raise PipelinesError('--secret is required')
+        options['secret'] = secret
 
         if ghauth:
             teams = []
