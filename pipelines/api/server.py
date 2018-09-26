@@ -542,7 +542,7 @@ def _hide_pw(conf_dict):
 
 def main(config):
     conf_logging()
-    app = make_app(config.get('secret'), config.get('workspace', 'fixtures/workspace'), config.get('auth'))
+    app = make_app(config.get('cookie_secret'), config.get('workspace', 'fixtures/workspace'), config.get('auth'))
     app.listen(
         int(config.get('port', 8888)),
         address=config.get('host', '127.0.0.1'),
