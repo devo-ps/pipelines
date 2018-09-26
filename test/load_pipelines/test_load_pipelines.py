@@ -13,10 +13,11 @@ from pipelines.pipeline.pipeline import Pipeline
 import os.path
 
 WORKSPACE = os.path.realpath('test/fixtures/workspace')
+SECRET = '12345'
 
 class TestAPIs(AsyncHTTPTestCase):
     def get_app(self):
-        return server.make_app(WORKSPACE)
+        return server.make_app(SECRET, WORKSPACE)
 
     def _get_pipelines(self):
         for path in _file_iterator(WORKSPACE, extensions=PIPELINES_EXT):

@@ -9,11 +9,11 @@ import pipelines.api.server as server
 from tornado.testing import AsyncHTTPTestCase
 
 WORKSPACE = os.path.realpath('test/fixtures/workspace')
-
+SECRET = '12345'
 
 class TestAPIs(AsyncHTTPTestCase):
     def get_app(self):
-        return server.make_app(WORKSPACE)
+        return server.make_app(SECRET, WORKSPACE)
 
     def test_get_pipelines(self):
         '''
