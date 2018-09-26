@@ -2,17 +2,17 @@
 '''
 Usage: 
     pipelines (--version|--help)
-    pipelines server --workspace=<workspace> --secret=<secret> [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
+    pipelines server --workspace=<workspace> --cookie-secret=<cookie-secret> [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
 
 Options:
-    --host=<host>               Bind address [default: 127.0.0.1]
-    --port=<port>               Bind port [default: 8888]
-    --secret=<secret>           Cookie Secret
-    --username=<username>       Admin Username
-    --password=<password>       Admin Password
-    --ask-password              Ask to type in password manually
-    --github-auth=<Org/Team>    Enable Github Authentication (OAuth). Allow specific Team.
-    --workspace=<workspace>     Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
+    --host=<host>                       Bind address [default: 127.0.0.1]
+    --port=<port>                       Bind port [default: 8888]
+    --cookie-secret=<cookie-secret>     Cookie Secret
+    --username=<username>               Admin Username
+    --password=<password>               Admin Password
+    --ask-password                      Ask to type in password manually
+    --github-auth=<Org/Team>            Enable Github Authentication (OAuth). Allow specific Team.
+    --workspace=<workspace>             Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
 
 Help:
     pipelines server            Starts pipelines' server (API + UI)
@@ -45,11 +45,11 @@ def _get_password(args):
         return os.environ['PASSWORD']
     return None
 
-def _get_secret(args):
-    if args['--secret']:
-        return args['--secret']
-    if 'SECRET' in os.environ:
-        return os.environ['SECRET']
+def _get_cookie_secret(args):
+    if args['--cookie-secret']:
+        return args['--cookie-secret']
+    if 'COOKIE_SECRET' in os.environ:
+        return os.environ['COOKIE_SECRET']
     return None
 
 
@@ -69,12 +69,12 @@ def main():
 
         username = _get_username(args)
         password = _get_password(args)
-        secret = _get_secret(args)
+        cookie_secret = _get_cookie_secret(args)
         ghauth = args.get('--github-auth')
 
-        if secret is None:
-            raise PipelinesError('--secret is required')
-        options['secret'] = secret
+        if cookie_secret is None:
+            raise PipelinesError('--cookie-secret is required')
+        options['cookie_secret'] = cookie_secret
 
         if ghauth:
             teams = []

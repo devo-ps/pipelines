@@ -491,7 +491,10 @@ def _get_auth_dict(auth_settings):
         }
 
 
-def make_app(secret, workspace='fixtures/workspace', auth=None):
+def make_app(cookie_secret, workspace='fixtures/workspace', auth=None):
+    if cookie_secret is None:
+        raise PipelineError('Cookie secret can not be empty')
+
     if not os.path.isdir(workspace):
         raise PipelinesError('Workspace is not a valid directory: %s' % workspace)
 
@@ -518,7 +521,7 @@ def make_app(secret, workspace='fixtures/workspace', auth=None):
                        auth=auth_dict,
                        login_url="/login",
                        debug="True",
-                       cookie_secret=secret
+                       cookie_secret=cookie_secret
                        )
 
 
