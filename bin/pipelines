@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 '''
-Usage: 
+Usage:
     pipelines (--version|--help)
-    pipelines server --workspace=<workspace> --cookie-secret=<cookie-secret> [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
+    pipelines server --workspace=<workspace> [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>]
 
 Options:
     --host=<host>                       Bind address [default: 127.0.0.1]
@@ -26,6 +26,7 @@ from getpass import getpass
 
 from pipelines import __version__, PipelinesError
 from pipelines.api import server
+from pipelines.pipeline.utils import random_secret
 
 MIN_PASSWORD_LEN = 4
 
@@ -72,9 +73,7 @@ def main():
         cookie_secret = _get_cookie_secret(args)
         ghauth = args.get('--github-auth')
 
-        if cookie_secret is None:
-            raise PipelinesError('--cookie-secret is required')
-        options['cookie_secret'] = cookie_secret
+        options['cookie_secret']  = cookie_secret if cookie_secret else random_secret()
 
         if ghauth:
             teams = []

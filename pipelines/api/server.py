@@ -537,6 +537,7 @@ def _hide_pw(conf_dict):
     out = copy(conf_dict)
     if 'auth' in out and len(out['auth']) > 0 and out['auth'][0] == 'static':
         out['auth'] = (out['auth'][0], out['auth'][1], '*******')
+    out['cookie_secret'] = '*******'
     return out
 
 
