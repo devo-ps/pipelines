@@ -1,4 +1,5 @@
 import logging
+import json
 
 from pipelines.plugins.base_executor import BaseExecutorPlugin
 from pipelines.pipeline.task import TaskResult, EXECUTION_SUCCESSFUL, EXECUTION_FAILED
@@ -46,8 +47,7 @@ class BashExecutor(BaseExecutorPlugin):
             return TaskResult(EXECUTION_SUCCESSFUL)
 
         try:
-            # stdout = self._run_bash(cmd)
-            output = self._run_bash(cmd, timeout)
+            output, return_obj = self._run_bash(cmd, timeout)
             status = EXECUTION_SUCCESSFUL
             msg = 'Bash task finished'
         except BashExecuteError as e:
@@ -56,7 +56,7 @@ class BashExecutor(BaseExecutorPlugin):
             msg = 'Bash task failed: %s' % e.msg
             output = e.data['stdout']
 
-        return TaskResult(status, msg, data={'output': output})
+        return TaskResult(status, msg, data={'output': output}, return_obj=return_obj)
 
 
     def _run_bash(self, bash_input, timeout=DEFAULT_TIMEOUT):
@@ -65,11 +65,15 @@ class BashExecutor(BaseExecutorPlugin):
         if self.log_file:
             f = open(self.log_file, 'a+')
 
-        output = {'stdout': ''}
+        output = {'stdout': '', 'last_line': ''}
         try:
             def process_line(line):
                 log.debug('Got line: %s' % line)
                 output['stdout'] += line
+
+                if line and line.strip():
+                    output['last_line'] = line
+
                 if f:
                     f.write(line)
 
@@ -88,7 +92,14 @@ class BashExecutor(BaseExecutorPlugin):
         except TimeoutException as e:
             log.debug('BashExec timed out after %s seconds' % timeout)
             raise BashExecuteError("Task Timed Out", 1, data=output)
-        return output['stdout']
+
+        return_obj = None
+        try:
+            return_obj = json.loads(output['last_line'])
+        except:
+            log.debug('Failed to parse last line of bash as json: "{}"'.format(output['last_line']))
+
+        return output['stdout'], return_obj
 
     @classmethod
     def from_dict(cls, conf_dict, event_mgr=None):
