@@ -29,7 +29,7 @@ class TestAPIs(AsyncHTTPTestCase):
             # TODO - better way to raise the error
             self.assertTrue(False)
         print 'gg'
-        for pipeline_item in content:
+        for pipeline_item in content['tasks']:
             if '_error' in pipeline_item:
                 self.assertTrue(pipeline_item['_filepath'])
             else:

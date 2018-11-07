@@ -18,12 +18,13 @@ export function getAllPipelines() {
   })
   .then(bodyParser)
   .then(function(pipelines){
-    return pipelines.map(function(item){
+    pipelines.tasks.map(function(item){
       if (!item.runs){
         item.runs = [];
       }
       return item
     })
+    return pipelines
   })
 }
 
