@@ -77,8 +77,9 @@ PIPELINES_SCHEMA = Schema({
         )
     },
     Optional('triggers'): [{
-        'type': Or('webhook', 'cron'),
-        Optional('schedule'): basestring
+        'type': Or('webhook', 'cron', 'slackbot'),
+        Optional('schedule'): basestring,
+        Optional(basestring): Optional(Or(object, basestring, list))
     }]
 })
 

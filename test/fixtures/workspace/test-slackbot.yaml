@@ -1,0 +1,14 @@
+name: Slackbot pipeline
+
+actions:
+ - 'echo "Testing Slackbot cmd: {{command}}, component: {{component}}, env: {{environment}}, version: {{version}}"'
+
+triggers:
+  - type: webhook
+  - type: slackbot
+    command: deploy
+    arguments:
+      - command
+      - component
+      - environment
+      - version

@@ -1,6 +1,7 @@
+
 .*
 !.gitignore
-
+!.pipeline-store.json
 *.pyc
 *.pyo
 *.egg-info
