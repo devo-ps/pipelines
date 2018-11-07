@@ -60,6 +60,39 @@ class TestPipelines(TestCase):
         self.assertEqual(res['results'][0].status, EXECUTION_FAILED)
         self.assertEqual(len(res['results']), 1)
 
+    def test_variable_passing(self):
+        pipeline_def = {
+            'actions': [
+            'echo \'{"test22": 1}\'',
+            'echo "{{ prev_result.return_obj.test22 }}"'
+            ],
+        }
+        pipeline = Pipeline.form_dict(pipeline_def)
+        res = pipeline.run()
+
+        self.assertEqual(res['status'], PIPELINE_STATUS_OK)
+        self.assertEqual(res['results'][1].data['output'].strip(), "1")
+
+    def test_variable_passing_python(self):
+        pipeline_def = {
+            'actions': [
+            {
+                'type': 'python',
+                'script': '''
+import json
+a = {'testpy': 'tdd', 'array': [1,2,3]}
+print json.dumps(a)
+'''
+            },
+            'echo "{{ prev_result.return_obj.testpy }}"'
+            ],
+        }
+        pipeline = Pipeline.form_dict(pipeline_def)
+        res = pipeline.run()
+
+        self.assertEqual(res['status'], PIPELINE_STATUS_OK)
+        self.assertEqual(res['results'][1].data['output'].strip(), "tdd")
+
     def test_templating(self):
         vars = {
             'vars': {
