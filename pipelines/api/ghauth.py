@@ -186,13 +186,16 @@ class GithubOAuth2LoginHandler(RequestHandler,
             teams = r.json()
 
             for org, team in allowed_teams:
-                if filter(lambda x: x['name'] == team and x.get('organization',{}).get('name') == org, teams):
+                if filter(lambda x: x['slug'].lower() == team.lower() and x.get('organization',{}).get('login', '').lower() == org.lower(), teams):
                     log.debug('Allowed access to github user for team %s/%s' % (org, team))
                     cookie = json.dumps(user, separators=(',',   ':'))
                     self.set_secure_cookie('user', cookie)
                     break
             else:
-                log.debug('Access not allowed to user: %s' % teams)
+                log.debug('Access not allowed to user. User teams:  %s' % (
+                    ['%s/%s' % (t.get('organization', {}).get('login'), t.get('slug')) for t in teams])
+                )
+
 
             self.redirect(self.get_query_argument("next", "/"))
         else:

@@ -2,24 +2,28 @@ import React, { Component, PropTypes } from 'react';
 import Task from '../Task/Task';
 import {getAllPipelines} from '../../api';
 import 'styles/main'
+import DocumentTitle from 'react-document-title'
+
+
 
 export default class Index extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {pipelines: [], loaded: false};
+    this.state = {pipelines: [], title: 'Pipelines', loaded: false};
   }
 
   componentWillMount () {
     getAllPipelines()
     .then((data) => {
-      this.setState({pipelines: data, loaded: true})
+      this.setState({pipelines: data.tasks, title: data.title, loaded: true})
     })
 
   }
 
   render() {
     return (
+      <DocumentTitle title={this.state.title}>
       <section className={!this.state.loaded?'loading':''} id='app'>
         <header id='header'>
           <div className='wrapper'>
@@ -43,7 +47,19 @@ export default class Index extends Component {
             {
               this.state.pipelines && this.state.pipelines.length ?
               this.state.pipelines.map((item, index) => {
-                return <Task key={index} task={item}/>;
+                if (item._error){
+                    return (
+                      <article className='item pipeline'>
+                      <div className='notification warning'>
+                        Error loading pipeline { item._filepath } : { item._error }
+                      </div>
+                      </article>
+                      )
+                }
+                else {
+                    return <Task key={index} task={item}/>;
+                }
+
               })
               :
                 (<div className='notification info'>No pipelines yet. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>See how to add a pipeline</a></div>)
@@ -53,6 +69,7 @@ export default class Index extends Component {
           </div>
         </div>
       </section>
+      </DocumentTitle>
     );
   }
 };

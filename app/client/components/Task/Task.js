@@ -1,8 +1,8 @@
 import React, { Component, PropTypes } from 'react'
 import * as API from '../../api'
 import moment from 'moment';
-// var Highlight = require('react-syntax-highlight');
 
+// var Highlight = require('react-syntax-highlight');
 // require('highlight.js/styles/default.css');
 
 var log = function(){
@@ -17,9 +17,14 @@ var process_prompt_def = function(prompt_def){
     var ret = {};
     prompt_def = prompt_def || {};
     Object.keys(prompt_def).map(function(key){
+      if (prompt_def[key] === null){
+        prompt_def[key] = ''
+      }
       if (typeof prompt_def[key] === 'string' || prompt_def[key] instanceof String){
         ret[key] = prompt_def[key];
-      } else {
+      } else if(prompt_def[key]['type'] == 'checkbox'){
+        ret[key] = prompt_def[key]['default'] || false;
+      } else if(prompt_def[key]['type'] == 'select'){
         if (prompt_def[key]['default']){
           // Take default
           ret[key] = prompt_def[key]['default'];
@@ -47,9 +52,10 @@ export default class Task extends Component {
 
   constructor(props) {
     super(props);
-
-    var prompt = process_prompt_def(props.task.definition.prompt)
-
+    var prompt = {}
+    if (props.task.definition){
+      prompt = process_prompt_def(props.task.definition.prompt)
+    }
     this.state = {
         open: false,
         task: props.task,
@@ -139,7 +145,6 @@ export default class Task extends Component {
           activeRunId: '0'
 
         })
-
 
         API.runPipeline(task.slug, params)
           .then((data) => {
@@ -251,7 +256,7 @@ export default class Task extends Component {
     if (timestamp == 'now') {
       return 'Now'
     }
-    return moment(timestamp, "YYYY-MM-DDThh:mm:ss.SSSSSS").fromNow();
+    return moment.utc(timestamp, "YYYY-MM-DDThh:mm:ss.SSSSSS").local().fromNow();
   }
 
   getRunHistoryPointers(runs){
@@ -263,6 +268,19 @@ export default class Task extends Component {
       var status = run.status == 'success'? 'ok' : 'error';
       return <div className={`status ${status}`} key={run.id}><span>{run.status} &middot; { that.relativeTime(run.start_time)}</span></div>
     })
+  }
+  calculateRunDuration(run) {
+    var duration;
+    if (run['start_time'] && run['finish_time']){
+      try {
+        duration = (moment(run['finish_time']) - moment(run['start_time']))/1000
+        duration = (duration + 1).toFixed(0) // round to integer
+      } catch(e){
+        console.warn('Could not calculate duration', run['finish_time'], run['finish_time'])
+      }
+
+    }
+    return duration;
   }
   getRunsHtml(runs){
     var that = this;
@@ -277,13 +295,14 @@ export default class Task extends Component {
             }
 
             var statusClass = item.status == 'success'? 'ok' : 'error';
+            var duration = that.calculateRunDuration(item)
 
             return (
               <a
                 key={'runs'+index}
                 onClick={this.selectRun.bind(this, item.id)}
                 className={ `status ${statusClass} ${item.id == that.state.activeRunId ? 'active': ''}`}>
-                  {item.status}	&middot; { that.relativeTime(item.start_time) }
+                  {item.status}{ duration && ` (${duration}s)`}	&middot; { that.relativeTime(item.start_time) }
                 </a>
             )
           });
@@ -292,32 +311,19 @@ export default class Task extends Component {
   }
   getLogsToolbar(runsHtml) {
 
-      var activeRunObj = this.getRunWithId(this.state.activeRunId) || {};
-      var statusClass = activeRunObj.status == 'success'? 'ok' : 'error';
-
-     return (
-       <header className='toolbar'>
-         <span className='menu'>
-           <div className='options'>
-             { this.getRunsHtml(this.state.task.runs) }
-           </div>
-           <a className={`status ${statusClass}`}>{activeRunObj.status}	&middot; {activeRunObj && this.relativeTime(activeRunObj.start_time)}</a>
-         </span>
-         {/*
-         <button className='icon previous'>
-           <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 15.4135,16.5841L 10.8275,11.9981L 15.4135,7.41207L 13.9995,5.99807L 7.99951,11.9981L 13.9995,17.9981L 15.4135,16.5841 Z '/></svg>"}}/>
-           <span>Previous</span>
-         </button>
-         <button className='icon next'>
-           <div className='svg'
-                 dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 8.58527,16.584L 13.1713,11.998L 8.58527,7.41198L 9.99927,5.99798L 15.9993,11.998L 9.99927,17.998L 8.58527,16.584 Z '/></svg>"}}/>
-           <span>Next</span>
-         </button>
-         */}
+    var activeRunObj = this.getRunWithId(this.state.activeRunId) || {};
+    var statusClass = activeRunObj.status == 'success'? 'ok' : 'error';
+    var latestDuration = this.calculateRunDuration(activeRunObj)
+    return (
+      <header className='toolbar'>
+        <span className='menu'>
+          <div className='options'>
+            { this.getRunsHtml(this.state.task.runs) }
+          </div>
+          <a className={`status ${statusClass}`}>{activeRunObj.status}{ latestDuration && ` (${latestDuration}s)`}	{}&middot; {activeRunObj && this.relativeTime(activeRunObj.start_time)}</a>
+        </span>
        </header>
-     )
-
-
+      )
   }
 
   getPastRunHtml (runs) {
@@ -344,7 +350,7 @@ export default class Task extends Component {
 
   handlePropFormChange(key, e) {
     var promptHolder = this.state.promptHolder;
-    promptHolder[key] = e.target.value;
+    promptHolder[key] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     this.setState({promptHolder: promptHolder})
   }
 
@@ -360,8 +366,16 @@ export default class Task extends Component {
                 <input type='text' value={that.state.promptHolder[key]} onChange={that.handlePropFormChange.bind(that, key)}></input>
               </div>
             )
-        } else {
-            console.log('getPromptFieldsHtml', that.state.promptHolder)
+        }
+        else if (prompt_def[key]['type'] === 'checkbox'){
+            return (
+              <div className="field" key={key}>
+                <label>{key}</label>
+                <input type='checkbox' onChange={that.handlePropFormChange.bind(that, key)} checked={that.state.promptHolder[key] || false}></input>
+              </div>
+            )
+        }
+        else {
             if (prompt_def[key]['type'] == 'select'){
 
                 var optionsHtml = prompt_def[key]['options'].map(function(option){
@@ -421,8 +435,8 @@ export default class Task extends Component {
 
       function highlight(input){
         var timestampRegex = /(\d\d\d\d:\d\d:\d\d) (\d\d:\d\d:\d\d):/g;
-        var failRegex = /([^0] failed|failed|fail|error|err|status: 1)/g;
-        var succRegex = /(0 failed|status: 0)/g;
+        var failRegex = /([1-9] failed|failed|fail|error|err|status: 1)/g;
+        var succRegex = /(0 failed|status: 0|success)/g;
         var bashColors = [
         [/\[(0;)?30m(.*?)\[(0)?m/g, '<span class="black">$2</span>'],
         [/\[(0;)?31m(.*?)\[(0)?m/g, '<span class="red">$2</span>'],
@@ -511,7 +525,13 @@ export default class Task extends Component {
             {this.getPromptFieldsHtml()}
 
             <button className='icon run' onClick={this.onRun.bind(this, undefined)}>
-              <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
+              {
+                Object.keys(this.state.promptHolder).length &&
+                 <div className='svg' dangerouslySetInnerHTML={{__html:"<svg width='24' height='24' xmlns='http://www.w3.org/2000/svg'>   <g>   <title>background</title>   <rect fill='none' id='canvas_background' height='402' width='582' y='-1' x='-1'/>  </g>  <g>   <title>Layer 1</title>   <path id='svg_1' d='m8.031905,5.13684l0,13.99996l11.00001,-7l-11.00001,-6.99996z' stroke-linejoin='round' stroke-width='0.2'/>   <ellipse stroke='null' ry='2.080978' rx='2.080978' id='svg_2' cy='17.590776' cx='16.861037' stroke-width='0.2'/>  </g> </svg>"}}/>
+                 || <div className='svg' dangerouslySetInnerHTML={{__html:"<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' baseProfile='full' width='24' height='24' viewBox='0 0 24.00 24.00' enable-background='new 0 0 24.00 24.00' xml:space='preserve'><path stroke-width='0.2' stroke-linejoin='round' d='M 7.99939,5.13684L 7.99939,19.1368L 18.9994,12.1368L 7.99939,5.13684 Z '/></svg>"}}/>
+              }
+
+
             </button>
 
             <h2>{this.state.task.definition.name ? this.state.task.definition.name : this.state.task.slug}</h2>

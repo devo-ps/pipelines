@@ -19,7 +19,7 @@ It runs on port 8888.
 ```
 cd app
 npm install
-NODE_ENV=test npm start
+NODE_ENV=test API_HOST=http://127.0.0.1:8888 npm start
 ```
 
 - Open browser on: http://localhost:3001/

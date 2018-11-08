@@ -7,7 +7,8 @@ var env = {
   production: NODE_ENV === 'production',
   staging: NODE_ENV === 'staging',
   test: NODE_ENV === 'test',
-  development: NODE_ENV === 'development' || typeof NODE_ENV === 'undefined'
+  development: NODE_ENV === 'development' || typeof NODE_ENV === 'undefined',
+  api_host:  JSON.stringify(process.env.API_HOST || '')
 };
 
 Object.assign(env, {
@@ -21,25 +22,25 @@ module.exports = {
   target: 'web',
 
   entry: [
-    'babel-polyfill',
-    './client/main.jsx'
+    'idempotent-babel-polyfill',
+    './client/main.js'
   ],
 
   output: {
-    path: path.join(process.cwd(), '/client'),
-    pathInfo: true,
-    publicPath: 'http://localhost:3000/client/',
-    filename: 'main.js'
+    path: process.cwd(),
+//    pathInfo: true,
+    publicPath: '/client',
+    filename: 'bundle.js'
   },
 
   resolve: {
-    root: path.join(__dirname, ''),
-    modulesDirectories: [
-      'web_modules',
-      'node_modules',
-      'client'
+    modules: [
+      path.join(__dirname, ""),
+      "web_modules",
+      "node_modules",
+      "client"
     ],
-    extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx', '.scss', '.css'],
+    extensions: ['.webpack.js', '.web.js', '.js', '.jsx', '.scss', '.css'],
     alias:  {
       styles: 'client/styles',
     }
@@ -49,17 +50,57 @@ module.exports = {
     new webpack.DefinePlugin({
       __DEV__: env.development,
       __STAGING__: env.staging,
+      __API_HOST__: env.api_host,
       __PRODUCTION__: env.production,
       __CURRENT_ENV__: '\'' + (NODE_ENV) + '\''
     })
   ],
-
   module: {
-    loaders: [
-      {test: /\.scss$/, loader: 'style!css!autoprefixer?browsers=last 2 version!sass?outputStyle=expanded?includePaths[]=' + bourbonPaths},
-      {test: /\.css$/, loader: 'style-loader!css-loader'}
+    rules: [
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: "style-loader"
+          }, {
+            loader: "css-loader"
+          }, {
+            loader: "sass-loader",
+            options: {
+              includePaths: bourbonPaths
+            }
+          }
+        ]
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.json$/,
+        use: 'json-loader'
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: 'babel-loader',
+        exclude: /node_modules/
+      }
     ],
-
     noParse: /\.min\.js/
   }
 };
+
+//config.module.rules.push(
+//  {
+//    test: /\.jsx?$/,
+//    use: [
+//      {
+//        loaders: [ 'babel'],
+//        options: {
+//          exclude: /node_modules/
+//        }
+//      }
+//    ]
+//  }
+//);
+

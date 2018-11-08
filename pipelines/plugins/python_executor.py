@@ -64,15 +64,16 @@ class PythonExecutor(BashExecutor):
         if self.dry_run:
             return TaskResult(EXECUTION_SUCCESSFUL)
 
+        return_obj=None
         try:
-            stdout = self._run_bash(bash_input)
+            stdout, return_obj = self._run_bash(bash_input)
             status = EXECUTION_SUCCESSFUL
         except BashExecuteError as e:
             status = EXECUTION_FAILED
-            stdout = e.stderr
+            stdout = e.data.get('stdout')
         print 'Finished, stdout: %s' % (stdout)
 
-        return TaskResult(status, 'Execution finished')
+        return TaskResult(status, 'Execution finished', data={'output': stdout}, return_obj=return_obj)
 
 
 

@@ -5,11 +5,12 @@ import sys
 
 import yaml
 
+from jinja2 import TemplateError
 from dotmap import DotMap
 
-from pipelines.pipeline.task import TaskResult, EXECUTION_FAILED
+from pipelines.pipeline.task import TaskResult, EXECUTION_FAILED, EXECUTION_SUCCESSFUL
 from pipelines.plugins import builtin_plugins
-from pipelines.pipeline.exceptions import PipelineError, MissingVariableError
+from pipelines.pipeline.exceptions import PipelineError
 from pipelines.pipeline.task import Task
 from pipelines.pipeline.var_processing import substitute_variables
 from pipelines.plugin.exceptions import PluginError
@@ -43,6 +44,7 @@ PIPELINES_SCHEMA = Schema({
     Optional('vars'): {
         Optional(basestring): Or(
             Optional(basestring),
+            Optional(bool),
             Optional(dict)
         )
     },
@@ -53,9 +55,10 @@ PIPELINES_SCHEMA = Schema({
             {
                 'type': basestring,
                 Optional('cmd'): basestring,
+                Optional('ignore_errors'): bool,
                 Optional('always_run'): bool,
                 Optional('message'): basestring,
-                Optional(basestring): basestring  # Allow custom keys for actions
+                Optional(basestring): object  # Allow custom keys for actions
             }
         )
     ],
@@ -64,17 +67,19 @@ PIPELINES_SCHEMA = Schema({
     ],
     Optional('prompt'): {
         Optional(basestring): Or(
-            Optional(basestring),
+            None,
+            Optional(basestring, bool),
             {
-                'type': Or('text', 'select'),
-                Optional('default'): basestring,
+                'type': Or('text', 'select', 'checkbox'),
+                Optional('default'): Or(basestring, bool),
                 Optional('options'): [basestring],
             }
         )
     },
     Optional('triggers'): [{
-        'type': Or('webhook', 'cron'),
-        Optional('schedule'): basestring
+        'type': Or('webhook', 'cron', 'slackbot'),
+        Optional('schedule'): basestring,
+        Optional(basestring): Optional(Or(object, basestring, list))
     }]
 })
 
@@ -174,11 +179,15 @@ class Pipeline(object):
                 result_obj = None
                 try:
                     task.args = substitute_variables(pipeline_context, task.args)
-                except MissingVariableError as e:
+                except TemplateError as e:
                     result_obj = TaskResult(EXECUTION_FAILED, e.message)
 
                 if not result_obj:
                     result_obj = self._run_task(task)
+                    if task.ignore_errors and result_obj.status == EXECUTION_FAILED:
+                        log.debug('Task has ignore_errors set, overriding to successful')
+                        # Override to be successful
+                        result_obj['status'] = EXECUTION_SUCCESSFUL
 
                 pipeline_context.results.append(result_obj)
                 pipeline_context['prev_result'] = result_obj
@@ -189,6 +198,7 @@ class Pipeline(object):
                 log.debug('Skipping task: {}'.format(task.name))
         log.debug('Pipeline finished. Status: {}'.format(pipeline_context['status']))
         self.plugin_mgr.trigger('on_pipeline_finish', pipeline_context)
+        return pipeline_context
 
     def _should_run(self, task, pipeline_context):
 
@@ -218,7 +228,11 @@ class Pipeline(object):
 
         try:
             results = self.plugin_mgr.trigger(event_name, task.args)  # Run the task
-        except KeyboardInterrupt as e:
+        except PluginError as e:
+            log.warning('Unexpected plugin error running task: %s' % e)
+            raise
+        except (KeyboardInterrupt, SystemExit) as e:
+            log.warning('Unexpected system error running task: %s' % e)
             raise
         except Exception as e:
             log.warning('Unexpected error running task: %s' % e)

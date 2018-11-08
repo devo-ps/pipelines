@@ -1,7 +1,7 @@
 import superagent from 'superagent'
 
 //const API_URL = '/api/pipelines' // for DIST mode
-const API_URL = 'http://localhost:8888/api/pipelines'
+const API_URL = `${__API_HOST__}/api/pipelines`
 
 function request(method, url, body) {
   return superagent(method, `${API_URL}${url}`)
@@ -18,12 +18,13 @@ export function getAllPipelines() {
   })
   .then(bodyParser)
   .then(function(pipelines){
-    return pipelines.map(function(item){
+    pipelines.tasks.map(function(item){
       if (!item.runs){
         item.runs = [];
       }
       return item
     })
+    return pipelines
   })
 }
 
