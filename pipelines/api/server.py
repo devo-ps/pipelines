@@ -2,9 +2,6 @@ import os
 import re
 import json
 from copy import copy
-
-from operator import itemgetter
-
 import yaml
 import logging
 import tornado
@@ -454,14 +451,15 @@ def _hide_pw(conf_dict):
 def main(config):
     conf_logging()
     app = make_app(
-            cookie_secret=config.get('cookie_secret'), 
-            workspace=config.get('workspace', 'fixtures/workspace'), 
-            title=config.get('title'), 
-            auth=config.get('auth')
-        )
+        cookie_secret=config.get('cookie_secret'), 
+        workspace=config.get('workspace', 'fixtures/workspace'), 
+        title=config.get('title'), 
+        auth=config.get('auth')
+    )
     app.listen(
         int(config.get('port', 8888)),
         address=config.get('host', '127.0.0.1'),
+        xheaders=True
     )
 
     log.info('Starting server: {}'.format(_hide_pw(config)))

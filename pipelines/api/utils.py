@@ -10,6 +10,7 @@ import os.path
 import json
 import logging
 from uuid import uuid4
+import base64
 
 from tornado.web import HTTPError
 import os.path
@@ -145,4 +146,18 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None
         handler.write(json.dumps({'task_id': task_id}, indent=2))
         handler.finish()
 
-    yield runner.run({'username': handler.get_current_user(), 'ip': handler.request.remote_ip})
+    user_context = {
+        'username': handler.get_current_user(),
+        'ip': handler.request.remote_ip
+    }
+    if 'authorization' in handler.request.headers:
+        user_context['username'] = _parse_basicauth_user(handler.request.headers['authorization'])
+    
+    yield runner.run(user_context)
+
+def _parse_basicauth_user(basicauth_http_header):
+    try:
+        return base64.decodestring (basicauth_http_header.split(' ')[1]).split(':')[0]
+    except Exception as e:
+        log.warn('Could not parse nginx auth header: {}'.format(basicauth_http_header))
+        return '(problem parsing user)'
