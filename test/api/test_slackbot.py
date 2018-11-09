@@ -9,7 +9,7 @@ WORKSPACE = os.path.realpath('test/fixtures/workspace')
 
 class TestSlackbotAPI(AsyncHTTPTestCase):
     def get_app(self):
-        return server.make_app(WORKSPACE)
+        return server.make_app('1234', WORKSPACE)
 
     def test_slackbot_success(self):
         '''
