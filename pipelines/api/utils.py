@@ -148,7 +148,7 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None
 
     username = handler.get_current_user()
     if isinstance(username, dict):
-        username.get('username', 'unknown')
+        username = username.get('username', 'unknown')
 
     user_context = {
         'username': username,
