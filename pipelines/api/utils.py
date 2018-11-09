@@ -146,8 +146,12 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None
         handler.write(json.dumps({'task_id': task_id}, indent=2))
         handler.finish()
 
+    username = handler.get_current_user()
+    if isinstance(username, dict):
+        username = username.get('username', 'unknown')
+
     user_context = {
-        'username': handler.get_current_user(),
+        'username': username,
         'ip': handler.request.remote_ip
     }
     if 'authorization' in handler.request.headers:

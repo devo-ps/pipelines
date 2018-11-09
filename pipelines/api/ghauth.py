@@ -188,6 +188,7 @@ class GithubOAuth2LoginHandler(RequestHandler,
             for org, team in allowed_teams:
                 if filter(lambda x: x['slug'].lower() == team.lower() and x.get('organization',{}).get('login', '').lower() == org.lower(), teams):
                     log.debug('Allowed access to github user for team %s/%s' % (org, team))
+                    user['username'] = user.get('login', 'unknown')
                     cookie = json.dumps(user, separators=(',',   ':'))
                     self.set_secure_cookie('user', cookie)
                     break
