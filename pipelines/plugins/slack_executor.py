@@ -32,6 +32,7 @@ class SlackExecutor(BaseExecutorPlugin):
 
         payload = {
             'username': 'Pipelines',
+            'link_names': 1,
             'text': message
         }
 
