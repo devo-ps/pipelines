@@ -136,6 +136,7 @@ To get your OAUTH Key and Secret:
 - Copy the `Client ID` and `Client Secret` from that page.
 
 To start the pipelines server with Github OAuth enabled.
+
 .. code-block:: bash
   
     GH_OAUTH_KEY=my_oauth_app_key \
