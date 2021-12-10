@@ -3,7 +3,7 @@
 import os
 import functools
 import json
-from urllib import urlencode
+from urllib.parse import urlencode
 import logging
 import tornado
 import requests
