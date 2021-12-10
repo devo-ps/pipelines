@@ -189,7 +189,7 @@ class LoginHandler(PipelinesRequestHandler):
                 self.get_argument('password')
         ):
             self.set_secure_cookie("user", tornado.escape.json_encode(self.get_argument("username")))
-            print 'set secure cookie'
+            print('set secure cookie')
             self.redirect("/index.html")
         else:
             self.render(

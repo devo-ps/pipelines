@@ -71,7 +71,7 @@ class PythonExecutor(BashExecutor):
         except BashExecuteError as e:
             status = EXECUTION_FAILED
             stdout = e.data.get('stdout')
-        print 'Finished, stdout: %s' % (stdout)
+        print('Finished, stdout: %s' % (stdout))
 
         return TaskResult(status, 'Execution finished', data={'output': stdout}, return_obj=return_obj)
 
@@ -84,5 +84,5 @@ if __name__ == '__main__':
     # b = BashExecutor()
     # r = b.execute({'cmd': 'echo "test" && echo "test2"'})
     #
-    # print r.status
-    # print r.message
+    # print(r.status)
+    # print(r.message)

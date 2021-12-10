@@ -28,7 +28,7 @@ class TestAPIs(AsyncHTTPTestCase):
         except:
             # TODO - better way to raise the error
             self.assertTrue(False)
-        print 'gg'
+        print('gg')
         for pipeline_item in content['tasks']:
             if '_error' in pipeline_item:
                 self.assertTrue(pipeline_item['_filepath'])
@@ -83,7 +83,7 @@ class TestAPIs(AsyncHTTPTestCase):
             self.assertTrue(False)
 
         # Expect status in the parsed response
-        print content
+        print(content)
         self.assertTrue(content['status'])
 
     def test_get_log(self):
@@ -110,7 +110,7 @@ class TestAPIs(AsyncHTTPTestCase):
 
         # Run the pipeline, and extract the task id
 
-        print url_run % pipeline_id
+        print(url_run % pipeline_id)
         resp_run = self.fetch(url_run % pipeline_id, method='POST', body='{"prompt": {}}')
         self.assertEquals(resp_run.code, 200)
         json_run = json.loads(resp_run.body)
@@ -131,7 +131,7 @@ class TestAPIs(AsyncHTTPTestCase):
         resp_status2 = self.fetch(url_status % (pipeline_id, task_id))
         self.assertTrue(resp_status2.code, 200)
         json_status2 = json.loads(resp_status2.body)
-        print json_status2
+        print(json_status2)
         self.assertEqual(json_status2['status'], 'success')
 
 

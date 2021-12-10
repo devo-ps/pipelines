@@ -167,7 +167,7 @@ class GithubOAuth2LoginHandler(RequestHandler,
     def get(self):
         if self.get_argument('code', False):
             def cb(*args):
-                print 'Callback: %s' % args
+                print('Callback: %s' % args)
             user = yield self.get_authenticated_user(
                 code=self.get_argument('code'),
                 callback=cb

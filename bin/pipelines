@@ -99,9 +99,9 @@ def main():
         try:
             server.main(options)
         except KeyboardInterrupt:
-            print 'Exiting'
+            print('Exiting')
     else:
-        print __doc__.strip('\n')
+        print(__doc__.strip('\n'))
         sys.exit(0)
 
 
