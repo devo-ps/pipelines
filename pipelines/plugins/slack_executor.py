@@ -56,7 +56,7 @@ class SlackExecutor(BaseExecutorPlugin):
         if 'slack_webhook' not in conf_dict:
             log.debug('SlackExecutor is missing slack_webhook parameter')
         else:
-            if not isinstance(conf_dict['slack_webhook'], basestring):
+            if not isinstance(conf_dict['slack_webhook'], str):
                 raise PluginError('WebhookLogger has invalid slack_webhook parameter')
             log.debug('SlackExecutor got slack_webhook parameter: %s' % conf_dict['slack_webhook'])
 

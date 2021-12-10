@@ -21,7 +21,7 @@ class WebhookLogger(StdoutLogger):
             #                   'configuration parameter')
             log.debug('WebhookLogger missing webhook_url parameter. Disabling.')
         else:
-            if not isinstance(conf_dict['webhook_url'], basestring):
+            if not isinstance(conf_dict['webhook_url'], str):
                 raise PluginError('WebhookLogger has invalid webhook_url parameter')
 
         return WebhookLogger(conf_dict.get('webhook_url'))

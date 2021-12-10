@@ -37,7 +37,7 @@ class TestAPIs(AsyncHTTPTestCase):
                 self.assertIsInstance(pipeline_item['run_ids'], list)
                 self.assertIsInstance(pipeline_item['runs'], list)
                 self.assertIsInstance(pipeline_item['definition'], dict)
-                self.assertIsInstance(pipeline_item['raw'], basestring)
+                self.assertIsInstance(pipeline_item['raw'], str)
 
 
     def test_run_pipeline_404(self):

@@ -32,7 +32,7 @@ def substitute_variables(pipeline_context, obj):
 
 def _loop_strings(func, obj):
     new_obj = obj
-    if isinstance(obj, basestring):
+    if isinstance(obj, str):
         new_obj = func(obj)
     elif isinstance(obj, dict):
         new_obj = dict([(_loop_strings(func, k), _loop_strings(func, v)) for k,v in obj.items()])
