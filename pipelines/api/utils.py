@@ -154,6 +154,7 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None
         'username': username,
         'ip': handler.request.remote_ip
     }
+    log.debug('user context: %j' % user_context)
     if 'authorization' in handler.request.headers:
         user_context['username'] = _parse_basicauth_user(handler.request.headers['authorization'])
     
