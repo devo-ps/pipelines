@@ -41,7 +41,8 @@ log = logging.getLogger('pipelines')
 class PipelinesRequestHandler(RequestHandler):
     def get_current_user(self):
         log.debug('Get current user')
-        log.debug(self.settings)
+        # TODO remove the secret or password in settings before print it out
+        #log.debug(self.settings)
         if not self.settings.get('auth'):
             log.debug('noauth')
             # No authentication required
