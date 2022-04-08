@@ -42,44 +42,44 @@ DEFAULTS = {
 
 PIPELINES_SCHEMA = Schema({
     Optional('vars'): {
-        Optional(basestring): Or(
-            Optional(basestring),
+        Optional(str): Or(
+            Optional(str),
             Optional(bool),
             Optional(dict)
         )
     },
-    Optional('name'): basestring,
+    Optional('name'): str,
     'actions': [
         Or(
-            basestring,
+            str,
             {
-                'type': basestring,
-                Optional('cmd'): basestring,
+                'type': str,
+                Optional('cmd'): str,
                 Optional('ignore_errors'): bool,
                 Optional('always_run'): bool,
-                Optional('message'): basestring,
-                Optional(basestring): object  # Allow custom keys for actions
+                Optional('message'): str,
+                Optional(str): object  # Allow custom keys for actions
             }
         )
     ],
     Optional('plugins'): [
-        Optional(basestring)
+        Optional(str)
     ],
     Optional('prompt'): {
-        Optional(basestring): Or(
+        Optional(str): Or(
             None,
-            Optional(basestring, bool),
+            Optional(str, bool),
             {
                 'type': Or('text', 'select', 'checkbox'),
-                Optional('default'): Or(basestring, bool),
-                Optional('options'): [basestring],
+                Optional('default'): Or(str, bool),
+                Optional('options'): [str],
             }
         )
     },
     Optional('triggers'): [{
         'type': Or('webhook', 'cron', 'slackbot'),
-        Optional('schedule'): basestring,
-        Optional(basestring): Optional(Or(object, basestring, list))
+        Optional('schedule'): str,
+        Optional(str): Optional(Or(object, str, list))
     }]
 })
 
@@ -108,7 +108,7 @@ class Pipeline(object):
 
     @staticmethod
     def from_yaml(file_path, params={}):
-        if not isinstance(file_path, basestring):
+        if not isinstance(file_path, str):
             raise PipelineError('Unexpected argument type %s expecting string' % type(file_path))
 
         if not os.path.exists(file_path):
@@ -250,7 +250,7 @@ class Pipeline(object):
         return result
 
     def _load_plugin(self, plugin_str):
-        if not isinstance(plugin_str, basestring):
+        if not isinstance(plugin_str, str):
             raise PluginError('Plugins must be a string, got {}'.format(plugin_str))
 
         plugin_class = self._resolve_plugin_class(plugin_str)

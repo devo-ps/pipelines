@@ -11,10 +11,10 @@ conf_logging()
 class TestPythonExecutor(TestCase):
 
     def test_basic_script(self):
-        print 'Running test_basic_script'
+        print('Running test_basic_script')
         executor = PythonExecutor()
         args = {
-            'script': 'print "test"'
+            'script': 'print("test")'
         }
         res = executor.execute(args)
         self.assertIsInstance(res, TaskResult)
@@ -24,7 +24,7 @@ class TestPythonExecutor(TestCase):
 
 
     def test_basic_file(self):
-        print 'Running test_basic_script'
+        print('Running test_basic_script')
         executor = PythonExecutor()
         args = {
             'file': 'test/files/test_python_file.py'
@@ -37,7 +37,7 @@ class TestPythonExecutor(TestCase):
 
 
     def test_workdir(self):
-        print 'Running test_workdir'
+        print('Running test_workdir')
         executor = PythonExecutor()
         args = {
             'workdir': 'test/files',
@@ -51,7 +51,7 @@ class TestPythonExecutor(TestCase):
 
 
     def test_workdir_abspath(self):
-        print 'Running test_workdir'
+        print('Running test_workdir')
         executor = PythonExecutor()
         args = {
             'workdir': os.path.abspath('test/files'),
@@ -65,13 +65,13 @@ class TestPythonExecutor(TestCase):
 
 
 #     def test_workdir_virtualenv(self):
-#         print 'Running test_workdir'
+#         print('Running test_workdir')
 #         executor = PythonExecutor()
 #         args = {
 #             'virtualenv': 'test/files/test_venv',
 #             'script': '''
 # import dopy
-# print dopy.__license__
+# print(dopy.__license__)
 #             '''
 #
 #         }
@@ -81,13 +81,13 @@ class TestPythonExecutor(TestCase):
 #         self.assertEqual(res.status, EXECUTION_SUCCESSFUL)
 #
 #     def test_workdir_virtualenv_abs(self):
-#         print 'Running test_workdir'
+#         print('Running test_workdir')
 #         executor = PythonExecutor()
 #         args = {
 #             'virtualenv': os.path.abspath('test/files/test_venv'),
 #             'script': '''
 # import dopy
-# print dopy.__license__
+# print(dopy.__license__)
 #             '''
 #
 #         }
@@ -97,7 +97,7 @@ class TestPythonExecutor(TestCase):
 #         self.assertEqual(res.message.strip(), 'MIT')
 
     # def test_workdir_virtualenv_file(self):
-    #     print 'Running test_workdir'
+    #     print('Running test_workdir')
     #     executor = PythonExecutor()
     #     args = {
     #         'virtualenv': os.path.abspath('test/files/test_venv'),

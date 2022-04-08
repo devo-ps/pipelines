@@ -156,8 +156,8 @@ class StdoutLogger(BasePlugin):
 
 
     def _generate_report(self, msg_format):
-        fail_count = len(filter(lambda task: not task['result'].is_successful(),
-                                self.stats['tasks']))
+        fail_count = len(list(filter(lambda task: not task['result'].is_successful(),
+                                self.stats['tasks'])))
 
         return 'Pipeline finished. Duration: {duration}, {fail_count} failed tasks'.format(
             duration=self._duration_str(self.stats['duration']),
