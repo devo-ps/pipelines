@@ -66,5 +66,5 @@ if __name__ == '__main__':
     m = PluginManager()
     m.register_plugin(DummyExecutor)
     m.register_plugin(StdoutLogger)
-    print m.get_plugin_count()
-    print m.get_plugin_count('on_task_start')
+    print(m.get_plugin_count())
+    print(m.get_plugin_count('on_task_start'))

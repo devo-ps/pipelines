@@ -81,7 +81,7 @@ class TestPipelines(TestCase):
                 'script': '''
 import json
 a = {'testpy': 'tdd', 'array': [1,2,3]}
-print json.dumps(a)
+print(json.dumps(a))
 '''
             },
             'echo "{{ prev_result.return_obj.testpy }}"'

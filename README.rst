@@ -136,6 +136,7 @@ To get your OAUTH Key and Secret:
 - Copy the `Client ID` and `Client Secret` from that page.
 
 To start the pipelines server with Github OAuth enabled.
+
 .. code-block:: bash
   
     GH_OAUTH_KEY=my_oauth_app_key \
@@ -262,7 +263,7 @@ The ``python`` plugin allows to run python scripts or inline python code.
         script: |
           import json
           a = {'test': 'value', 'array': [1,2,3]}
-          print json.dumps(a, indent=2)
+          print(json.dumps(a, indent=2))
       - type: python
         virtualenv:  /opt/venvs/my_env
         file: '/tmp/some_script.py'

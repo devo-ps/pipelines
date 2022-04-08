@@ -21,7 +21,7 @@ class TestAPIs(AsyncHTTPTestCase):
 
     def _get_pipelines(self):
         for path in _file_iterator(WORKSPACE, extensions=PIPELINES_EXT):
-            print 'yielding: {}'.format(os.path.join(WORKSPACE, path))
+            print('yielding: {}'.format(os.path.join(WORKSPACE, path)))
             yield os.path.join(WORKSPACE, path)
 
     def test_load_sample_pipelines(self):
@@ -29,7 +29,7 @@ class TestAPIs(AsyncHTTPTestCase):
             try:
                 res = Pipeline.from_yaml(pipeline_path, {})
             except (SchemaError, PipelineError) as e:
-                print e
+                print(e)
                 self.assertTrue(False, 'Pipeline failed to validate: {}'.format(pipeline_path))
 
         # TODO: Add more validation

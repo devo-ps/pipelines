@@ -23,7 +23,7 @@ class FileLogger(StdoutLogger):
             raise PluginError('File logger is missing status_file'
                               'configuration parameter')
 
-        if not isinstance(conf_dict['status_file'], basestring):
+        if not isinstance(conf_dict['status_file'], str):
             raise PluginError('File logger has invalid status_file parameter')
 
         return StatusLogger(conf_dict['status_file'])

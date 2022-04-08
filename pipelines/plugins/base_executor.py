@@ -13,4 +13,4 @@ class BaseExecutorPlugin(BasePlugin):
         return result
 
     def execute(self, command):
-        print 'Running executor with command: %s' % command
+        print('Running executor with command: %s' % command)

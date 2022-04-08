@@ -118,7 +118,7 @@ def walk_pipelines(workspace):
 
 
 def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None):
-    log.debug('Running pipeline %s with params %s' % (pipeline_slug, json.dumps(params)))
+    log.debug('Running pipeline %s with params %s' % (pipeline_slug, params))
     # Guess the pipeline extension
     pipeline_filepath = _get_pipeline_filepath(workspace, pipeline_slug)
     if not pipeline_filepath:
@@ -146,10 +146,15 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None
         handler.write(json.dumps({'task_id': task_id}, indent=2))
         handler.finish()
 
+    username = handler.get_current_user()
+    if isinstance(username, dict):
+        username = username.get('username', 'unknown')
+
     user_context = {
-        'username': handler.get_current_user(),
+        'username': username,
         'ip': handler.request.remote_ip
     }
+    log.debug('user context: %s' % user_context)
     if 'authorization' in handler.request.headers:
         user_context['username'] = _parse_basicauth_user(handler.request.headers['authorization'])
     

@@ -15,10 +15,11 @@ export default class Index extends Component {
 
   componentWillMount () {
     getAllPipelines()
-    .then((data) => {
-      this.setState({pipelines: data.tasks, title: data.title, loaded: true})
-    })
-
+      .then((data) => {
+        if (data) {
+          this.setState({pipelines: data.tasks, title: data.title, loaded: true})
+        }
+      })
   }
 
   render() {
@@ -30,7 +31,6 @@ export default class Index extends Component {
             <nav className='links'>
               <a hred='http://github.com/Wiredcraft/pipelines/wiki' target='_blank'>Help</a>
             </nav>
-
             <h1>Pipelines</h1>
           </div>
         </header>
@@ -44,28 +44,26 @@ export default class Index extends Component {
               <input type='text' placeholder='Filter by name' className='search'/>
             </header>
             <section className='body'>
-            {
-              this.state.pipelines && this.state.pipelines.length ?
-              this.state.pipelines.map((item, index) => {
-                if (item._error){
+              {
+                this.state.pipelines && this.state.pipelines.length ? this.state.pipelines.map((item, index) => {
+                  if (item._error) {
                     return (
                       <article className='item pipeline'>
-                      <div className='notification warning'>
-                        Error loading pipeline { item._filepath } : { item._error }
-                      </div>
+                        <div className='notification warning'>
+                          Error loading pipeline { item._filepath } : { item._error }
+                        </div>
                       </article>
-                      )
-                }
-                else {
-                    return <Task key={index} task={item}/>;
-                }
-
-              })
-              :
-                (<div className='notification info'>No pipelines yet. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>See how to add a pipeline</a></div>)
-            }
+                    )
+                  }
+                  return <Task key={index} task={item}/>;
+                }) : (
+                  <div className='notification info'>No pipelines yet. <a href='https://github.com/Wiredcraft/pipelines/wiki' target='_blank'>See how to add a pipeline</a></div>
+                )
+              }
             </section>
-            <small className="credit">Powered by <a href="http://github.com/Wiredcraft/pipelines/wiki" target="_blank">Pipelines</a></small>
+            <small className="credit">
+              Powered by <a href="http://github.com/Wiredcraft/pipelines/wiki" target='_blank'>Pipelines</a>
+            </small>
           </div>
         </div>
       </section>

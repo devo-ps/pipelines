@@ -22,5 +22,5 @@ class DummyExecutor(BaseExecutorPlugin):
         if self.dry_run:
             return TaskResult(EXECUTION_SUCCESSFUL, 'Dry run')
 
-        print 'Running executor with command: %s' % cmd
+        print('Running executor with command: %s' % cmd)
         return TaskResult(EXECUTION_SUCCESSFUL, 'Dummy execute completed')

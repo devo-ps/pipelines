@@ -3,7 +3,7 @@
 import os
 import functools
 import json
-from urllib import urlencode
+from urllib.parse import urlencode
 import logging
 import tornado
 import requests
@@ -64,23 +64,23 @@ class GithubOAuth2Mixin(object):
         """
         http = self.get_auth_http_client()
         body = urlencode({
-            "code": code,
             "client_id": self.gh_settings[self._OAUTH_SETTINGS_KEY]["key"],
             "client_secret": self.gh_settings[self._OAUTH_SETTINGS_KEY]["secret"],
+            "code": code
         })
 
         http.fetch(self._OAUTH_ACCESS_TOKEN_URL,
                    functools.partial(self._on_access_token, callback),
                    method="POST",
                    headers={"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"},
-                   body=body)
+                   body=body
+                   )
 
     def _on_access_token(self, future, response):
         """Callback function for the exchange to the access token."""
         if response.error:
             future.set_exception(AuthError("Github auth error: %s" % str(response)))
             return
-
         args = escape.json_decode(escape.native_str(response.body))
         access_token = args.get("access_token", None)
         if not access_token:
@@ -119,7 +119,6 @@ class GithubOAuth2Mixin(object):
         url = self._OAUTH_USER_BASE_URL + path
         all_args = {}
         if access_token:
-            all_args["access_token"] = access_token
             all_args.update(args)
         if all_args:
             url += "?" + urlencode(all_args)
@@ -129,9 +128,12 @@ class GithubOAuth2Mixin(object):
         if post_args is not None:
             http.fetch(url, method="POST", body=urlencode(post_args),
                        callback=callback, user_agent=ua,
-                       headers={"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"})
+                       headers={"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"},
+                       auth_mode='basic', auth_username='_', auth_password=access_token)
         else:
-            http.fetch(url, method="GET", callback=callback, user_agent=ua, headers={"Accept": "application/json"})
+            http.fetch(url, method="GET", callback=callback, user_agent=ua,
+                       headers={"Accept": "application/json"}, auth_mode='basic',
+                       auth_username='_', auth_password=access_token)
 
     @staticmethod
     def _on_github_request(future, response):
@@ -165,7 +167,7 @@ class GithubOAuth2LoginHandler(RequestHandler,
     def get(self):
         if self.get_argument('code', False):
             def cb(*args):
-                print 'Callback: %s' % args
+                print('Callback: %s' % args)
             user = yield self.get_authenticated_user(
                 code=self.get_argument('code'),
                 callback=cb
@@ -178,7 +180,7 @@ class GithubOAuth2LoginHandler(RequestHandler,
                 self.redirect('/login')
                 return
 
-            r = requests.get('https://api.github.com/user/teams?access_token=%s' % user['access_token'])
+            r = requests.get('https://api.github.com/user/teams', auth=('_', user['access_token']))
 
 
             allowed_teams = self.settings['auth'].get('teams', [])
@@ -188,6 +190,7 @@ class GithubOAuth2LoginHandler(RequestHandler,
             for org, team in allowed_teams:
                 if filter(lambda x: x['slug'].lower() == team.lower() and x.get('organization',{}).get('login', '').lower() == org.lower(), teams):
                     log.debug('Allowed access to github user for team %s/%s' % (org, team))
+                    user['username'] = user.get('login', 'unknown')
                     cookie = json.dumps(user, separators=(',',   ':'))
                     self.set_secure_cookie('user', cookie)
                     break

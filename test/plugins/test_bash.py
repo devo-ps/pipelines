@@ -17,13 +17,13 @@ class TestPythonExecutor(TestCase):
 
     # def test_basic_loading(self):
     #
-    #     print 'Running test_basic_loading'
+    #     print('Running test_basic_loading')
     #     executor = BashExecutor.from_dict({})
     #     self.assertIsInstance(executor, BashExecutor)
     #
     # # def test_basic_loading(self):
     # #     with tempfile.NamedTemporaryFile() as f:
-    # #         print 'Running test_basic_loading'
+    # #         print('Running test_basic_loading')
     # #         executor = BashExecutor.from_dict({'log_file': f.name})
     # #         self.assertIsInstance(executor, BashExecutor)
     # #         executor.execute()
@@ -34,7 +34,7 @@ class TestPythonExecutor(TestCase):
     #
     #
     # def test_timeout_script_pass(self):
-    #     print 'Running test_timeout_script_pass'
+    #     print('Running test_timeout_script_pass')
     #     executor = BashExecutor(timeout=3)
     #     args = {
     #         'cmd': 'echo "test" && sleep "2"'
@@ -44,7 +44,7 @@ class TestPythonExecutor(TestCase):
     #     self.assertEqual(res.data['output'], 'test\n')
     #
     # def test_timeout_script_fail(self):
-    #     print 'Running test_timeout_script_pass'
+    #     print('Running test_timeout_script_pass')
     #     executor = BashExecutor(timeout=2)
     #     args = {
     #         'cmd': 'echo "test" && sleep "3"'
@@ -69,7 +69,7 @@ class TestPythonExecutor(TestCase):
     #     res = pipeline.run()
     #     self.assertEqual(res['status'], PIPELINE_STATUS_OK)
     def test_basic_script(self):
-        print 'Running test_basic_script'
+        print('Running test_basic_script')
         executor = BashExecutor()
         args = {
             'cmd': 'echo "test"'
@@ -81,7 +81,7 @@ class TestPythonExecutor(TestCase):
         self.assertEqual(res.message.strip(), 'Bash task finished')
 
     def test_return_obj(self):
-        print 'Testing return object parsing'
+        print('Testing return object parsing')
         executor = BashExecutor()
         args = {
             'cmd': 'echo \'{"test": 1}\''
@@ -93,7 +93,7 @@ class TestPythonExecutor(TestCase):
         self.assertEqual(res.return_obj, {"test": 1})
 
     def test_return_obj_empty_rows(self):
-        print 'Testing return object parsing'
+        print('Testing return object parsing')
         executor = BashExecutor()
         args = {
             'cmd': 'echo \'{"otest": 1}\n\''
@@ -102,7 +102,7 @@ class TestPythonExecutor(TestCase):
         self.assertEqual(res.return_obj, {"otest": 1})
 
     def test_return_obj_nojson(self):
-        print 'Testing return object parsing'
+        print('Testing return object parsing')
         executor = BashExecutor()
         args = {
             'cmd': 'echo \'abba\n"test": 1}\n\''
@@ -111,7 +111,7 @@ class TestPythonExecutor(TestCase):
         self.assertIsNone(res.return_obj)
 
     # def test_utf_script(self):
-    #     print 'Running test_basic_script'
+    #     print('Running test_basic_script')
     #     executor = BashExecutor()
     #     args = {
     #         'cmd': u'echo "test\u4e2dtest"'
@@ -138,8 +138,8 @@ class TestPythonExecutor(TestCase):
         pipeline = Pipeline.form_dict(pipeline_def)
         res = pipeline.run()
         seconds = (datetime.now() - start).total_seconds()
-        print res
-        print seconds
+        print(res)
+        print(seconds)
         self.assertEqual(res['status'], PIPELINE_STATUS_FAIL)
         self.assertLess(seconds, 2)
         # self.assertEqual(res['results'][0]['mesasge'], 'Timed Out')

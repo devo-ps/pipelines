@@ -23,7 +23,7 @@ module.exports = {
 
   entry: [
     'idempotent-babel-polyfill',
-    './client/main.js'
+    './client/main'
   ],
 
   output: {
@@ -43,6 +43,7 @@ module.exports = {
     extensions: ['.webpack.js', '.web.js', '.js', '.jsx', '.scss', '.css'],
     alias:  {
       styles: 'client/styles',
+      helpers: 'client/helpers',
     }
   },
 
