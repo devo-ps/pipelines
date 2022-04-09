@@ -23,7 +23,7 @@
     "express": "4.13.4",
     "express-ejs-layouts": "2.0.0",
     "idempotent-babel-polyfill": "0.1.1",
-    "moment": "2.15.1",
+    "moment": "2.29.2",
     "react": "0.14.6",
     "react-document-title": "2.0.3",
     "react-dom": "0.14.6",
