@@ -12,7 +12,7 @@ Pipelines
 UI or automatically via webhooks.
 
 **Pipelines** is composed of three components:
- 
+
 - **Web UI** : User interface that allows users to run tasks, inspect logs and show the task details. It also support username/password authentication.
 - **Pipelines API** : This is the backend for the Web UI and webh
 - **Pipelines library** : This component includes core logic for running pipelies such as reading task definitions, handling logging and running the pipelines.
@@ -24,8 +24,13 @@ Installation
 
 Requirements:
 
-- **python 2.7** (other versions not tested)
+- **python 3.6** (other versions not tested)
 - **pip**
+
+
+Note for python2.7:
+
+we drop support for python2.7 as it reached EOL. for those who still want to use pipelines in some legacy environment. use tag `0.0.15` or branch `legacy-for-python2`.
 
 Base install
 ------------
@@ -42,7 +47,7 @@ Configuration
 -------------
 
 **Pipelines** runs solely on files. No database is currently required.
-All the pipelines, the logs of each run and various temporary files are stored under the ``workspace`` folder. 
+All the pipelines, the logs of each run and various temporary files are stored under the ``workspace`` folder.
 
 Workspace is a folder that needs to be specified when running ``pipelines``.
 
@@ -76,11 +81,11 @@ Create a dedicated user to run pipelines
 
     # Create a pipelines user
     useradd -m -d /var/lib/pipelines -s /bin/false pipelines
-    
+
     # Create the workspace folder (optional)
     mkdir /var/lib/pipelines/workspace
     chown -R pipelines. /var/lib/pipelines
-    
+
     # Create a SSH key pair (optional)
     sudo -u pipelines ssh-keygen
 
@@ -138,7 +143,7 @@ To get your OAUTH Key and Secret:
 To start the pipelines server with Github OAuth enabled.
 
 .. code-block:: bash
-  
+
     GH_OAUTH_KEY=my_oauth_app_key \
     GH_OAUTH_SECRET=my_super_secret \
     pipelines server [--options] --github-auth=MY_ORG/MY_TEAM[,MY_ORG/ANOTHER_TEAM]
@@ -160,17 +165,17 @@ This is a very basic pipeline definition. Save it in your workspace within a ``.
 
     ---
     # Pipeline definitions are standard yaml and you can include comments inside
-    
+
     # Variables are exposed to all actions through {{ varname }} syntax.
     vars:
         code_branch: dev
-    
-    # Triggers define the automated ways to run the task. In addition to manual execution 
+
+    # Triggers define the automated ways to run the task. In addition to manual execution
     # through the UI, only webhook is supported for now.
     triggers:
         - type: webhook
-    
-    # Actions are the steps that are run for this pipeline. The default action plugin is bash, 
+
+    # Actions are the steps that are run for this pipeline. The default action plugin is bash,
     # but you can use others by defining the "type" field.
     actions:
         - 'echo "Starting task for {{ code_branch }}"'
@@ -193,7 +198,7 @@ The ``vars`` section of the pipeline definition defines variables that will then
     actions:
         - echo {{ my_var }}
 
-You can then use the variables as seen above. 
+You can then use the variables as seen above.
 
 **Note**:
 
@@ -316,7 +321,7 @@ Triggers
 Webhooks
 ````````
 
-If you want to run your pipeline by triggering it through a webhook you can enable it in the triggers section. 
+If you want to run your pipeline by triggering it through a webhook you can enable it in the triggers section.
 
 .. code-block:: yaml
 
@@ -382,12 +387,12 @@ Dirty line by line setup
 Docker
 ======
 
-**Note**: Not heavily tested. 
+**Note**: Not heavily tested.
 
 .. code-block:: bash
 
     docker run -d boratbot/pipelines
- 
+
 
 Roadmap
 =======
@@ -399,7 +404,7 @@ Among the possible features:
 - Improved web UI & features
 - Better webhook management
 - Better management of the tasks
-- CLI 
-- Toolbar 
+- CLI
+- Toolbar
 - Improved Auth
 - etc.

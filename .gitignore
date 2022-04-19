@@ -12,6 +12,7 @@ assets.json
 .DS_Store
 
 venv
+.venv/
 
 dist/*
 !pipelines/api/app_dist/client/dist/bundle.min.js
@@ -19,3 +20,8 @@ bundle.min.js
 
 !test/fixtures/workspace/sample-deploy/
 test/fixtures/workspace/sample-deploy/*
+
+/build/
+/ws/
+
+local.mk
