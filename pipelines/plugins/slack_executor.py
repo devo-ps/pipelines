@@ -18,8 +18,13 @@ class SlackExecutor(BaseExecutorPlugin):
         self.slack_webhook = slack_webhook
 
     def execute(self, args_dict):
-        if not self.slack_webhook:
+        # try to use task level parameter first, then fallback to the top level
+        slack_webhook = args_dict.get('slack_webhook', self.slack_webhook)
+        if not slack_webhook:
             raise PluginError('SlackExecutor is missing slack_webhook parameter. Can not execute')
+
+        if not isinstance(slack_webhook, str):
+            raise PluginError('SlackExecutor has invalid slack_webhook parameter')
 
         if 'message' not in args_dict:
             raise PluginError('SlackExecutor got incorrect arguments, got: {}'.format(
@@ -37,7 +42,7 @@ class SlackExecutor(BaseExecutorPlugin):
         }
 
         for i in range(RETRY_COUNT + 1):
-            resp = requests.post(self.slack_webhook, json=payload)
+            resp = requests.post(slack_webhook, json=payload)
             if resp.ok:
                 log.debug('Successfully sent slack message')
                 break
@@ -57,7 +62,7 @@ class SlackExecutor(BaseExecutorPlugin):
             log.debug('SlackExecutor is missing slack_webhook parameter')
         else:
             if not isinstance(conf_dict['slack_webhook'], str):
-                raise PluginError('WebhookLogger has invalid slack_webhook parameter')
+                raise PluginError('SlackExecutor has invalid slack_webhook parameter')
             log.debug('SlackExecutor got slack_webhook parameter: %s' % conf_dict['slack_webhook'])
 
         return cls(slack_webhook=conf_dict.get('slack_webhook'))
