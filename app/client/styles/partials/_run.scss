@@ -18,7 +18,7 @@ $img_size: $space;
 &:not(.running) {
   .run {
     &:hover {
-      @include transform(scale(1.1));
+      transform: (scale(1.1));
       &:after {
         background: rgba($primary, 1);
         border-color: $primary;
@@ -28,7 +28,7 @@ $img_size: $space;
       }
     }
     &:active {
-      @include transform(scale(1));
+      transform: (scale(1));
       &:after {
         background: rgba($primary, 0);
         border-color: $primary;
@@ -44,15 +44,15 @@ $img_size: $space;
   height: $loading_size + 2*$loading_thickness;
   position: relative;
   width: $loading_size + 2*$loading_thickness;
-  @include transition-property(transform);
-  @include transition-duration($ease);
+  transition-property: (transform);
+  transition-duration: ($ease);
   svg {
     fill: $grey;
     @include font-size($micro);
     position: absolute;
     text-transform: uppercase;
-    @include transition-property(fill);
-    @include transition-duration($ease);
+    transition-property: (fill);
+    transition-duration: ($ease);
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
