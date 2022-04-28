@@ -23,7 +23,7 @@
       bottom: 100%;
       left: 50%;
       margin-bottom: $arrow;
-      @include transform(translateX(-50%));
+      transform: (translateX(-50%));
       &:after {
         @include arrow(bottom, $color);
       }
@@ -34,7 +34,7 @@
       left: 50%;
       margin-top: $arrow;
       top: 100%;
-      @include transform(translateX(-50%));
+      transform: (translateX(-50%));
       &:after {
         @include arrow(top, $color);
       }
@@ -45,7 +45,7 @@
       margin-right: $arrow;
       right: 100%;
       top: 50%;
-      @include transform(translateY(-50%));
+      transform: (translateY(-50%));
       &:after {
         @include arrow(right, $color);
       }
@@ -56,7 +56,7 @@
       left: 100%;
       margin-left: $arrow;
       top: 50%;
-      @include transform(translateY(-50%));
+      transform: (translateY(-50%));
       &:after {
         @include arrow(left, $color);
       }

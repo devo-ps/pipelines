@@ -27,8 +27,8 @@
     opacity: 0.5;
     padding: 0;
     text-decoration: none;
-    @include transition-property(opacity);
-    @include transition-duration($ease);
+    transition-property: (opacity);
+    transition-duration: ($ease);
     &:hover {
       opacity: 1;
     }

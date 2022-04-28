@@ -8,7 +8,7 @@
     border-right: $size solid transparent;
     left: 50%;
     top: -$size;
-    @include transform(translateX(-50%));
+    transform: (translateX(-50%));
   }
   @else if $position == right {
     border-top: $size solid transparent;
@@ -17,7 +17,7 @@
     border-bottom: $size solid transparent;
     right: -$size;
     top: 50%;
-    @include transform(translateY(-50%));
+    transform: (translateY(-50%));
   }
   @else if $position == bottom {
     border-right: $size solid transparent;
@@ -26,7 +26,7 @@
     border-left: $size solid transparent;
     bottom: -$size;
     left: 50%;
-    @include transform(translateX(-50%));
+    transform: (translateX(-50%));
   }
   @else {
     border-bottom: $size solid transparent;
@@ -35,6 +35,6 @@
     border-top: $size solid transparent;
     left: -$size;
     top: 50%;
-    @include transform(translateY(-50%));
+    transform: (translateY(-50%));
   }
 }

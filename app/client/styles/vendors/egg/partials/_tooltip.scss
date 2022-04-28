@@ -12,8 +12,8 @@
   .tooltip-top {
     > span {
       opacity: 0;
-      @include transition-property(opacity);
-      @include transition-duration($ease);
+      transition-property: (opacity);
+      transition-duration: ($ease);
     }
     &:hover > span,
     > span:hover {

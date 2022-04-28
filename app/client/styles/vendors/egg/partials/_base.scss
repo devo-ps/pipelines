@@ -151,8 +151,8 @@
     tbody {
       tr {
         border-top: 1px solid $line;
-        @include transition-property(border);
-        @include transition-duration($ease);
+        transition-property: (border);
+        transition-duration: ($ease);
       }
     }
   }
