@@ -1,0 +1,54 @@
+## 2022-04-27
+### other
+npx yarn remove classnames
+npx yarn remove react-hot-loader
+npx yarn remove cross-env
+npx yarn remove idempotent-babel-polyfill
+npx yarn remove "react-syntax-highlight"
+npx yarn remove 'react-document-title'
+npx yarn remove coveralls
+npx yarn remove react-addons-test-utils
+
+npx yarn add --dev "cross-env@^7.0.3"
+npx yarn add "react-helmet@^6.1.0"
+npx yarn add "prop-types@^15.8.1"
+npx yarn add "superagent@^7.1.3"
+npx yarn add "ejs@^3.1.7"
+npx yarn add "node-sass@^7.0.1"
+npx yarn add "react@^18.1.0" "react-dom@^18.1.0"
+npx yarn add "babel-preset-es2015@^6.24.1"
+npx yarn add "babel-preset-react@^6.24.1"
+npx yarn add "babel-preset-stage-0@^6.24.1"
+npx yarn add "compression@^1.7.4"
+npx yarn add "express@^4.18.0"
+npx yarn add "express-ejs-layouts@^2.5.1"
+npx yarn add "moment@^2.29.3"
+
+npx yarn add --dev "css-loader@^0.28.11" "style-loader@^0.23.1"
+
+npx yarn add --dev "sass-loader@^6.0.7"
+
+### webpack v3
+npx yarn add --dev "webpack-dev-server@^2.11.5"
+npx yarn add --dev "webpack@^3.0.0"
+
+npx yarn add --dev "sass-loader@^7.3.1"
+
+### webpack v4
+npx yarn add --dev "webpack@^4.46.0"
+npx yarn add --dev "webpack-dev-server@^3.11.3"
+npx yarn add --dev "assets-webpack-plugin@^5.1.2"
+npx yarn add --dev "css-loader@^5.2.7"
+npx yarn add --dev "style-loader@^2.0.0"
+npx yarn add --dev "sass-loader@^10.1.1"
+
+=> node-sass 4.0 || 5.0
+
+### webpack v5
+npx yarn add --dev "webpack@^5.72.0"
+npx yarn add --dev "webpack-dev-server@^4.8.1"
+npx yarn add --dev "assets-webpack-plugin@^7.1.1"
+npx yarn add --dev "css-loader@^6.7.1"
+npx yarn add --dev "style-loader@^3.3.1"
+npx yarn add --dev "sass-loader@^12.6.0"
+npx yarn add --dev "node-sass@^7.0.1"
