@@ -14,7 +14,7 @@
     <% if (env.production) { %>
       <script async src="<%= env.assets.main2.js %>">1</script>
     <% } else { %>
-      <script src="<%= env.devServerURL %>/client/bundle.js">2</script>
+      <script src="/client/bundle.js">2</script>
     <% } %>
   </body>
 </html>

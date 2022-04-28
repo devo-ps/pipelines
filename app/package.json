@@ -7,7 +7,7 @@
     "node": ">=14"
   },
   "scripts": {
-    "start": "node index",
+    "start": "node dev-server.js",
     "dist": "cross-env NODE_ENV=production webpack --progress"
   },
   "keywords": [],
