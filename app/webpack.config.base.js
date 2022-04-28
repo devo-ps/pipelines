@@ -16,13 +16,13 @@ Object.assign(env, {
 });
 
 
-var bourbonPaths = require('bourbon').includePaths
-
 module.exports = {
-  target: 'web',
+  mode: NODE_ENV === 'production' ? 'production' : 'development',
 
   entry: [
-    'idempotent-babel-polyfill',
+    // FIXME: see https://segmentfault.com/a/1190000021729561
+    // may prefer babel-plugin-transform-runtime instead??
+    // 'idempotent-babel-polyfill',
     './client/main'
   ],
 
@@ -61,14 +61,14 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
+          "style-loader",
+          "css-loader",
           {
-            loader: "style-loader"
-          }, {
-            loader: "css-loader"
-          }, {
             loader: "sass-loader",
             options: {
-              includePaths: bourbonPaths
+              sassOptions: {
+                includePaths: require('bourbon').includePaths,
+              }
             }
           }
         ]
@@ -78,17 +78,20 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       },
       {
-        test: /\.json$/,
-        use: 'json-loader'
-      },
-      {
         test: /\.(js|jsx)$/,
         use: 'babel-loader',
         exclude: /node_modules/
       }
     ],
     noParse: /\.min\.js/
-  }
+  },
+
+  // NOTE: webpack 4, see https://webpack.js.org/configuration/performance/
+  performance: {
+    hints: false,
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
+  },
 };
 
 //config.module.rules.push(
@@ -104,4 +107,3 @@ module.exports = {
 //    ]
 //  }
 //);
-

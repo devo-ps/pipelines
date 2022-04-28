@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react'
+import React, { Component } from 'react'
+import { PropTypes } from 'prop-types';
 import * as API from '../../api'
 import moment from 'moment';
 import { processPromptDef } from 'helpers/prompt'

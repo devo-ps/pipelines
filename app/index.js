@@ -21,7 +21,7 @@ app.use('/client', express.static(path.join(process.cwd(), '/client')));
 app.disable('x-powered-by');
 
 var env = {
-  production: process.env.NODE_ENV === 'production'
+  production: process.env.NODE_ENV === 'production',
 };
 
 if (env.production) {
@@ -47,18 +47,26 @@ if (env.production === false) {
 
   var webpackDevConfig = require('./webpack.config.development');
 
-  new WebpackDevServer(webpack(webpackDevConfig), {
+  const compiler = webpack(webpackDevConfig);
+  const devServer = new WebpackDevServer(compiler, {
     publicPath: '/client/',
     contentBase: './',
+
+    // because we use custom dev server and already setup HMR
+    // no need to turn on in options
+    injectClient: false,
+    injectHot: false,
+
     inline: true,
-    hot: true,
     stats: true,
     historyApiFallback: true,
     headers: {
       'Access-Control-Allow-Origin': 'http://localhost:3001',
       'Access-Control-Allow-Headers': 'X-Requested-With'
     }
-  }).listen(3000, 'localhost', function (err) {
+  });
+
+  devServer.listen(3000, function (err) {
     if (err) {
       console.log(err);
     }
