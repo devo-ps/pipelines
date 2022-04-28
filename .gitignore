@@ -19,3 +19,5 @@ bundle.min.js
 
 !test/fixtures/workspace/sample-deploy/
 test/fixtures/workspace/sample-deploy/*
+
+local.mk

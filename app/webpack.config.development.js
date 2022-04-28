@@ -5,8 +5,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 var config = require('./webpack.config.base.js');
 var Path = require("path");
 
-// const devServerURL = process.env.DEV_SERVER_URL || 'http://localhost:3000';
-
 if (process.env.NODE_ENV !== 'test') {
   // see https://webpack.js.org/guides/hot-module-replacement
   config.entry = [
