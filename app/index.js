@@ -48,29 +48,41 @@ if (env.production === false) {
   var webpackDevConfig = require('./webpack.config.development');
 
   const compiler = webpack(webpackDevConfig);
-  const devServer = new WebpackDevServer(compiler, {
-    publicPath: '/client/',
-    contentBase: './',
-
+  const devServer = new WebpackDevServer({
+    host: '0.0.0.0',
+    port: 3000,
+    // webSocketServer: 'sockjs',
+    devMiddleware: {
+      publicPath: '/client/',
+      stats: true,
+    },
+    static: {
+      directory: './',
+    },
+    client: false,
+    // {
+    //   webSocketURL: {
+    //     hostname: '0.0.0.0',
+    //     port: 3000,
+    //   },
+    // },
     // because we use custom dev server and already setup HMR
     // no need to turn on in options
-    injectClient: false,
-    injectHot: false,
+    hot: false,
 
-    inline: true,
-    stats: true,
+    // inline: true, // removed in webpack-dev-server v4
     historyApiFallback: true,
     headers: {
       'Access-Control-Allow-Origin': 'http://localhost:3001',
       'Access-Control-Allow-Headers': 'X-Requested-With'
     }
-  });
+  }, compiler);
 
-  devServer.listen(3000, function (err) {
+  (async () => {
+    const err = await devServer.start();
     if (err) {
       console.log(err);
     }
-
     console.log('webpack dev server listening on localhost:3000');
-  });
+  })();
 }
