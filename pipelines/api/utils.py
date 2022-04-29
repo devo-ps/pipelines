@@ -109,7 +109,7 @@ def walk_pipelines(workspace):
             continue
 
         try:
-            pipeline_def = yaml.load(yaml_string)
+            pipeline_def = yaml.safe_load(yaml_string)
         except YAMLError:
             log.error('Skipping pipeline. Could not load yaml for: {}'.format(path))
             continue
