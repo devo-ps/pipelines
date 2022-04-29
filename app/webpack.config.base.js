@@ -17,6 +17,9 @@ Object.assign(env, {
 
 
 module.exports = {
+
+  target: 'browserslist',
+
   mode: NODE_ENV === 'production' ? 'production' : 'development',
 
   entry: [
@@ -90,10 +93,9 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         use: 'babel-loader',
-        exclude: /node_modules/
+        exclude: /node_modules/,
       }
     ],
-    noParse: /\.min\.js/
   },
 
   // NOTE: webpack 4, see https://webpack.js.org/configuration/performance/

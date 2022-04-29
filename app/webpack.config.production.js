@@ -4,7 +4,7 @@ var webpack = require('webpack');
 var config = require('./webpack.config.base.js');
 
 var SaveAssetsJson = require('assets-webpack-plugin');
-var FileSystem = require('fs')
+var FileSystem = require('fs');
 var Path = require("path");
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -16,7 +16,7 @@ config.output = {
   path: Path.join(__dirname, '../pipelines/api/app_dist/client/dist'),
   pathinfo: true,
   publicPath: '/client/dist/',
-  filename: 'bundle.min.js'
+  filename: 'bundle.min.js',
 };
 
 config.optimization = {
@@ -30,6 +30,7 @@ config.optimization = {
     extractComments: false,
   })],
 };
+
 config.plugins = config.plugins.concat([
   new SaveAssetsJson({
     path: process.cwd(),
