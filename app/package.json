@@ -19,7 +19,7 @@
     "classnames": "2.2.5",
     "compression": "1.6.1",
     "cross-env": "1.0.7",
-    "ejs": "2.4.1",
+    "ejs": "3.1.7",
     "express": "4.13.4",
     "express-ejs-layouts": "2.0.0",
     "idempotent-babel-polyfill": "0.1.1",
