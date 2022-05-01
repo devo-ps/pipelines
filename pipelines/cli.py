@@ -2,7 +2,8 @@
 '''
 Usage:
     pipelines (--version|--help)
-    pipelines server --workspace=<workspace> [--title=<title>] [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>] [--debug] [--history-limit=<history-limit>]
+    pipelines server --workspace=<workspace> [--title=<title>] [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>] [--debug] [--history-limit=<history-limit>] [--web-path=<web-path>]
+
 
 Options:
     --host=<host>                       Bind address [default: 127.0.0.1]
@@ -16,6 +17,7 @@ Options:
     --title=<title>                     Title on tab
     --debug                             Set log level to debug
     --history-limit=<history-limit>     Limit run history loading for pipelines
+    --web-path=<web-path>               Serve at a path in web [default: /]
 
 Help:
     pipelines server            Starts pipelines' server (API + UI)
@@ -113,6 +115,7 @@ def main():
 
         options['debug'] = args.get('--debug')
         options['history_limit'] = int(args.get('--history-limit') or 30)
+        options['web_path'] = args.get('--web-path') or '/'
         try:
             server.main(options)
         except KeyboardInterrupt:

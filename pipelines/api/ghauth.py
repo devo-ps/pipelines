@@ -2,6 +2,7 @@
 import functools
 import json
 import logging
+
 import os
 from urllib.parse import urlencode
 
@@ -123,7 +124,7 @@ class GithubOAuth2Mixin(object):
 
         if resp.error:
             raise AuthError("Error response %s fetching %s" %
-                            (response.error, response.request.url))
+                            (resp.text, url))
 
         return escape.json_decode(resp.body)
 
@@ -177,11 +178,9 @@ class GithubOAuth2LoginHandler(RequestHandler,
                 code=code,
             )
 
-            # r = requests.get('https://api.github.com/user/teams?access_token=%s' % user['access_token'])
-
             if not user or not user.get('access_token'):
                 log.debug('Auth failed, missing access_token')
-                self.redirect('/login')
+                self.redirect(self.reverse_url('login'))
                 return
 
             username = user.get('login')
@@ -190,15 +189,18 @@ class GithubOAuth2LoginHandler(RequestHandler,
                 self.redirect('/login')
                 return
 
-            r = requests.get('https://api.github.com/user/teams', auth=('_', user['access_token']))
-
+            resp = yield self.get_auth_http_client().fetch(
+                'https://api.github.com/user/teams', method="GET",
+                headers={"Accept": "application/json"},
+                auth_mode='basic', auth_username='_',
+                auth_password=user['access_token'])
 
             allowed_teams = self.settings['auth'].get('teams', [])
             allowed_teams_set = set()
             for org, team in allowed_teams:
                 allowed_teams_set.add((org.lower(), team.lower()))
             log.debug('Allowed teams: %s' % allowed_teams_set)
-            teams = r.json()
+            teams = json.loads(resp.body)
 
             user_teams_set = set()
             for x in teams:
