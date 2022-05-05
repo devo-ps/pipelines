@@ -32,7 +32,7 @@ from pipelines import __version__, PipelinesError
 from pipelines.api import server
 from pipelines.pipeline.utils import random_secret
 
-MIN_PASSWORD_LEN = 4
+MIN_PASSWORD_LEN = 12
 
 def _get_username(args):
     if args['--username']:
