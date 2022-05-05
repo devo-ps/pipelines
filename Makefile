@@ -35,7 +35,7 @@ install: ${VENV}
 	${VENV}/bin/pipenv install
 
 run:
-	${VENV}/bin/python bin/pipelines ${API_SERVER_ARGS}
+	${VENV}/bin/python -m pipelines ${API_SERVER_ARGS}
 
 test:
 	# PYTHONPATH=./pipelines $(NOSETESTS) -d -v -w test/*

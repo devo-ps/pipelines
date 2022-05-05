@@ -38,7 +38,11 @@ setup(
         'pipelines.api',
         'pipelines.plugins',
         'pipelines.plugin'],
-    scripts=['bin/pipelines'],
+    entry_points={
+        'console_scripts': [
+            'pipelines = pipelines.cli:main',
+        ],
+    },
     install_requires=[
         'certifi==2021.10.8',
         "charset-normalizer==2.0.12; python_version >= '3'",
