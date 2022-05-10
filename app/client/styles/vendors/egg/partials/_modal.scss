@@ -8,8 +8,8 @@
     right: 0;
     text-align: center;
     top: 0;
-    @include transition-property(opacity);
-    @include transition-duration($ease);
+    transition-property: (opacity);
+    transition-duration: ($ease);
     visibility: hidden;
     z-index: 1000;
   }
@@ -24,8 +24,8 @@
     width: 50%;
     z-index: 3000;
     @include animation(slide 0.2s ease);
-    @include transition-property(width);
-    @include transition-duration($ease);
+    transition-property: (width);
+    transition-duration: ($ease);
     @include keyframes(slide) {
       0% {
         margin-top: 0;

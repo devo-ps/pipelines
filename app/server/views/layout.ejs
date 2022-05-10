@@ -8,13 +8,13 @@
   </head>
   <body>
     <%- body %>
-    
+
     <section id="js-main" class="content"></section>
 
     <% if (env.production) { %>
       <script async src="<%= env.assets.main2.js %>">1</script>
     <% } else { %>
-      <script src="http://localhost:3000/client/bundle.js">2</script>
+      <script src="/client/bundle.js">2</script>
     <% } %>
   </body>
 </html>

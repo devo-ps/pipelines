@@ -65,12 +65,12 @@
         @include tooltip;
         &:before {
           margin: 0 $space/8 0 0;
-          @include transition-property(transform);
-          @include transition-duration($ease);
+          transition-property: (transform);
+          transition-duration: ($ease);
         }
         &:hover {
           &:before {
-            @include transform(scale(1.3));
+            transform: (scale(1.3));
           }
         }
       }

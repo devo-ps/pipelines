@@ -10,8 +10,8 @@
     right: 0;
     text-align: center;
     top: 0;
-    @include transition-property(opacity);
-    @include transition-duration($ease);
+    transition-property: (opacity);
+    transition-duration: ($ease);
     z-index: 998;
   }
   &:after {
