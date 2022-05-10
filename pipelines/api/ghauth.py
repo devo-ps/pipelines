@@ -180,20 +180,38 @@ class GithubOAuth2LoginHandler(RequestHandler,
                 self.redirect('/login')
                 return
 
+            username = user.get('login')
+            if not username:
+                log.warn('Auth failed, missing login')
+                self.redirect('/login')
+                return
+
             r = requests.get('https://api.github.com/user/teams', auth=('_', user['access_token']))
 
 
             allowed_teams = self.settings['auth'].get('teams', [])
-            log.debug('Allowed teams: %s' % allowed_teams)
+            allowed_teams_set = set()
+            for org, team in allowed_teams:
+                allowed_teams_set.add((org.lower(), team.lower()))
+            log.debug('Allowed teams: %s' % allowed_teams_set)
             teams = r.json()
 
-            for org, team in allowed_teams:
-                if filter(lambda x: x['slug'].lower() == team.lower() and x.get('organization',{}).get('login', '').lower() == org.lower(), teams):
-                    log.debug('Allowed access to github user for team %s/%s' % (org, team))
-                    user['username'] = user.get('login', 'unknown')
+            user_teams_set = set()
+            for x in teams:
+                o = x.get('organization',{}).get('login', '').lower()
+                t = x.get('slug', '').lower()
+                if not o or not t:
+                    continue
+                user_teams_set.add((o, t))
+            log.debug('user teams: %s' % user_teams_set)
+
+            intersection = allowed_teams_set.intersection(user_teams_set)
+            log.debug('intersection: %s' % intersection)
+            if len(intersection) > 0:
+                    log.debug('Allowed access to github user for team %s' % (intersection))
+                    user['username'] = username
                     cookie = json.dumps(user, separators=(',',   ':'))
                     self.set_secure_cookie('user', cookie)
-                    break
             else:
                 log.debug('Access not allowed to user. User teams:  %s' % (
                     ['%s/%s' % (t.get('organization', {}).get('login'), t.get('slug')) for t in teams])

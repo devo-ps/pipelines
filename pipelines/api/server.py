@@ -135,7 +135,7 @@ class GetTriggersHandler(PipelinesRequestHandler):
 
         with open(yaml_filepath) as f:
             try:
-                pipeline_def = yaml.load(f)
+                pipeline_def = yaml.safe_load(f)
                 log.debug(pipeline_def)
             except yaml.YAMLError as e:
                 log.exception(e)
@@ -229,7 +229,7 @@ class GetPipelinesHandler(PipelinesRequestHandler):
                 continue
 
             try:
-                pipeline_def = yaml.load(yaml_string)
+                pipeline_def = yaml.safe_load(yaml_string)
             except YAMLError:
                 log.error('Skipping pipeline. Could not load yaml for: {}'.format(path))
                 continue
@@ -276,7 +276,7 @@ class GetPipelineHandler(PipelinesRequestHandler):
 
         with open(file_path) as f:
             yaml_string = f.read()
-        pipeline_def = yaml.load(yaml_string)
+        pipeline_def = yaml.safe_load(yaml_string)
 
         # expect to have runs
         ids = list(_run_id_iterator(folder_path))

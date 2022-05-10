@@ -116,7 +116,7 @@ class Pipeline(object):
 
         with open(file_path) as f:
             try:
-                pipeline_def = yaml.load(f)
+                pipeline_def = yaml.safe_load(f)
             except yaml.YAMLError as e:
                 log.exception(e)
                 err_msg = e.problem
