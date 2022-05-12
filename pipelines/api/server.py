@@ -311,7 +311,7 @@ def _fetch_runs(path, run_ids):
             log.debug('Run status file doesn\'t exist: %s' % run_status_path)
 
         ret.append(item)
-    ret.sort(key=lambda run: run.get('start_time'), reverse=True)
+    ret.sort(key=lambda run: run.get('start_time', ''), reverse=True)
     return ret
 
 
@@ -451,9 +451,9 @@ def _hide_pw(conf_dict):
 def main(config):
     conf_logging()
     app = make_app(
-        cookie_secret=config.get('cookie_secret'), 
-        workspace=config.get('workspace', 'fixtures/workspace'), 
-        title=config.get('title'), 
+        cookie_secret=config.get('cookie_secret'),
+        workspace=config.get('workspace', 'fixtures/workspace'),
+        title=config.get('title'),
         auth=config.get('auth')
     )
     app.listen(
