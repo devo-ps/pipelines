@@ -40,7 +40,7 @@ Base install
     pip install pipelines
 
 
-Or get the latest dev version from `Github <https://github.com/Wiredcraft/pipelines>`_ and run ``pip install .`` from within the cloned repo. Or run pip directly from git ``pip install git+git://github.com/Wiredcraft/pipelines@dev``.
+Or get the latest dev version from `Github <https://github.com/Wiredcraft/pipelines>`_ and run ``pip install .`` from within the cloned repo. Or run pip directly from git ``pip install git+https://github.com/Wiredcraft/pipelines@master``.
 
 
 Configuration
