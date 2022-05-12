@@ -1,47 +1,31 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
-import os
 import functools
 import json
-from urllib.parse import urlencode
 import logging
-import tornado
+import os
+from urllib.parse import urlencode
+
 import requests
-from tornado.concurrent import return_future
-from tornado.web import RequestHandler
-from tornado.auth import _auth_return_future, AuthError
-from tornado import httpclient
+import tornado
+from tornado import escape, httpclient
+from tornado.auth import AuthError
 from tornado.httputil import url_concat
-from tornado import escape
+from tornado.web import RequestHandler
+
 
 log = logging.getLogger('pipelines')
 
-
 class GithubOAuth2Mixin(object):
+    """
+    see
+    https://docs.github.com/en/developers/apps/building-oauth-apps/authorizing-oauth-apps#web-application-flow
+    """
     _OAUTH_AUTHORIZE_URL = "https://github.com/login/oauth/authorize"
     _OAUTH_ACCESS_TOKEN_URL = "https://github.com/login/oauth/access_token"
     _OAUTH_USER_BASE_URL = "https://api.github.com"
     _OAUTH_SETTINGS_KEY = "github_oauth"
 
-    @return_future
-    def authorize_redirect(self,
-                           scopes=None,
-                           response_type="code",
-                           callback=None,
-                           **kwargs):
-        args = {
-            "client_id": self.gh_settings[self._OAUTH_SETTINGS_KEY]["key"],
-            "response_type": response_type
-        }
-        if kwargs:
-            args.update(kwargs)
-        if scopes:
-            args["scope"] = ",".join(scopes)
-        self.redirect(url_concat(self._OAUTH_AUTHORIZE_URL, args))
-        callback()
-
-    # Copyed from above
-    def get_auth_url(self, scopes=None):
+    def get_auth_url(self, scopes: list[str] = None):
         args = {
             "client_id": self.gh_settings[self._OAUTH_SETTINGS_KEY]["key"],
             "response_type": 'code'
@@ -50,9 +34,10 @@ class GithubOAuth2Mixin(object):
             args["scope"] = ",".join(scopes)
         return url_concat(self._OAUTH_AUTHORIZE_URL, args)
 
-    @_auth_return_future
-    def get_authenticated_user(self, code, callback):
+    @tornado.gen.coroutine
+    def get_authenticated_user(self, code):
         """Handles the login for the Github user, returning a user object.
+
         Example usage::
             class GithubOAuth2LoginHandler(tornado.web.RequestHandler,
                                            GithubOAuth2Mixin):
@@ -62,119 +47,115 @@ class GithubOAuth2Mixin(object):
                         user = yield self.get_authenticated_user(code=self.get_argument("code"))
                         # Save the user with e.g. set_secure_cookie
                     else:
-                        yield self.authorize_redirect(scope=["user:email"])
+                        return self.redirect(self.get_auth_url(scope=["user:email"]))
         """
         http = self.get_auth_http_client()
         body = urlencode({
-            "client_id":
-            self.gh_settings[self._OAUTH_SETTINGS_KEY]["key"],
-            "client_secret":
-            self.gh_settings[self._OAUTH_SETTINGS_KEY]["secret"],
-            "code":
-            code
+            "client_id": self.gh_settings[self._OAUTH_SETTINGS_KEY]["key"],
+            "client_secret": self.gh_settings[self._OAUTH_SETTINGS_KEY]["secret"],
+            "code": code
         })
 
-        http.fetch(self._OAUTH_ACCESS_TOKEN_URL,
-                   functools.partial(self._on_access_token, callback),
-                   method="POST",
-                   headers={
-                       "Content-Type": "application/x-www-form-urlencoded",
-                       "Accept": "application/json"
-                   },
-                   body=body)
-
-    def _on_access_token(self, future, response):
-        """Callback function for the exchange to the access token."""
-        if response.error:
-            future.set_exception(
-                AuthError("Github auth error: %s" % str(response)))
-            return
-        args = escape.json_decode(escape.native_str(response.body))
+        # retrieve access token
+        resp = yield http.fetch(
+            self._OAUTH_ACCESS_TOKEN_URL,
+            method="POST",
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Accept": "application/json",
+            },
+            body=body
+        )
+        if resp.error:
+            raise AuthError("Github auth error: %s" % str(resp))
+        args = escape.json_decode(escape.native_str(resp.body))
         access_token = args.get("access_token", None)
         if not access_token:
-            future.set_result(None)
+            log.warn("no access_token in token request")
+            return None
+
+        # retrieve user info
+        user = yield self.github_request(
+            path="/user",
+            access_token=access_token
+        )
+        user['access_token'] = access_token
+
         scopes = args["scope"].split(",")
         has_user_email_scope = scopes.count("user:email") > 0
-        self.github_request(path="/user",
-                            callback=functools.partial(self._on_get_user_info,
-                                                       future, access_token,
-                                                       has_user_email_scope),
-                            access_token=access_token)
-
-    def _on_get_user_info(self, future, access_token, has_user_email_scope,
-                          user):
-        if user is None:
-            future.set_result(None)
-            return
-
-        user.update({"access_token": access_token})
         if not has_user_email_scope:
-            return future.set_result(user)
-        self.github_request(path="/user/emails",
-                            callback=functools.partial(self._on_get_user_email,
-                                                       future, user),
-                            access_token=access_token)
+            return user
 
-    @staticmethod
-    def _on_get_user_email(future, user, emails):
-        user.update({"private_emails": emails})
-        future.set_result(user)
+        # retrieve email info
+        emails = yield self.github_request(
+            path="/user/emails",
+            access_token=access_token
+        )
+        user["private_emails"] = emails
+        return user
 
-    @_auth_return_future
-    def github_request(self,
-                       path,
-                       callback,
-                       access_token=None,
-                       post_args=None,
-                       **args):
+    @tornado.gen.coroutine
+    def github_request(self, path, access_token=None, post_args=None, **args):
         url = self._OAUTH_USER_BASE_URL + path
         all_args = {}
         if access_token:
             all_args.update(args)
         if all_args:
             url += "?" + urlencode(all_args)
-        callback = functools.partial(self._on_github_request, callback)
+
         http = self.get_auth_http_client()
+
         ua = "tornado"
         if post_args is not None:
-            http.fetch(url,
-                       method="POST",
-                       body=urlencode(post_args),
-                       callback=callback,
-                       user_agent=ua,
-                       headers={
-                           "Content-Type": "application/x-www-form-urlencoded",
-                           "Accept": "application/json"
-                       },
-                       auth_mode='basic',
-                       auth_username='_',
-                       auth_password=access_token)
+            resp = yield http.fetch(
+                url, method="POST", body=urlencode(post_args),
+                user_agent=ua,
+                headers={
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Accept": "application/json",
+                },
+                auth_mode='basic', auth_username='_', auth_password=access_token)
         else:
-            http.fetch(url,
-                       method="GET",
-                       callback=callback,
-                       user_agent=ua,
-                       headers={"Accept": "application/json"},
-                       auth_mode='basic',
-                       auth_username='_',
-                       auth_password=access_token)
+            resp = yield http.fetch(
+                url, method="GET", user_agent=ua,
+                headers={"Accept": "application/json"}, auth_mode='basic',
+                auth_username='_', auth_password=access_token)
 
-    @staticmethod
-    def _on_github_request(future, response):
-        if response.error:
-            future.set_exception(
-                AuthError("Error response %s fetching %s" %
-                          (response.error, response.request.url)))
-            return
+        if resp.error:
+            raise AuthError("Error response %s fetching %s" %
+                            (response.error, response.request.url))
 
-        future.set_result(escape.json_decode(response.body))
+        return escape.json_decode(resp.body)
 
     @staticmethod
     def get_auth_http_client():
+        impl = 'tornado.simple_httpclient.SimpleAsyncHTTPClient'
+        # debug support
+        proxy_host = os.environ.get("PROXY_HOST")
+        proxy_port = os.environ.get("PROXY_PORT")
+        defaults = {
+            'user_agent': 'tornado',
+        }
+        if proxy_host and proxy_port:
+            log.debug('>> enable proxy support for tornado.httpclient')
+            log.debug('>> proxy: %s:%s', proxy_host, proxy_port)
+            # as for torado 6.0, proxy is only supported in
+            # curl_httpclient, need to install pycurl
+            defaults.update({
+                'proxy_host': proxy_host,
+                'proxy_port': int(proxy_port),
+            })
+            impl = 'tornado.curl_httpclient.CurlAsyncHTTPClient'
+
+        httpclient.AsyncHTTPClient.configure(
+            impl=impl,
+            defaults=defaults)
+
         return httpclient.AsyncHTTPClient()
 
 
-class GithubOAuth2LoginHandler(RequestHandler, GithubOAuth2Mixin):
+class GithubOAuth2LoginHandler(RequestHandler,
+                               GithubOAuth2Mixin):
 
     gh_settings = {
         'github_oauth': {
@@ -191,12 +172,10 @@ class GithubOAuth2LoginHandler(RequestHandler, GithubOAuth2Mixin):
     @tornado.gen.coroutine
     def get(self):
         if self.get_argument('code', False):
-
-            def cb(*args):
-                print('Callback: %s' % args)
-
+            code = self.get_argument('code')
             user = yield self.get_authenticated_user(
-                code=self.get_argument('code'), callback=cb)
+                code=code,
+            )
 
             # r = requests.get('https://api.github.com/user/teams?access_token=%s' % user['access_token'])
 
@@ -211,8 +190,8 @@ class GithubOAuth2LoginHandler(RequestHandler, GithubOAuth2Mixin):
                 self.redirect('/login')
                 return
 
-            r = requests.get('https://api.github.com/user/teams',
-                             auth=('_', user['access_token']))
+            r = requests.get('https://api.github.com/user/teams', auth=('_', user['access_token']))
+
 
             allowed_teams = self.settings['auth'].get('teams', [])
             allowed_teams_set = set()
@@ -223,7 +202,7 @@ class GithubOAuth2LoginHandler(RequestHandler, GithubOAuth2Mixin):
 
             user_teams_set = set()
             for x in teams:
-                o = x.get('organization', {}).get('login', '').lower()
+                o = x.get('organization',{}).get('login', '').lower()
                 t = x.get('slug', '').lower()
                 if not o or not t:
                     continue
@@ -233,17 +212,15 @@ class GithubOAuth2LoginHandler(RequestHandler, GithubOAuth2Mixin):
             intersection = allowed_teams_set.intersection(user_teams_set)
             log.debug('intersection: %s' % intersection)
             if len(intersection) > 0:
-                log.debug('Allowed access to github user for team %s' %
-                          (intersection))
-                user['username'] = username
-                cookie = json.dumps(user, separators=(',', ':'))
-                self.set_secure_cookie('user', cookie)
+                    log.debug('Allowed access to github user for team %s' % (intersection))
+                    user['username'] = username
+                    cookie = json.dumps(user, separators=(',',   ':'))
+                    self.set_secure_cookie('user', cookie)
             else:
-                log.debug('Access not allowed to user. User teams:  %s' % ([
-                    '%s/%s' %
-                    (t.get('organization', {}).get('login'), t.get('slug'))
-                    for t in teams
-                ]))
+                log.debug('Access not allowed to user. User teams:  %s' % (
+                    ['%s/%s' % (t.get('organization', {}).get('login'), t.get('slug')) for t in teams])
+                )
+
 
             self.redirect(self.get_query_argument("next", "/"))
         else:

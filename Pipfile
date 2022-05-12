@@ -11,7 +11,7 @@ filelock = "==3.4.0"
 requests = "==2.26.0"
 schema = "==0.7.5"
 sh = "==1.14.2"
-tornado = "==5.1.1"
+tornado = "==6.1"
 Jinja2 = "==3.0.3"
 PyYAML = "==6.0"
 
@@ -24,6 +24,7 @@ coverage = "*"
 autopep8 = "*"
 pipenv-setup = "*"
 pylint = "*"
+pycurl = "*"
 
 [requires]
 python_version = "3"

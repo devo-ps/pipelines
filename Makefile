@@ -32,10 +32,12 @@ ${VENV}:
 install: ${VENV}
 	${VENV}/bin/pip install -U pip
 	${VENV}/bin/pip install -U pipenv
-	${VENV}/bin/pipenv install
+	${VENV}/bin/pipenv install -d
 
 run:
-	${VENV}/bin/python -m pipelines ${API_SERVER_ARGS}
+	PROXY_HOST=${PROXY_HOST} PROXY_PORT=${PROXY_PORT} \
+		GH_OAUTH_KEY=${GH_OAUTH_KEY} GH_OAUTH_SECRET=${GH_OAUTH_SECRET} \
+		${VENV}/bin/python -m pipelines ${API_SERVER_ARGS}
 
 test:
 	# PYTHONPATH=./pipelines $(NOSETESTS) -d -v -w test/*

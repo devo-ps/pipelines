@@ -1,4 +1,4 @@
-__version__ = '0.0.15'
+__version__ = '0.2.0a1'
 __author__ = 'Wiredcraft'
 
 
