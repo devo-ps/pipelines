@@ -1,25 +1,27 @@
-from datetime import datetime
-
-import yaml
+# -*- coding: utf-8; mode: python -*-
+import base64
 from concurrent.futures.thread import ThreadPoolExecutor
-from tornado import ioloop, concurrent
-from yaml.error import YAMLError
-import re
-from pipelines.api import PIPELINES_EXT
-import os.path
+from datetime import datetime
 import json
 import logging
-from uuid import uuid4
-import base64
-
-from tornado.web import HTTPError
 import os.path
+from pathlib import Path
+import re
+from uuid import uuid4
+
+from tornado import ioloop, concurrent
+from tornado.web import HTTPError
+import yaml
+from yaml.error import YAMLError
 
 from pipelines import PipelinesError
+from pipelines.api import PIPELINES_EXT
 from pipelines.pipeline.pipeline import Pipeline
 from pipelines.plugin.exceptions import PluginError
 
+
 log = logging.getLogger('pipelines')
+
 
 class AsyncRunner(object):
     __instance = None
@@ -77,12 +79,23 @@ def _slugify_file(filename):
     basename = filename.rsplit('/', 1)[-1]
     return basename.rsplit('.', 1)[0]
 
+# patched with limit, order by modify time
+def _run_id_iterator(slug, limit):
+    try:
+        path = Path(slug)
+    except FileNotFoundError:
+        log.warn('pipeline slug dir %s not exists', slug)
+        return []
 
-def _run_id_iterator(slug):
-    for sub_folder in os.listdir(slug):
-        if _is_valid_uuid(sub_folder):
-            yield sub_folder
-
+    ids = [x.name for x in path.iterdir()
+           if x.is_dir() and _is_valid_uuid(x.name)]
+    ids = sorted(
+        ids,
+        key=lambda x: os.path.getmtime(os.path.join(slug, x)),
+        reverse=True)
+    if limit > 0:
+        return ids[:limit]
+    return ids
 
 def _is_valid_uuid(uuid):
     regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
@@ -157,7 +170,7 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None
     log.debug('user context: %s' % user_context)
     if 'authorization' in handler.request.headers:
         user_context['username'] = _parse_basicauth_user(handler.request.headers['authorization'])
-    
+
     yield runner.run(user_context)
 
 def _parse_basicauth_user(basicauth_http_header):

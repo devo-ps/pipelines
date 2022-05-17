@@ -29,8 +29,14 @@ from pipelines import PipelinesError
 from pipelines.api import PIPELINES_EXT, WEB_HOOK_CONFIG
 from pipelines.api.ghauth import GithubOAuth2LoginHandler
 from pipelines.api.slackbot import SlackbotHandler
-from pipelines.api.utils import _get_pipeline_filepath, _file_iterator, _slugify_file, _run_id_iterator, \
-    AsyncRunner, _run_pipeline
+from pipelines.api.utils import (
+    AsyncRunner,
+    _get_pipeline_filepath,
+    _file_iterator,
+    _run_id_iterator,
+    _run_pipeline,
+    _slugify_file,
+)
 from pipelines.plugin.exceptions import PluginError
 from pipelines.utils import conf_logging
 from pipelines.pipeline.pipeline import Pipeline
@@ -245,12 +251,14 @@ class GetPipelinesHandler(PipelinesRequestHandler):
             }
             if os.path.isdir(full_path):
                 # expect to have runs
-                ids = list(_run_id_iterator(full_path))
+                ids = list(_run_id_iterator(
+                    full_path, self.settings['history_limit']))
+                log.info('pipeline %s run history: %s', full_path, len(ids))
                 runs = _fetch_runs(full_path, ids)
                 run_dict['run_ids'] = ids
                 run_dict['runs'] = runs
             tasks.append(run_dict)
-        
+
 
         # Sort the pipelines alphabetically
         sorted_tasks = sorted(tasks, key=lambda x: x.get('slug'))
@@ -279,7 +287,10 @@ class GetPipelineHandler(PipelinesRequestHandler):
         pipeline_def = yaml.safe_load(yaml_string)
 
         # expect to have runs
-        ids = list(_run_id_iterator(folder_path))
+        ids = list(_run_id_iterator(
+            full_path, self.settings['history_limit']))
+        log.info('pipeline %s run history: %s', full_path, len(ids))
+        log.info('ids: %s', ids)
         runs = _fetch_runs(folder_path, ids)
 
         ret = {
@@ -396,7 +407,9 @@ def _get_auth_dict(auth_settings):
         }
 
 
-def make_app(cookie_secret=None, workspace='fixtures/workspace', title='Pipelines', auth=None):
+def make_app(
+        cookie_secret=None, workspace='fixtures/workspace',
+        title='Pipelines', auth=None, history_limit=0):
     if cookie_secret is None:
         raise PipelineError('Cookie secret can not be empty')
 
@@ -428,7 +441,8 @@ def make_app(cookie_secret=None, workspace='fixtures/workspace', title='Pipeline
                        auth=auth_dict,
                        login_url="/login",
                        debug="True",
-                       cookie_secret=cookie_secret
+                       cookie_secret=cookie_secret,
+                       history_limit=history_limit,
                        )
 
 
@@ -454,7 +468,8 @@ def main(config):
         cookie_secret=config.get('cookie_secret'),
         workspace=config.get('workspace', 'fixtures/workspace'),
         title=config.get('title'),
-        auth=config.get('auth')
+        auth=config.get('auth'),
+        history_limit=config.get('history_limit'),
     )
     app.listen(
         int(config.get('port', 8888)),
