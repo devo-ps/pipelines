@@ -2,7 +2,7 @@
 '''
 Usage:
     pipelines (--version|--help)
-    pipelines server --workspace=<workspace> [--title=<title>] [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>] [--debug]
+    pipelines server --workspace=<workspace> [--title=<title>] [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>] [--debug] [--history-limit=<history-limit>]
 
 Options:
     --host=<host>                       Bind address [default: 127.0.0.1]
@@ -15,6 +15,7 @@ Options:
     --workspace=<workspace>             Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
     --title=<title>                     Title on tab
     --debug                             Set log level to debug
+    --history-limit=<history-limit>     Limit run history loading for pipelines
 
 Help:
     pipelines server            Starts pipelines' server (API + UI)
@@ -102,6 +103,7 @@ def main():
             options['auth'] = ('static', username, password)
 
         options['debug'] = args.get('--debug')
+        options['history_limit'] = int(args.get('--history-limit') or 30)
         try:
             server.main(options)
         except KeyboardInterrupt:
