@@ -78,8 +78,11 @@ def _slugify_file(filename):
     return basename.rsplit('.', 1)[0]
 
 
-def _run_id_iterator(slug):
-    for sub_folder in os.listdir(slug):
+def _run_id_iterator(slug, log_limits):
+    dir_list = os.listdir(slug)
+    #sorted by modify time
+    dir_list = sorted(dir_list,key=lambda x: os.path.getmtime(os.path.join(slug, x)), reverse = True)
+    for sub_folder in dir_list[:log_limits]:
         if _is_valid_uuid(sub_folder):
             yield sub_folder
 

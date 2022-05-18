@@ -206,6 +206,7 @@ class GetPipelinesHandler(PipelinesRequestHandler):
         log.debug('Get pipelines')
         workspace = self.settings['workspace_path']
         title = self.settings['title']
+        log_limits = int(self.settings['log_limits'])
         log.debug('Getting all pipelines')
         tasks = []
         for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
@@ -245,7 +246,7 @@ class GetPipelinesHandler(PipelinesRequestHandler):
             }
             if os.path.isdir(full_path):
                 # expect to have runs
-                ids = list(_run_id_iterator(full_path))
+                ids = list(_run_id_iterator(full_path, log_limits))
                 runs = _fetch_runs(full_path, ids)
                 run_dict['run_ids'] = ids
                 run_dict['runs'] = runs
@@ -396,7 +397,7 @@ def _get_auth_dict(auth_settings):
         }
 
 
-def make_app(cookie_secret=None, workspace='fixtures/workspace', title='Pipelines', auth=None):
+def make_app(cookie_secret=None, workspace='fixtures/workspace', title='Pipelines', auth=None, log_limits=None):
     if cookie_secret is None:
         raise PipelineError('Cookie secret can not be empty')
 
@@ -421,14 +422,16 @@ def make_app(cookie_secret=None, workspace='fixtures/workspace', title='Pipeline
 
     if auth_dict and auth_dict.get('type') == 'gh':
         endpoints.insert(len(endpoints) - 1, (r"/ghauth", GithubOAuth2LoginHandler)),
-
+    
+    
     return Application(endpoints,
                        title=title,
                        workspace_path=workspace,
                        auth=auth_dict,
                        login_url="/login",
                        debug="True",
-                       cookie_secret=cookie_secret
+                       cookie_secret=cookie_secret,
+                       log_limits=log_limits,
                        )
 
 
@@ -454,8 +457,10 @@ def main(config):
         cookie_secret=config.get('cookie_secret'),
         workspace=config.get('workspace', 'fixtures/workspace'),
         title=config.get('title'),
-        auth=config.get('auth')
+        auth=config.get('auth'),
+        log_limits=config.get('log_limits')
     )
+    
     app.listen(
         int(config.get('port', 8888)),
         address=config.get('host', '127.0.0.1'),
@@ -465,7 +470,7 @@ def main(config):
     log.info('Starting server: {}'.format(_hide_pw(config)))
     io_loop = IOLoop.current()
     io_loop.start()
-
+    
 
 if __name__ == '__main__':
     main()

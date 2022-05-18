@@ -2,7 +2,7 @@
 '''
 Usage:
     pipelines (--version|--help)
-    pipelines server --workspace=<workspace> [--title=<title>] [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>] [--debug]
+    pipelines server --workspace=<workspace> [--title=<title>] [--cookie-secret=<cookie-secret>] [--host=<host>] [--port=<port>] [--username=<username>] [--password=<password>] [--ask-password] [--github-auth=<Org/Team>] [--log-limits=<number>] [--debug]
 
 Options:
     --host=<host>                       Bind address [default: 127.0.0.1]
@@ -14,6 +14,7 @@ Options:
     --github-auth=<Org/Team>            Enable Github Authentication (OAuth). Allow specific Team.
     --workspace=<workspace>             Location of the pipelines and runs [default: /var/lib/pipelines/workspace]
     --title=<title>                     Title on tab
+    --log-limits=<a number>             The number of loaded tasks log 
     --debug                             Set log level to debug
 
 Help:
@@ -33,6 +34,13 @@ from pipelines.api import server
 from pipelines.pipeline.utils import random_secret
 
 MIN_PASSWORD_LEN = 12
+
+def _get_log_limits(args):
+    if args['--log-limits']:
+        return args['--log-limits']
+    if 'LOG_LIMITS' in os.environ:
+        return os.environ['LOG_LIMITS']
+    return None
 
 def _get_username(args):
     if args['--username']:
@@ -78,13 +86,17 @@ def main():
             'workspace': os.path.realpath(os.path.expanduser(args.get('--workspace'))),
             'title': _get_title(args),
             'host': args.get('--host'),
-            'port': args.get('--port')
+            'port': args.get('--port'),
+            'log_limits': _get_log_limits(args)
         }
-
         username = _get_username(args)
         password = _get_password(args)
         cookie_secret = _get_cookie_secret(args)
         ghauth = args.get('--github-auth')
+
+        #set log_limits default value as 20 ,user if not pass this parameter
+        if not options.get('log_limits'):
+            options['log_limits'] = 20
 
         options['cookie_secret']  = cookie_secret if cookie_secret else random_secret()
 
