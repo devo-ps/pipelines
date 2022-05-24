@@ -20,7 +20,7 @@ setup(
     name='pipelines',
     version=__version__,
     description='Pipelines',
-    url='https://getpipelines.com',
+    url='https://github.com/Wiredcraft/pipelines',
     author=__author__,
     author_email='info@wiredcraft.com',
     license='MIT',
