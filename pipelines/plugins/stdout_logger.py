@@ -9,40 +9,31 @@ log = logging.getLogger('pipelines')
 
 VAR_LOG_MAX_LEN = 3000
 
+
 class StdoutLogger(BasePlugin):
     hook_prefix = ''
-    hooks = (
-        'on_pipeline_start',
-        'on_task_start',
-        'on_task_finish',
-        'on_pipeline_finish',
-        'on_task_event'
-    )
+    hooks = ('on_pipeline_start', 'on_task_start', 'on_task_finish',
+             'on_pipeline_finish', 'on_task_event')
 
-    write_on = ['on_pipeline_start',
-                'on_pipeline_finish',
-                'on_task_start',
-                'on_task_output',
-                'on_task_finish',
-                'on_task_event']
+    write_on = [
+        'on_pipeline_start', 'on_pipeline_finish', 'on_task_start',
+        'on_task_output', 'on_task_finish', 'on_task_event'
+    ]
 
     timestamp_format = '%Y:%m:%d %H:%M:%S'
     log_format = '{timestamp}: {message}'
 
-    log_file=None
+    log_file = None
 
     def __init__(self, log_file=None):
-        self.stats = {
-            'start': None,
-            'finish': None,
-            'tasks': []
-        }
+        self.stats = {'start': None, 'finish': None, 'tasks': []}
         self.log_file = log_file
 
     @classmethod
     def from_dict(cls, conf_dict, event_mgr=None):
         if 'log_file' in conf_dict:
-            log.debug('Found Log File for stdout logger: %s' % conf_dict['log_file'])
+            log.debug('Found Log File for stdout logger: %s' %
+                      conf_dict['log_file'])
         else:
             log.debug('No Log File for stdout logger')
         return cls(conf_dict.get('log_file'))
@@ -56,29 +47,37 @@ class StdoutLogger(BasePlugin):
                 length = len(input_str)
                 ret = input_str[:limit]
                 if length > limit:
-                    ret += ' ...(%s more characters)' % (length-VAR_LOG_MAX_LEN)
+                    ret += ' ...(%s more characters)' % (length -
+                                                         VAR_LOG_MAX_LEN)
                 return ret
 
             def custom_var_serializer(vars):
                 vars_log = '\n'
-                if vars.get('webhook_content', {}).get('raw') and len(vars.get('webhook_content', {})) > 1:
-                    del vars['webhook_content']['raw']  # Remove from logs to avoid pollution
+                if vars.get('webhook_content', {}).get('raw') and len(
+                        vars.get('webhook_content', {})) > 1:
+                    # Remove from logs to avoid pollution
+                    del vars['webhook_content']['raw']
 
                 if vars:
-                    for k,v in vars.items():
+                    for k, v in vars.items():
                         if isinstance(v, dict) or isinstance(v, list):
-                            log_str = yaml.safe_dump(v, default_style=False, default_flow_style=False)[:-1]
+                            log_str = yaml.safe_dump(
+                                v,
+                                default_style=False,
+                                default_flow_style=False)[:-1]
                         else:
                             log_str = str(v)
                         value_log = limit_log_len(log_str, VAR_LOG_MAX_LEN)
-                        vars_log += '[1;30m%s[0m: %s' % (k, value_log)  # Adds color to highlight keys
+                        # Adds color to highlight keys
+                        vars_log += '[1;30m%s[0m: %s' % (k, value_log)
                         vars_log += '\n'
                 else:
                     vars_log += 'No variables'
                 return vars_log
 
             pipeline_vars = pipeline_context.toDict().get('vars', {})
-            self.write('Pipeline started. vars: %s' % custom_var_serializer(pipeline_vars))
+            self.write('Pipeline started. vars: %s' %
+                       custom_var_serializer(pipeline_vars))
 
     def on_pipeline_finish(self, *args):
         self._add_pipeline_finish_stats()
@@ -106,22 +105,17 @@ class StdoutLogger(BasePlugin):
         self._add_task_finish_stats(result)
 
         if 'on_task_finish' in self.write_on:
-            msg = (
-                'Task finished, name: {task_name}, status: {task_status}, '
-                'msg: {message}'
-            ).format(
-                task_name = task.name,
-                task_status = result.status,
-                message=result.message
-            )
+            msg = ('Task finished, name: {task_name}, status: {task_status}, '
+                   'msg: {message}').format(task_name=task.name,
+                                            task_status=result.status,
+                                            message=result.message)
 
             self.write(msg)
 
     def write(self, msg):
         now_str = self._timestamp(datetime.utcnow())
 
-        to_write = self.log_format.format(timestamp=now_str,
-                                          message=msg)
+        to_write = self.log_format.format(timestamp=now_str, message=msg)
         if self.log_file:
             with open(self.log_file, 'a') as f:
                 f.write(to_write)
@@ -132,10 +126,7 @@ class StdoutLogger(BasePlugin):
     def _add_task_start_stats(self, task):
         now = datetime.now()
 
-        self.stats['tasks'].append({
-            'start': now,
-            'task': task
-        })
+        self.stats['tasks'].append({'start': now, 'task': task})
 
     def _add_task_finish_stats(self, result):
         now = datetime.now()
@@ -154,15 +145,15 @@ class StdoutLogger(BasePlugin):
         self.stats['finish'] = now
         self.stats['duration'] = now - self.stats['start']
 
-
     def _generate_report(self, msg_format):
-        fail_count = len(list(filter(lambda task: not task['result'].is_successful(),
-                                self.stats['tasks'])))
+        fail_count = len(
+            list(
+                filter(lambda task: not task['result'].is_successful(),
+                       self.stats['tasks'])))
 
         return 'Pipeline finished. Duration: {duration}, {fail_count} failed tasks'.format(
             duration=self._duration_str(self.stats['duration']),
-            fail_count= fail_count
-        )
+            fail_count=fail_count)
 
     def _timestamp(self, date_obj):
         return date_obj.strftime(self.timestamp_format)
@@ -179,4 +170,3 @@ class StdoutLogger(BasePlugin):
         ret += '{}s'.format(round(seconds, 2))
 
         return ret
-

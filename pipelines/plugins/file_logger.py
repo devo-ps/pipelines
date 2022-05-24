@@ -8,6 +8,7 @@ RETRY_COUNT = 2
 
 log = logging.getLogger('pipelines')
 
+
 class FileLogger(StdoutLogger):
 
     def __init__(self, file_path):
@@ -30,6 +31,4 @@ class FileLogger(StdoutLogger):
 
     def write(self, msg):
         with open(self.file_path) as f:
-            f.write(json.dump({
-                'status': 'success'
-            }, indent=2))
+            f.write(json.dump({'status': 'success'}, indent=2))

@@ -8,9 +8,11 @@ from sh import ErrorReturnCode, TimeoutException
 from sh import bash
 
 log = logging.getLogger('pipelines')
-DEFAULT_TIMEOUT = 60*60  # Timeout to 1h
+DEFAULT_TIMEOUT = 60 * 60  # Timeout to 1h
+
 
 class BashExecuteError(PluginError):
+
     def __init__(self, msg, code, data={}):
         self.msg = msg
         self.code = code
@@ -19,7 +21,7 @@ class BashExecuteError(PluginError):
 
 class BashExecutor(BaseExecutorPlugin):
     hook_prefix = 'bash'
-    hooks = ('execute',)
+    hooks = ('execute', )
 
     def __init__(self, log_file=None, event_mgr=None):
         self.log_file = log_file
@@ -29,14 +31,14 @@ class BashExecutor(BaseExecutorPlugin):
 
     def _parse_args_dict(self, args_dict):
         if 'cmd' not in args_dict:
-            raise PluginError('BashExecutor got incorrect arguments, got: {}'.format(
-                args_dict.keys()
-            ))
+            raise PluginError(
+                'BashExecutor got incorrect arguments, got: {}'.format(
+                    args_dict.keys()))
         timeout = args_dict.get('timeout') or DEFAULT_TIMEOUT
         if not isinstance(timeout, int):
-            raise PluginError('BashExecutor got incorrect timeout argument type, got: {} expecting int'.format(
-                type(timeout)
-            ))
+            raise PluginError(
+                'BashExecutor got incorrect timeout argument type, got: {} expecting int'
+                .format(type(timeout)))
 
         return args_dict['cmd'], timeout
 
@@ -56,8 +58,10 @@ class BashExecutor(BaseExecutorPlugin):
             msg = 'Bash task failed: %s' % e.msg
             output = e.data['stdout']
 
-        return TaskResult(status, msg, data={'output': output}, return_obj=return_obj)
-
+        return TaskResult(status,
+                          msg,
+                          data={'output': output},
+                          return_obj=return_obj)
 
     def _run_bash(self, bash_input, timeout=DEFAULT_TIMEOUT):
         log.debug('Running bash command: "{}"'.format(bash_input))
@@ -67,6 +71,7 @@ class BashExecutor(BaseExecutorPlugin):
 
         output = {'stdout': '', 'last_line': ''}
         try:
+
             def process_line(line):
                 log.debug('Got line: %s' % line)
                 output['stdout'] += line
@@ -78,17 +83,24 @@ class BashExecutor(BaseExecutorPlugin):
                     f.write(line)
 
                 if self.event_mgr:
-                    if len(line)>0 and line[-1] == '\n':
+                    if len(line) > 0 and line[-1] == '\n':
                         line = line[:-1]
                     self.event_mgr.trigger('on_task_event', {'output': line})
 
-            proc = bash(_in=bash_input, _out=process_line, _err=process_line, _timeout=timeout)
+            proc = bash(_in=bash_input,
+                        _out=process_line,
+                        _err=process_line,
+                        _timeout=timeout)
             proc.wait()
-            log.debug('Finished: %s, %s, %s' % (proc.exit_code, proc.stdout, proc.stderr))
+            log.debug('Finished: %s, %s, %s' %
+                      (proc.exit_code, proc.stdout, proc.stderr))
 
         except ErrorReturnCode as e:
             log.warning('BashExec failed %s' % e.message)
-            raise BashExecuteError("Execution failed with code: %s" % e.exit_code, e.exit_code, data=output)
+            raise BashExecuteError("Execution failed with code: %s" %
+                                   e.exit_code,
+                                   e.exit_code,
+                                   data=output)
         except TimeoutException as e:
             log.debug('BashExec timed out after %s seconds' % timeout)
             raise BashExecuteError("Task Timed Out", 1, data=output)
@@ -96,12 +108,12 @@ class BashExecutor(BaseExecutorPlugin):
         return_obj = None
         try:
             return_obj = json.loads(output['last_line'])
-        except:
-            log.debug('Failed to parse last line of bash as json: "{}"'.format(output['last_line']))
+        except BaseException:
+            log.debug('Failed to parse last line of bash as json: "{}"'.format(
+                output['last_line']))
 
         return output['stdout'], return_obj
 
     @classmethod
     def from_dict(cls, conf_dict, event_mgr=None):
         return cls(conf_dict.get('bash_log_file'), event_mgr)
-

@@ -5,8 +5,8 @@ import os.path
 
 from pipelines.plugin.base_plugin import BasePlugin
 
-
 log = logging.getLogger('pipelines')
+
 
 class StatusLogger(BasePlugin):
     hook_prefix = ''

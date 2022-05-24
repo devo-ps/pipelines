@@ -25,11 +25,7 @@ PIPELINE_STATUS_OK = 'success'
 PIPELINE_STATUS_FAIL = 'failure'
 
 DEFAULT_PLUGINS = [
-    'stdout_logger',
-    'bash',
-    'python',
-    'status_logger',
-    'slack'
+    'stdout_logger', 'bash', 'python', 'status_logger', 'slack'
     # 'webhook_logger'
 ]
 
@@ -42,13 +38,10 @@ DEFAULTS = {
 
 PIPELINES_SCHEMA = Schema({
     Optional('vars'): {
-        Optional(str): Or(
-            Optional(str),
-            Optional(bool),
-            Optional(dict)
-        )
+        Optional(str): Or(Optional(str), Optional(bool), Optional(dict))
     },
-    Optional('name'): str,
+    Optional('name'):
+    str,
     'actions': [
         Or(
             str,
@@ -59,22 +52,17 @@ PIPELINES_SCHEMA = Schema({
                 Optional('always_run'): bool,
                 Optional('message'): str,
                 Optional(str): object  # Allow custom keys for actions
-            }
-        )
+            })
     ],
-    Optional('plugins'): [
-        Optional(str)
-    ],
+    Optional('plugins'): [Optional(str)],
     Optional('prompt'): {
-        Optional(str): Or(
-            None,
-            Optional(str, bool),
-            {
+        Optional(str):
+        Or(
+            None, Optional(str, bool), {
                 'type': Or('text', 'select', 'checkbox'),
                 Optional('default'): Or(str, bool),
                 Optional('options'): [str],
-            }
-        )
+            })
     },
     Optional('triggers'): [{
         'type': Or('webhook', 'cron', 'slackbot'),
@@ -82,6 +70,7 @@ PIPELINES_SCHEMA = Schema({
         Optional(str): Optional(Or(object, str, list))
     }]
 })
+
 
 class Pipeline(object):
 
@@ -98,21 +87,25 @@ class Pipeline(object):
             definition_dict['triggers'] = {}
 
         if not isinstance(definition_dict, dict):
-            raise PipelineError('Unexpected argument type %s expecting dict' % type(definition_dict))
+            raise PipelineError('Unexpected argument type %s expecting dict' %
+                                type(definition_dict))
 
         tasks = definition_dict['actions']
         plugins = definition_dict.get('plugins', [])
 
         return Pipeline(tasks, plugins, context=definition_dict)
 
-
     @staticmethod
     def from_yaml(file_path, params={}):
         if not isinstance(file_path, str):
-            raise PipelineError('Unexpected argument type %s expecting string' % type(file_path))
+            raise PipelineError(
+                'Unexpected argument type %s expecting string' %
+                type(file_path))
 
         if not os.path.exists(file_path):
-            raise PipelineError('PipelineDefinition: Pipeline definition file does not exist: %s' % file_path)
+            raise PipelineError(
+                'PipelineDefinition: Pipeline definition file does not exist: %s'
+                % file_path)
 
         with open(file_path) as f:
             try:
@@ -121,9 +114,12 @@ class Pipeline(object):
                 log.exception(e)
                 err_msg = e.problem
                 err_msg += ' (line: {})'.format(e.problem_mark.line)
-                raise PipelineError('PipelineDefinition: Pipeline definition file is not valid YAML: %s - %s' % (file_path, err_msg))
+                raise PipelineError(
+                    'PipelineDefinition: Pipeline definition file is not valid YAML: %s - %s'
+                    % (file_path, err_msg))
 
-        pipeline_def['vars'] = deepmerge(pipeline_def.get('vars', {}), params or {})
+        pipeline_def['vars'] = deepmerge(pipeline_def.get('vars', {}), params
+                                         or {})
 
         # Substitute {{ }} variables in tasks
         # vars = pipeline_def.get('vars', {})
@@ -150,7 +146,8 @@ class Pipeline(object):
         for i, task in enumerate(tasks):
             normalized_task = self._normalize_task_dict(task)
             if not self._task_executor_valid(normalized_task['type']):
-                raise PipelineError('Unsupported task type: %s' % normalized_task['type'])
+                raise PipelineError('Unsupported task type: %s' %
+                                    normalized_task['type'])
             task_obj = Task.from_dict(normalized_task)
             if not task_obj.name:
                 task_obj.name = 'Task-{}'.format(i + 1)
@@ -159,10 +156,9 @@ class Pipeline(object):
     def _task_executor_valid(self, task_type):
         return bool(self.plugin_mgr.get_plugin('{}.execute'.format(task_type)))
 
-
     def run(self):
         log.debug('Run pipeline. params: {}'.format(self.context))
-        pipeline_context ={
+        pipeline_context = {
             'results': [],
             'vars': self.context.get('vars', {}),
             'status': PIPELINE_STATUS_OK,
@@ -178,25 +174,31 @@ class Pipeline(object):
             if self._should_run(task, pipeline_context):
                 result_obj = None
                 try:
-                    task.args = substitute_variables(pipeline_context, task.args)
+                    task.args = substitute_variables(pipeline_context,
+                                                     task.args)
                 except TemplateError as e:
                     result_obj = TaskResult(EXECUTION_FAILED, e.message)
 
                 if not result_obj:
                     result_obj = self._run_task(task)
                     if task.ignore_errors and result_obj.status == EXECUTION_FAILED:
-                        log.debug('Task has ignore_errors set, overriding to successful')
+                        log.debug(
+                            'Task has ignore_errors set, overriding to successful'
+                        )
                         # Override to be successful
                         result_obj['status'] = EXECUTION_SUCCESSFUL
 
                 pipeline_context.results.append(result_obj)
                 pipeline_context['prev_result'] = result_obj
 
-                if pipeline_context['status'] == PIPELINE_STATUS_OK and result_obj.get('status') != 0:
+                if pipeline_context[
+                        'status'] == PIPELINE_STATUS_OK and result_obj.get(
+                            'status') != 0:
                     pipeline_context['status'] = PIPELINE_STATUS_FAIL
             else:
                 log.debug('Skipping task: {}'.format(task.name))
-        log.debug('Pipeline finished. Status: {}'.format(pipeline_context['status']))
+        log.debug('Pipeline finished. Status: {}'.format(
+            pipeline_context['status']))
         self.plugin_mgr.trigger('on_pipeline_finish', pipeline_context)
         return pipeline_context
 
@@ -212,10 +214,13 @@ class Pipeline(object):
 
     def _validate_executor_plugin(self, event_name):
         if self.plugin_mgr.get_plugin_count(event_name) > 1:
-            raise PipelineError('More than one executor plugins with same name {}'.format(event_name))
+            raise PipelineError(
+                'More than one executor plugins with same name {}'.format(
+                    event_name))
 
         if self.plugin_mgr.get_plugin_count(event_name) == 0:
-            raise PipelineError('Can not find executor plugin for {}'.format(event_name))
+            raise PipelineError(
+                'Can not find executor plugin for {}'.format(event_name))
 
     def _run_task(self, task):
         log.debug('Starting to execute task {}'.format(task.name))
@@ -227,7 +232,8 @@ class Pipeline(object):
         self._validate_executor_plugin(event_name)
 
         try:
-            results = self.plugin_mgr.trigger(event_name, task.args)  # Run the task
+            results = self.plugin_mgr.trigger(event_name,
+                                              task.args)  # Run the task
         except PluginError as e:
             log.warning('Unexpected plugin error running task: %s' % e)
             raise
@@ -251,11 +257,11 @@ class Pipeline(object):
 
     def _load_plugin(self, plugin_str):
         if not isinstance(plugin_str, str):
-            raise PluginError('Plugins must be a string, got {}'.format(plugin_str))
+            raise PluginError(
+                'Plugins must be a string, got {}'.format(plugin_str))
 
         plugin_class = self._resolve_plugin_class(plugin_str)
         self.plugin_mgr.register_plugin(plugin_class, self.context.get('vars'))
-
 
     def _resolve_plugin_class(self, plugin_name):
         if plugin_name in builtin_plugins:
@@ -277,6 +283,7 @@ class Pipeline(object):
 
         return task
 
+
 def _parse_class(plugin_path):
     if '.' not in plugin_path:
         raise PluginError('Invalid plugin: %s' % plugin_path)
@@ -288,9 +295,11 @@ def _parse_class(plugin_path):
         raise PluginError('Could not import plugin {}'.format(plugin_path))
 
     if not hasattr(m, class_name):
-        raise PluginError('Could not find class for plugin {}'.format(plugin_path))
+        raise PluginError(
+            'Could not find class for plugin {}'.format(plugin_path))
 
     return getattr(m, plugin_path)
+
 
 if __name__ == '__main__':
     conf_logging()

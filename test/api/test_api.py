@@ -11,7 +11,9 @@ from tornado.testing import AsyncHTTPTestCase
 WORKSPACE = os.path.realpath('test/fixtures/workspace')
 COOKIE_SECRET = '12345'
 
+
 class TestAPIs(AsyncHTTPTestCase):
+
     def get_app(self):
         return server.make_app(COOKIE_SECRET, WORKSPACE)
 
@@ -25,7 +27,7 @@ class TestAPIs(AsyncHTTPTestCase):
 
         try:
             content = json.loads(response.body)
-        except:
+        except BaseException:
             # TODO - better way to raise the error
             self.assertTrue(False)
         print('gg')
@@ -38,7 +40,6 @@ class TestAPIs(AsyncHTTPTestCase):
                 self.assertIsInstance(pipeline_item['runs'], list)
                 self.assertIsInstance(pipeline_item['definition'], dict)
                 self.assertIsInstance(pipeline_item['raw'], str)
-
 
     def test_run_pipeline_404(self):
         '''
@@ -59,7 +60,7 @@ class TestAPIs(AsyncHTTPTestCase):
 
         try:
             content = json.loads(response.body)
-        except:
+        except BaseException:
             # TODO - better way to raise the error
             self.assertTrue(False)
 
@@ -71,14 +72,14 @@ class TestAPIs(AsyncHTTPTestCase):
         Fetch the status of a pipeline run
         '''
         url = ("/api/pipelines/sample-deploy/"
-        "29010ce2-7c89-440e-8f8f-77839069580b/status")
-    
+               "29010ce2-7c89-440e-8f8f-77839069580b/status")
+
         response = self.fetch(url)
         self.assertEqual(response.code, 200)
 
         try:
             content = json.loads(response.body)
-        except:
+        except BaseException:
             # TODO - better way to raise the error
             self.assertTrue(False)
 
@@ -90,7 +91,9 @@ class TestAPIs(AsyncHTTPTestCase):
         '''
         Fetching logs from saved pipeline's run
         '''
-        url = ("/api/pipelines/sample-deploy/29010ce2-7c89-440e-8f8f-77839069580b/log")
+        url = (
+            "/api/pipelines/sample-deploy/29010ce2-7c89-440e-8f8f-77839069580b/log"
+        )
         response = self.fetch(url)
         self.assertEqual(response.code, 200)
 
@@ -106,17 +109,19 @@ class TestAPIs(AsyncHTTPTestCase):
         # Fetch the pipelines' list and extract one of the pipeline's ID
         resp_list = self.fetch(url_list)
         self.assertTrue(resp_list.code, 200)
-        pipeline_id = 'sample-deploy' # json_list[0]['slug']
+        pipeline_id = 'sample-deploy'  # json_list[0]['slug']
 
         # Run the pipeline, and extract the task id
 
         print(url_run % pipeline_id)
-        resp_run = self.fetch(url_run % pipeline_id, method='POST', body='{"prompt": {}}')
+        resp_run = self.fetch(url_run % pipeline_id,
+                              method='POST',
+                              body='{"prompt": {}}')
         self.assertEquals(resp_run.code, 200)
         json_run = json.loads(resp_run.body)
         task_id = json_run['task_id']
 
-        # Get the status of the task - should be incomplete 
+        # Get the status of the task - should be incomplete
         resp_status1 = self.fetch(url_status % (pipeline_id, task_id))
         self.assertTrue(resp_status1.code, 200)
 
@@ -125,9 +130,9 @@ class TestAPIs(AsyncHTTPTestCase):
 
         # Fetch the logs - expect a success
         resp_log = self.fetch(url_log % (pipeline_id, task_id))
-        self.assertTrue(resp_log.code, 200)        
+        self.assertTrue(resp_log.code, 200)
 
-        # Get (again) the status of the task - should be complete 
+        # Get (again) the status of the task - should be complete
         resp_status2 = self.fetch(url_status % (pipeline_id, task_id))
         self.assertTrue(resp_status2.code, 200)
         json_status2 = json.loads(resp_status2.body)

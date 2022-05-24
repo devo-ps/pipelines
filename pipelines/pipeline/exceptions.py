@@ -1,3 +1,2 @@
 class PipelineError(RuntimeError):
     pass
-

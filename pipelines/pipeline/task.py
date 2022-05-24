@@ -1,14 +1,16 @@
 import logging
 from copy import copy
 
-
 EXECUTION_SUCCESSFUL = 0
 EXECUTION_FAILED = 1
 
 log = logging.getLogger('pipelines')
 
+
 class Task(object):
-    def __init__(self, name, executor, args, always_run, ignore_errors, timeout):
+
+    def __init__(self, name, executor, args, always_run, ignore_errors,
+                 timeout):
         self.name = name
         self.executor = executor
         self.args = args
@@ -37,10 +39,12 @@ class Task(object):
         if 'timeout' in task_dict:
             timeout = task_dict.pop('timeout')
 
-        return Task(name, executor, task_args, always_run, ignore_errors, timeout)
+        return Task(name, executor, task_args, always_run, ignore_errors,
+                    timeout)
 
 
 class TaskResult(dict):
+
     def __init__(self, status, message='', data={}, return_obj={}):
         self['status'] = status
         self['message'] = message

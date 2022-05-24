@@ -35,12 +35,14 @@ from pipelines.pipeline.utils import random_secret
 
 MIN_PASSWORD_LEN = 12
 
+
 def _get_username(args):
     if args['--username']:
         return args['--username']
     if 'USERNAME' in os.environ:
         return os.environ['USERNAME']
     return None
+
 
 def _get_password(args):
     if args['--password']:
@@ -51,12 +53,14 @@ def _get_password(args):
         return os.environ['PASSWORD']
     return None
 
+
 def _get_cookie_secret(args):
     if args['--cookie-secret']:
         return args['--cookie-secret']
     if 'COOKIE_SECRET' in os.environ:
         return os.environ['COOKIE_SECRET']
     return None
+
 
 def _get_title(args):
     if args['--title']:
@@ -65,21 +69,22 @@ def _get_title(args):
         return os.environ['TITLE']
     return 'Pipelines'
 
+
 def main():
-    args = docopt.docopt(
-        __doc__,
-        version="version "+ __version__,
-        help=True
-    )
+    args = docopt.docopt(__doc__, version="version " + __version__, help=True)
 
     logging.error(pprint.pformat(args))
 
     if args.get('server'):
         options = {
-            'workspace': os.path.realpath(os.path.expanduser(args.get('--workspace'))),
-            'title': _get_title(args),
-            'host': args.get('--host'),
-            'port': args.get('--port')
+            'workspace':
+            os.path.realpath(os.path.expanduser(args.get('--workspace'))),
+            'title':
+            _get_title(args),
+            'host':
+            args.get('--host'),
+            'port':
+            args.get('--port')
         }
 
         username = _get_username(args)
@@ -87,13 +92,17 @@ def main():
         cookie_secret = _get_cookie_secret(args)
         ghauth = args.get('--github-auth')
 
-        options['cookie_secret']  = cookie_secret if cookie_secret else random_secret()
+        options[
+            'cookie_secret'] = cookie_secret if cookie_secret else random_secret(
+        )
 
         if ghauth:
             teams = []
             for allowed_team in ghauth.split(','):
                 if not '/' in allowed_team:
-                    raise PipelinesError('github-auth requires organization and team in format of "(org)/(team)"')
+                    raise PipelinesError(
+                        'github-auth requires organization and team in format of "(org)/(team)"'
+                    )
                 org, team = allowed_team.split('/', 1)
                 teams.append((org, team))
             options['auth'] = ('gh', teams)

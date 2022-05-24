@@ -19,7 +19,6 @@ from pipelines.api import PIPELINES_EXT
 from pipelines.pipeline.pipeline import Pipeline
 from pipelines.plugin.exceptions import PluginError
 
-
 log = logging.getLogger('pipelines')
 
 
@@ -28,8 +27,8 @@ class AsyncRunner(object):
 
     def __new__(cls, *args, **kwargs):
         if cls.__instance is None:
-            cls.__instance = super(
-                AsyncRunner, cls).__new__(cls, *args, **kwargs)
+            cls.__instance = super(AsyncRunner,
+                                   cls).__new__(cls, *args, **kwargs)
         return cls.__instance
 
     def __init__(self):
@@ -79,7 +78,10 @@ def _slugify_file(filename):
     basename = filename.rsplit('/', 1)[-1]
     return basename.rsplit('.', 1)[0]
 
+
 # patched with limit, order by modify time
+
+
 def _run_id_iterator(slug, limit):
     try:
         path = Path(slug)
@@ -87,18 +89,21 @@ def _run_id_iterator(slug, limit):
         log.warn('pipeline slug dir %s not exists', slug)
         return []
 
-    ids = [x.name for x in path.iterdir()
-           if x.is_dir() and _is_valid_uuid(x.name)]
-    ids = sorted(
-        ids,
-        key=lambda x: os.path.getmtime(os.path.join(slug, x)),
-        reverse=True)
+    ids = [
+        x.name for x in path.iterdir() if x.is_dir() and _is_valid_uuid(x.name)
+    ]
+    ids = sorted(ids,
+                 key=lambda x: os.path.getmtime(os.path.join(slug, x)),
+                 reverse=True)
     if limit > 0:
         return ids[:limit]
     return ids
 
+
 def _is_valid_uuid(uuid):
-    regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+    regex = re.compile(
+        '^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\\Z',
+        re.I)
     match = regex.match(uuid)
     return bool(match)
 
@@ -111,7 +116,10 @@ def _get_pipeline_filepath(workspace, slug):
             break
     return None
 
+
 # TODO server.js line 211 to use this func
+
+
 def walk_pipelines(workspace):
     for path in _file_iterator(workspace, extensions=PIPELINES_EXT):
         try:
@@ -124,13 +132,18 @@ def walk_pipelines(workspace):
         try:
             pipeline_def = yaml.safe_load(yaml_string)
         except YAMLError:
-            log.error('Skipping pipeline. Could not load yaml for: {}'.format(path))
+            log.error(
+                'Skipping pipeline. Could not load yaml for: {}'.format(path))
             continue
         slug = _slugify_file(path)
         yield slug, pipeline_def
 
 
-def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None):
+def _run_pipeline(handler,
+                  workspace,
+                  pipeline_slug,
+                  params={},
+                  response_fn=None):
     log.debug('Running pipeline %s with params %s' % (pipeline_slug, params))
     # Guess the pipeline extension
     pipeline_filepath = _get_pipeline_filepath(workspace, pipeline_slug)
@@ -163,19 +176,20 @@ def _run_pipeline(handler, workspace, pipeline_slug, params={}, response_fn=None
     if isinstance(username, dict):
         username = username.get('username', 'unknown')
 
-    user_context = {
-        'username': username,
-        'ip': handler.request.remote_ip
-    }
+    user_context = {'username': username, 'ip': handler.request.remote_ip}
     log.debug('user context: %s' % user_context)
     if 'authorization' in handler.request.headers:
-        user_context['username'] = _parse_basicauth_user(handler.request.headers['authorization'])
+        user_context['username'] = _parse_basicauth_user(
+            handler.request.headers['authorization'])
 
     yield runner.run(user_context)
 
+
 def _parse_basicauth_user(basicauth_http_header):
     try:
-        return base64.decodestring (basicauth_http_header.split(' ')[1]).split(':')[0]
+        return base64.decodestring(
+            basicauth_http_header.split(' ')[1]).split(':')[0]
     except Exception as e:
-        log.warn('Could not parse nginx auth header: {}'.format(basicauth_http_header))
+        log.warn('Could not parse nginx auth header: {}'.format(
+            basicauth_http_header))
         return '(problem parsing user)'

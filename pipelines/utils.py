@@ -2,6 +2,7 @@ import logging
 
 log = logging.getLogger('pipelines')
 
+
 def conf_logging():
     logger = logging.getLogger('pipelines')
     logger.setLevel(logging.DEBUG)
@@ -13,6 +14,7 @@ def conf_logging():
     ch.setLevel(logging.DEBUG)
 
     logger.addHandler(ch)
+
 
 def deepmerge(base, update):
     for k, v in base.items():
