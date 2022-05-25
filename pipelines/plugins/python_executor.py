@@ -7,28 +7,32 @@ from pipelines.plugin.exceptions import PluginError
 from os import path
 
 log = logging.getLogger('pipelines')
-
-
 '''
 
 THIS HAS NOT BEEN UPDATED/TESED PROPERLY
 
 '''
 
+
 class PythonExecutor(BashExecutor):
     hook_prefix = 'python'
-    hooks = ('execute',)
+    hooks = ('execute', )
 
     def _validate_args_dict(self, args_dict):
         if 'file' not in args_dict and 'script' not in args_dict:
-            raise PluginError('PythonExecutor requires either "file" or "script" arguments. Given: {}'.format(args_dict))
+            raise PluginError(
+                'PythonExecutor requires either "file" or "script" arguments. Given: {}'
+                .format(args_dict))
 
         if args_dict.get('file') and args_dict.get('script'):
             raise PluginError(
-                'PythonExecutor got both "file" and "script" aguments. Only one is supported.')
+                'PythonExecutor got both "file" and "script" aguments. Only one is supported.'
+            )
 
         if args_dict.get('workspace') and args_dict.get('script'):
-            raise PluginError('PythonExecutor requires either "file" or "script" arguments. Given: {}'.format(args_dict))
+            raise PluginError(
+                'PythonExecutor requires either "file" or "script" arguments. Given: {}'
+                .format(args_dict))
 
     def execute(self, args_dict):
         self._validate_args_dict(args_dict)
@@ -43,8 +47,11 @@ class PythonExecutor(BashExecutor):
 
         if virtualenv:
             activate_path = path.join(virtualenv, 'bin', 'activate')
-            if not path.exists(activate_path) or not path.isfile(activate_path):
-                raise PluginError('Python virtualenv doesn\'t exist: {}'.format(activate_path))
+            if not path.exists(activate_path) or not path.isfile(
+                    activate_path):
+                raise PluginError(
+                    'Python virtualenv doesn\'t exist: {}'.format(
+                        activate_path))
 
             bash_input += 'source {}\n'.format(activate_path)
 
@@ -64,7 +71,7 @@ class PythonExecutor(BashExecutor):
         if self.dry_run:
             return TaskResult(EXECUTION_SUCCESSFUL)
 
-        return_obj=None
+        return_obj = None
         try:
             stdout, return_obj = self._run_bash(bash_input)
             status = EXECUTION_SUCCESSFUL
@@ -73,8 +80,10 @@ class PythonExecutor(BashExecutor):
             stdout = e.data.get('stdout')
         print('Finished, stdout: %s' % (stdout))
 
-        return TaskResult(status, 'Execution finished', data={'output': stdout}, return_obj=return_obj)
-
+        return TaskResult(status,
+                          'Execution finished',
+                          data={'output': stdout},
+                          return_obj=return_obj)
 
 
 if __name__ == '__main__':

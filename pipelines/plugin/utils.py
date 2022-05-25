@@ -7,6 +7,7 @@ from pipelines.pipeline.task import Task, TaskResult
 
 log = logging.getLogger('pipelines')
 
+
 def class_name(obj):
     if isinstance(obj, type):
         return obj.__name__
@@ -24,6 +25,7 @@ def setup_logging(level=logging.DEBUG):
     for pack in ['sh', 'requests']:
         logging.getLogger(pack).setLevel(logging.WARNING)
 
+
 def datetime_serializer(obj):
     """JSON serializer for objects not serializable by default json code"""
 
@@ -40,10 +42,7 @@ def datetime_serializer(obj):
         return serial
 
     if isinstance(obj, TaskResult):
-        serial = json.dumps({
-            'status': obj.status,
-            'message': obj.message
-        })
+        serial = json.dumps({'status': obj.status, 'message': obj.message})
         return serial
 
     if isinstance(obj, timedelta):

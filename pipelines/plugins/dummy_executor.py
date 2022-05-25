@@ -5,13 +5,13 @@ from pipelines.plugin.exceptions import PluginError
 
 class DummyExecutor(BaseExecutorPlugin):
     hook_prefix = 'executors.dummy'
-    hooks = ('execute',)
+    hooks = ('execute', )
 
     def _parse_args_dict(self, args_dict):
         if 'cmd' not in args_dict:
-            raise PluginError('DummyExecutor got incorrect arguments, got: {}'.format(
-                args_dict.keys()
-            ))
+            raise PluginError(
+                'DummyExecutor got incorrect arguments, got: {}'.format(
+                    args_dict.keys()))
 
         return args_dict['cmd']
 

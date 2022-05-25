@@ -13,6 +13,7 @@ from pipelines.utils import conf_logging
 
 conf_logging()
 
+
 class TestPythonExecutor(TestCase):
 
     # def test_basic_loading(self):
@@ -71,9 +72,7 @@ class TestPythonExecutor(TestCase):
     def test_basic_script(self):
         print('Running test_basic_script')
         executor = BashExecutor()
-        args = {
-            'cmd': 'echo "test"'
-        }
+        args = {'cmd': 'echo "test"'}
         res = executor.execute(args)
         self.assertIsInstance(res, TaskResult)
         self.assertEqual(res.status, EXECUTION_SUCCESSFUL)
@@ -83,9 +82,7 @@ class TestPythonExecutor(TestCase):
     def test_return_obj(self):
         print('Testing return object parsing')
         executor = BashExecutor()
-        args = {
-            'cmd': 'echo \'{"test": 1}\''
-        }
+        args = {'cmd': 'echo \'{"test": 1}\''}
         res = executor.execute(args)
         self.assertIsInstance(res, TaskResult)
         self.assertEqual(res.status, EXECUTION_SUCCESSFUL)
@@ -95,18 +92,14 @@ class TestPythonExecutor(TestCase):
     def test_return_obj_empty_rows(self):
         print('Testing return object parsing')
         executor = BashExecutor()
-        args = {
-            'cmd': 'echo \'{"otest": 1}\n\''
-        }
+        args = {'cmd': 'echo \'{"otest": 1}\n\''}
         res = executor.execute(args)
         self.assertEqual(res.return_obj, {"otest": 1})
 
     def test_return_obj_nojson(self):
         print('Testing return object parsing')
         executor = BashExecutor()
-        args = {
-            'cmd': 'echo \'abba\n"test": 1}\n\''
-        }
+        args = {'cmd': 'echo \'abba\n"test": 1}\n\''}
         res = executor.execute(args)
         self.assertIsNone(res.return_obj)
 
@@ -122,17 +115,13 @@ class TestPythonExecutor(TestCase):
     #     self.assertEqual(res.data['output'].strip(), u'test\u4e2dtest')
     #     self.assertEqual(res.message.strip(), 'Bash task finished')
 
-
     def test_timeout_in_pipeline_def_timeouts(self):
         pipeline_def = {
-            'actions': [
-            {
+            'actions': [{
                 'type': 'bash',
                 'cmd': 'sleep 2',
                 'timeout': 1
-            }
-            ],
-
+            }],
         }
         start = datetime.now()
         pipeline = Pipeline.form_dict(pipeline_def)

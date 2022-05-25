@@ -10,7 +10,6 @@ try:
 except ImportError:
     from distutils.core import setup
 
-
 # NOTE:
 # do not edit install_requires and dependency_links manually
 # please use pipenv to install packages, then make sync-requirements
@@ -28,16 +27,13 @@ setup(
         'pipelines': 'pipelines',
     },
     package_data={
-        'pipelines.api': [
-            'app_dist/*.html',
-            'app_dist/client/dist/*',
-            'templates/*.html']},
+        'pipelines.api':
+        ['app_dist/*.html', 'app_dist/client/dist/*', 'templates/*.html']
+    },
     packages=[
-        'pipelines',
-        'pipelines.pipeline',
-        'pipelines.api',
-        'pipelines.plugins',
-        'pipelines.plugin'],
+        'pipelines', 'pipelines.pipeline', 'pipelines.api',
+        'pipelines.plugins', 'pipelines.plugin'
+    ],
     entry_points={
         'console_scripts': [
             'pipelines = pipelines.cli:main',
@@ -46,18 +42,12 @@ setup(
     install_requires=[
         'certifi==2021.10.8',
         "charset-normalizer==2.0.12; python_version >= '3'",
-        "contextlib2==21.6.0; python_version >= '3.6'",
-        'docopt==0.6.2',
-        'dotmap==1.3.26',
-        'filelock==3.4.0',
-        "idna==3.3; python_version >= '3'",
-        'jinja2==3.0.3',
-        "markupsafe==2.1.1; python_version >= '3.7'",
-        'pyyaml==6.0',
-        'requests==2.26.0',
-        'schema==0.7.5',
-        'sh==1.14.2',
-        'tornado==5.1.1',
-        "urllib3==1.26.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'"],
+        "contextlib2==21.6.0; python_version >= '3.6'", 'docopt==0.6.2',
+        'dotmap==1.3.26', 'filelock==3.4.0',
+        "idna==3.3; python_version >= '3'", 'jinja2==3.0.3',
+        "markupsafe==2.1.1; python_version >= '3.7'", 'pyyaml==6.0',
+        'requests==2.26.0', 'schema==0.7.5', 'sh==1.14.2', 'tornado==5.1.1',
+        "urllib3==1.26.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'"
+    ],
     dependency_links=[],
 )
