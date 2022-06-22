@@ -214,6 +214,12 @@ export default class Task extends Component {
     this.refreshLogs(runId)
   }
 
+  selectPointer(ev, runId) {
+    ev.stopPropagation();
+    this.selectRun(runId);
+    this.setState({open: true});
+  }
+
   getRunHistoryPointers(runs){
     var that = this;
     if (!runs || runs.length == 0) {
@@ -222,7 +228,7 @@ export default class Task extends Component {
     return runs.slice(0,6).map(run => {
       const status = run.status == 'success'? 'ok' : 'error';
       return (
-         <div className={`status ${status}`} key={run.id}>
+         <div className={`status ${status}`} key={run.id} onClick={ev => this.selectPointer(ev, run.id)}>
            <span>{run.status} &middot; { relativeTime(run.start_time)}</span>
          </div>
        )
