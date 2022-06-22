@@ -1,7 +1,19 @@
-import superagent from 'superagent'
+import superagent from 'superagent';
 
-//const API_URL = '/api/pipelines' // for DIST mode
-const API_URL = `${__API_HOST__}/api/pipelines`
+// used for local dev, on remote host
+let API_URL = `${__API_HOST__}/api/pipelines`;
+
+// NOTE: this is to support hosting pipelines at different path
+// not just root like http://example.com/
+// used for production, there will be an #js-entry element
+// with data-api-base property, provisioned by backend
+// giving the exact API_URL
+const entry = document.querySelector('#js-entry');
+if (!!entry) {
+  API_URL = entry.dataset.apiBase.replace(/\/+$/g, '');
+}
+
+// console.log(`API_URL: ${API_URL}`);
 
 function request(method, url, body) {
   return superagent(method, `${API_URL}${url}`)

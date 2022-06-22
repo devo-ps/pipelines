@@ -12,6 +12,12 @@
 PY := python3
 VENV := .venv
 VENV_BIN := ${VENV}/bin
+GH_OAUTH_KEY :=
+GH_OAUTH_SECRET :=
+
+# used in ghauth handler
+PROXY_HOST :=
+PROXY_PORT :=
 
 API_SERVER_ARGS := server --workspace=test/fixtures/workspace --host 0.0.0.0
 
@@ -23,6 +29,10 @@ PYFLAKES := ${VENV_BIN}/pyflakes
 NAME = "pipelines"
 OS = $(shell uname -s)
 
+export GH_OAUTH_KEY
+export GH_OAUTH_SECRET
+export PROXY_HOST
+export PROXY_PORT
 
 .PHONY: test
 

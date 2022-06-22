@@ -45,10 +45,12 @@ setup(
     install_requires=[
         "certifi==2022.6.15; python_version >= '3.6'",
         "charset-normalizer==2.0.12; python_version >= '3'",
+        'coloredlogs==15.0.1',
         "contextlib2==21.6.0; python_version >= '3.6'",
         'docopt==0.6.2',
         'dotmap==1.3.26',
         'filelock==3.4.0',
+        "humanfriendly==10.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
         "idna==3.3; python_version >= '3'",
         'jinja2==3.0.3',
         "markupsafe==2.1.1; python_version >= '3.7'",
