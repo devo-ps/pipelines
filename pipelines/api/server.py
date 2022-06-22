@@ -306,8 +306,8 @@ class GetPipelineHandler(PipelinesRequestHandler):
         pipeline_def = yaml.safe_load(yaml_string)
 
         # expect to have runs
-        ids = list(_run_id_iterator(full_path, self.settings['history_limit']))
-        log.info('pipeline %s run history: %s', full_path, len(ids))
+        ids = list(_run_id_iterator(folder_path, self.settings['history_limit']))
+        log.info('pipeline %s run history: %s', folder_path, len(ids))
         log.info('ids: %s', ids)
         runs = _fetch_runs(folder_path, ids)
 

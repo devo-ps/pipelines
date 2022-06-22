@@ -23,6 +23,7 @@ pyflakes = "*"
 coverage = "*"
 autopep8 = "*"
 pipenv-setup = "*"
+pylint = "*"
 
 [requires]
 python_version = "3"

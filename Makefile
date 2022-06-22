@@ -53,3 +53,6 @@ pyflakes:
 sync-requirements:
 	${VENV_BIN}/pipenv-setup sync
 	${VENV_BIN}/autopep8 -i -a -a setup.py
+
+lint:
+	${VENV_BIN}/pylint --disable C,R,W pipelines
