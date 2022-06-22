@@ -19,7 +19,7 @@ make install
 python3 -m venv .venv
 .venv/bin/pip install -U pip
 .venv/bin/pip install -U pipenv
-.venv/bin/pipenv install
+.venv/bin/pipenv install -d
 ```
 
 run API server.

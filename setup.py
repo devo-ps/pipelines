@@ -43,7 +43,7 @@ setup(
         ],
     },
     install_requires=[
-        "certifi==2022.5.18.1; python_version >= '3.6'",
+        "certifi==2022.6.15; python_version >= '3.6'",
         "charset-normalizer==2.0.12; python_version >= '3'",
         "contextlib2==21.6.0; python_version >= '3.6'",
         'docopt==0.6.2',
@@ -56,7 +56,7 @@ setup(
         'requests==2.26.0',
         'schema==0.7.5',
         'sh==1.14.2',
-        'tornado==5.1.1',
+        'tornado==6.1',
         "urllib3==1.26.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'"],
     dependency_links=[],
 )
