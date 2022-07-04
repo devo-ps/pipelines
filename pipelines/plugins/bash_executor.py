@@ -57,6 +57,7 @@ class BashExecutor(BaseExecutorPlugin):
             # stdout = e.stderr
             msg = 'Bash task failed: %s' % e.msg
             output = e.data['stdout']
+            return_obj = e.data['last_line']
 
         return TaskResult(status,
                           msg,
@@ -96,7 +97,7 @@ class BashExecutor(BaseExecutorPlugin):
                       (proc.exit_code, proc.stdout, proc.stderr))
 
         except ErrorReturnCode as e:
-            log.warning('BashExec failed %s' % e.message)
+            log.warning('BashExec failed %s' % e)
             raise BashExecuteError("Execution failed with code: %s" %
                                    e.exit_code,
                                    e.exit_code,
