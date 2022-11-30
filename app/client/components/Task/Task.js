@@ -7,6 +7,7 @@ import { relativeTime } from 'helpers/time'
 import { highlightLog } from 'helpers/log'
 import EnterFullScreen from '../svg/EnterFullScreen'
 import LeaveFullScreen from '../svg/LeaveFullScreen'
+import { tryNotifyTaskStatus } from 'helpers/notification'
 
 const log = console.log
 
@@ -172,7 +173,7 @@ export default class Task extends Component {
                     this.setState({task: result})
 
                     var pipelineStatus = ''
-                    result.runs.forEach(function(runObj){
+                    result.runs.forEach(function(runObj, index){
                       if (that.state.intervals[runObj.id] != undefined && runObj.status != 'running'){
                         // Run finished, clear the timeout
                         clearTimeout(that.state.intervals[runObj.id])
@@ -182,6 +183,20 @@ export default class Task extends Component {
                       }
                       if (runObj.status == 'running'){
                         pipelineStatus = 'running'
+                      }
+
+                      // this is the frist task in the array
+                      // it's previous status is "running"
+                      // but it's current status is not "running"
+                      if (
+                        index === 0 &&
+                        that.state.status === 'running' &&
+                        runObj.status !== 'running'
+                      ) {
+                        const {
+                          definition: { name }
+                        } = result;
+                        tryNotifyTaskStatus(name, runObj.status);
                       }
                     })
                     that.setState({
