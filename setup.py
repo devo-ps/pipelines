@@ -43,7 +43,7 @@ setup(
         ],
     },
     install_requires=[
-        "certifi==2022.6.15; python_version >= '3.6'",
+        "certifi==2022.12.7; python_version >= '3.6'",
         "charset-normalizer==2.0.12; python_version >= '3'",
         'coloredlogs==15.0.1',
         "contextlib2==21.6.0; python_version >= '3.6'",
